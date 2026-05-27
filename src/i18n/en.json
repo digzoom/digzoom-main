@@ -1,0 +1,535 @@
+{
+  "lang": "en",
+  "dir": "ltr",
+  "navbar": {
+    "home": "Home",
+    "shop": "Shop",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title1": "The #1",
+    "titleHighlight": "Digital Products",
+    "title2": "Marketplace in the Arab World",
+    "subtitle": "Discover thousands of ready-made digital products — books, templates, courses, and PLR products. Buy once, benefit for life.",
+    "btnShop": "Browse Products",
+    "btnAbout": "Learn More",
+    "feature1": "Instant Download",
+    "feature2": "30-Day Guarantee",
+    "feature3": "Free Updates"
+  },
+  "stats": {
+    "products": "Digital Products",
+    "customers": "Happy Customers",
+    "downloads": "Downloads",
+    "rating": "Average Rating",
+    "productsValue": "300+",
+    "customersValue": "12,000+",
+    "downloadsValue": "75,000+",
+    "ratingValue": "4.9"
+  },
+  "categories": {
+    "title": "Browse by Category",
+    "subtitle": "Choose a category and discover hundreds of ready-made digital products",
+    "pdf": "E-Books",
+    "templates": "Templates",
+    "fonts": "Fonts",
+    "graphics": "Graphics",
+    "videos": "Videos",
+    "audio": "Audio",
+    "web": "Web Design",
+    "code": "Code",
+    "photos": "Photos",
+    "3d": "3D Models"
+  },
+  "featured": {
+    "title": "Best Sellers",
+    "subtitle": "Products chosen by thousands of customers",
+    "viewAll": "View All",
+    "currency": "SAR"
+  },
+  "whyUs": {
+    "title": "Why digzoom?",
+    "subtitle": "We offer a seamless shopping experience and exclusive features for all our customers",
+    "f1Title": "Instant Download",
+    "f1Desc": "Get your products immediately after payment — no waiting",
+    "f2Title": "Money-Back Guarantee",
+    "f2Desc": "30-day full refund guarantee if you're not satisfied",
+    "f3Title": "24/7 Support",
+    "f3Desc": "Support team available around the clock to help you",
+    "f4Title": "Free Updates",
+    "f4Desc": "Get all new updates without any additional cost"
+  },
+  "subscriptions": {
+    "title": "Subscriptions",
+    "subtitle": "Subscribe and get all products with no limits",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Save",
+    "basicName": "Basic",
+    "basicDesc": "For starters",
+    "proName": "Pro",
+    "proDesc": "Best value",
+    "enterpriseName": "Enterprise",
+    "enterpriseDesc": "For teams"
+  },
+  "cta": {
+    "title": "Ready to Start Your Digital Journey?",
+    "subtitle": "Join thousands of happy customers and discover the world of digital products today",
+    "btn": "Start Shopping Now"
+  },
+  "shop": {
+    "title": "Shop",
+    "subtitle": "Browse our complete collection of digital products",
+    "searchPlaceholder": "Search for a product...",
+    "all": "All",
+    "popular": "Most Popular",
+    "priceLow": "Lowest Price",
+    "priceHigh": "Highest Price",
+    "topRated": "Top Rated",
+    "products": "products",
+    "discount": "OFF",
+    "empty": "No matching products found",
+    "showAll": "Show all products"
+  },
+  "product": {
+    "features": "Features",
+    "buyNow": "Buy Now",
+    "addToCart": "Add to Cart",
+    "guarantee": "30-day refund guarantee — 100% secure purchase",
+    "related": "Related Products",
+    "save": "Save",
+    "download": "Instant Download"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "emptyTitle": "Your Cart is Empty",
+    "emptySubtitle": "Start shopping and discover our digital products",
+    "btnShop": "Browse Products",
+    "summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tax": "Tax (15%)",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping",
+    "clear": "Clear Cart",
+    "currency": "SAR"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "personalInfo": "Personal Information",
+    "cardInfo": "Card Information",
+    "name": "Full Name",
+    "namePlaceholder": "John Smith",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "phonePlaceholder": "05xxxxxxxx",
+    "cardNumber": "Card Number",
+    "expiry": "Expiry Date",
+    "cvv": "CVV",
+    "secure": "All transactions are encrypted and 100% secure",
+    "pay": "Pay",
+    "summary": "Order Summary"
+  },
+  "success": {
+    "title": "Payment Successful!",
+    "subtitle": "Thank you for your purchase! Download details will be sent to your email.",
+    "btnShop": "Continue Shopping",
+    "btnHome": "Back to Home"
+  },
+  "about": {
+    "title": "About Us",
+    "mission": "Our Mission",
+    "vision": "Our Vision",
+    "valuesTitle": "Our Values",
+    "heroText": "digzoom is the #1 digital products marketplace in the Arab world.",
+    "missionText": "We aim to build the largest Arab marketplace for digital products.",
+    "visionText": "To be the leading Arab platform in the field of digital products.",
+    "v1Title": "High Quality",
+    "v1Desc": "Every product goes through rigorous review.",
+    "v2Title": "Vibrant Community",
+    "v2Desc": "An active Arab community of creators.",
+    "v3Title": "Global Reach",
+    "v3Desc": "Arab products that compete globally.",
+    "v4Title": "Continuous Innovation",
+    "v4Desc": "We invest in technology for seamless experience.",
+    "stat1": "Digital Products",
+    "stat1Value": "12,000+",
+    "stat2": "Active Sellers",
+    "stat2Value": "500+",
+    "stat3": "Happy Customers",
+    "stat3Value": "8,500+",
+    "stat4": "Arab Countries",
+    "stat4Value": "15+"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Our team is ready to help you with any inquiry or suggestion.",
+    "email": "Email",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "location": "Location",
+    "locationValue": "Riyadh, Saudi Arabia",
+    "formName": "Name",
+    "formNamePlaceholder": "Your full name",
+    "formEmail": "Email",
+    "formSubject": "Subject",
+    "formSubjectPlaceholder": "Message subject",
+    "formMessage": "Message",
+    "formMessagePlaceholder": "Write your message...",
+    "btnSend": "Send Message",
+    "btnSending": "Sending..."
+  },
+  "footer": {
+    "store": "Store",
+    "company": "Company",
+    "support": "Support",
+    "copyright": "© 2026 digzoom. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "support1": "How to Buy",
+    "support2": "FAQ",
+    "support3": "Request Refund",
+    "support4": "Technical Support",
+    "desc": "digzoom marketplace"
+  },
+  "products": {
+    "p1": {
+      "title": "Complete Digital Book Library",
+      "desc": "50+ digital books in marketing, development, and business"
+    },
+    "p2": {
+      "title": "Complete Digital Marketing Guide",
+      "desc": "Comprehensive book on digital marketing strategies"
+    },
+    "p3": {
+      "title": "E-Commerce Profit Encyclopedia",
+      "desc": "Your complete guide to building a successful online store"
+    },
+    "p4": {
+      "title": "Professional Templates Bundle",
+      "desc": "100+ ready templates for Excel, PowerPoint, and Word"
+    },
+    "p5": {
+      "title": "Social Media Templates",
+      "desc": "200+ ready designs for posts and stories"
+    },
+    "p6": {
+      "title": "Website Templates",
+      "desc": "25 ready HTML/CSS/JS templates for business"
+    },
+    "p7": {
+      "title": "Business Plans Bundle",
+      "desc": "30 professional business plans with financial analysis"
+    },
+    "p8": {
+      "title": "Legal Contracts Package",
+      "desc": "50+ contract and agreement templates"
+    },
+    "p9": {
+      "title": "Advanced Digital Marketing Course",
+      "desc": "20 hours of training to become a certified expert"
+    },
+    "p10": {
+      "title": "Professional Project Management",
+      "desc": "Simplified PMP - learn project management practically"
+    },
+    "p11": {
+      "title": "Complete PLR Library - 500 Products",
+      "desc": "500 digital products with full resale rights"
+    },
+    "p12": {
+      "title": "Social Media Content Bundle",
+      "desc": "1000+ ready content templates with PLR"
+    },
+    "p13": {
+      "title": "AI in Digital Marketing",
+      "desc": "Discover how AI is reshaping digital marketing"
+    },
+    "p14": {
+      "title": "Clickbank Success Secrets",
+      "desc": "Uncover Clickbank success secrets"
+    },
+    "p15": {
+      "title": "Email List Management",
+      "desc": "Master email list management"
+    },
+    "p16": {
+      "title": "Easy Writing Tips",
+      "desc": "25 essential tips to improve blogging skills"
+    },
+    "p17": {
+      "title": "Google Plus Profit Tactics",
+      "desc": "Unlock Google Plus potential"
+    },
+    "p18": {
+      "title": "Content Marketing for Beginners",
+      "desc": "Discover the power of content marketing"
+    },
+    "p19": {
+      "title": "Copywriting Sales Secrets",
+      "desc": "Learn the art of writing sales copy"
+    },
+    "p20": {
+      "title": "Spy on Your Competitors",
+      "desc": "Learn how to spy on competitors"
+    },
+    "p21": {
+      "title": "Graphic Design Bundle (600+)",
+      "desc": "600+ professional graphic designs"
+    },
+    "p22": {
+      "title": "Audio & Music Library",
+      "desc": "260+ professional audio and background music"
+    },
+    "p23": {
+      "title": "WordPress Templates (50+)",
+      "desc": "50+ professional WordPress templates"
+    },
+    "p24": {
+      "title": "Marketing Software Tools",
+      "desc": "30+ software tools for digital marketing"
+    },
+    "p25": {
+      "title": "5-Day Email Series",
+      "desc": "Learn to write professional email series"
+    },
+    "p26": {
+      "title": "Ready-Made Articles",
+      "desc": "1000+ ready articles with PLR"
+    },
+    "p27": {
+      "title": "Competitor Analysis Tools",
+      "desc": "20+ tools to analyze competitors"
+    },
+    "p28": {
+      "title": "Presentation Templates (200+)",
+      "desc": "200+ professional presentation templates"
+    },
+    "p29": {
+      "title": "Video Tutorial Library",
+      "desc": "50+ educational videos"
+    },
+    "p30": {
+      "title": "Content Marketing Bundle",
+      "desc": "500+ marketing content templates"
+    },
+    "p31": {
+      "title": "Advanced Copywriting",
+      "desc": "Advanced guide to writing sales copy"
+    },
+    "p32": {
+      "title": "Professional Podcast Bundle",
+      "desc": "100+ podcast templates and audio"
+    },
+    "p33": {
+      "title": "Nova Dashboard Pro",
+      "desc": "Professional admin dashboard with React + TypeScript, 50+ components and charts"
+    },
+    "p34": {
+      "title": "LuxeEstate - Real Estate",
+      "desc": "Luxury real estate website with property listings, search filters, and maps"
+    },
+    "p35": {
+      "title": "ShopMaster - E-Commerce",
+      "desc": "Professional online store template with cart, checkout, and admin panel"
+    },
+    "p36": {
+      "title": "AppFlow - Mobile App",
+      "desc": "100+ mobile app screens for iOS and Android with Figma design"
+    },
+    "p37": {
+      "title": "PixelUI Kit - Design System",
+      "desc": "500+ professional UI components with icon library and color system"
+    },
+    "p38": {
+      "title": "CorpVision - Corporate",
+      "desc": "Professional corporate website with team, services, and blog pages"
+    },
+    "p39": {
+      "title": "TravelVibe - Travel",
+      "desc": "Travel and tour website with booking engine and photo gallery"
+    },
+    "p40": {
+      "title": "FoodDash - Food Delivery",
+      "desc": "Food delivery and restaurant template with ordering and tracking"
+    },
+    "p41": {
+      "title": "EduLearn - Education",
+      "desc": "Education platform with video courses, quizzes, and certificates"
+    },
+    "p42": {
+      "title": "FitLife - Fitness Gym",
+      "desc": "Fitness gym template with workout plans and membership system"
+    },
+    "p43": {
+      "title": "BeautyGlow - Beauty Salon",
+      "desc": "Beauty salon and spa with booking and before/after gallery"
+    },
+    "p44": {
+      "title": "AutoShow - Car Dealership",
+      "desc": "Luxury car showroom with specs comparison and financing calculator"
+    },
+    "p45": {
+      "title": "Vintage Font Collection - 50+",
+      "desc": "50+ classic and modern font families in OTF & TTF with commercial license"
+    },
+    "p46": {
+      "title": "Ultimate Icon Bundle - 5000+",
+      "desc": "5000+ editable vector icons in 32 categories in SVG & PNG formats"
+    },
+    "p47": {
+      "title": "Watercolor Floral Graphics - 200+",
+      "desc": "200+ hand-painted watercolor floral elements in transparent PNG at 300 DPI"
+    },
+    "p48": {
+      "title": "Logo Master Bundle - 100+",
+      "desc": "100+ professional fully editable vector logos with brand guidelines"
+    },
+    "p49": {
+      "title": "Social Media Template Kit - 200+",
+      "desc": "200+ Instagram, Facebook & TikTok templates for Canva & Photoshop"
+    },
+    "p50": {
+      "title": "Seamless Pattern Collection - 100+",
+      "desc": "100+ seamless geometric & floral patterns in AI & PAT for print & design"
+    },
+    "p51": {
+      "title": "Wedding Invitation Suite - 20+",
+      "desc": "20+ wedding invitation designs with RSVP, menu & thank you cards, print-ready"
+    },
+    "p52": {
+      "title": "Business Card Templates - 50+",
+      "desc": "50+ professional front & back business card designs in AI & PSD, print-ready"
+    },
+    "p53": {
+      "title": "Typography Poster Bundle - 30+",
+      "desc": "30+ motivational typography wall art posters in A3 & A4, ready to print"
+    },
+    "p54": {
+      "title": "Mockup Scene Creator - 500+",
+      "desc": "500+ professional device & product mockups in PSD with Smart Objects"
+    },
+    "p55": {
+      "title": "Digital Paper Textures - 100+",
+      "desc": "100+ digital papers and textures, 12x12 inch, 300 DPI for scrapbooking"
+    },
+    "p56": {
+      "title": "Resume & CV Templates - 25+",
+      "desc": "25+ modern clean resume & cover letter templates in Word & PSD, A4 & Letter"
+    },
+    "p57": {
+      "title": "Christmas Clipart Bundle - 150+",
+      "desc": "150+ watercolor Christmas elements in transparent PNG, 300 DPI for cards & tags"
+    },
+    "p58": {
+      "title": "Branding Identity Kit",
+      "desc": "Complete brand identity with logo, stationery, guidelines & social media kit"
+    },
+    "p59": {
+      "title": "Vector Illustrations Pack - 300+",
+      "desc": "300+ cute kawaii vector illustrations of characters, food & animals in AI & SVG"
+    },
+    "p60": {
+      "title": "Photo Presets Bundle - 100+",
+      "desc": "100+ Lightroom & Photoshop presets for food & portrait, one-click edit"
+    },
+    "p61": {
+      "title": "eBook & Magazine Templates - 20+",
+      "desc": "20+ eBook & digital magazine layouts in InDesign & Canva for tablet & mobile"
+    },
+    "p62": {
+      "title": "Map Illustrations Bundle - 50+",
+      "desc": "50+ artistic map styles in AI & PSD: vintage & modern city & world maps"
+    },
+    "p63": {
+      "title": "Presentation Slide Decks - 100+",
+      "desc": "100+ PPT & Keynote slides with infographics, charts, maps & animations"
+    },
+    "p64": {
+      "title": "Digital Brushes Collection - 200+",
+      "desc": "200+ Procreate & Photoshop brushes: watercolor, ink, lettering & paint"
+    },
+    "p65": {
+      "title": "Planner Sticker Bundle - 500+",
+      "desc": "500+ cute planner & journal stickers in PNG & SVG, transparent & printable"
+    },
+    "p66": {
+      "title": "Label & Tag Templates - 100+",
+      "desc": "100+ product, gift & clothing label designs in AI & PSD, print-ready"
+    },
+    "p67": {
+      "title": "Gold Foil Ornaments - 150+",
+      "desc": "150+ gold & rose gold ornamental elements in transparent PNG for luxury designs"
+    },
+    "p68": {
+      "title": "Photo Overlays Pack - 80+",
+      "desc": "80+ photography overlays: light leaks, bokeh, lens flare & vintage film effects"
+    },
+    "p69": {
+      "title": "Certificate Templates - 30+",
+      "desc": "30+ certificate & award designs in AI, PSD & Word, A4 size with seals"
+    },
+    "p70": {
+      "title": "Planner & Journal Templates",
+      "desc": "50+ weekly & monthly planner pages with habit tracker & goal setting, printable"
+    },
+    "p71": {
+      "title": "T-Shirt Design Bundle - 200+",
+      "desc": "200+ print-ready t-shirt designs in PSD & AI: vintage, modern, quotes & graphics"
+    },
+    "p72": {
+      "title": "Boho Tribal Clipart - 120+",
+      "desc": "120+ bohemian elements: dreamcatchers, feathers, arrows & mandalas in PNG & AI"
+    },
+    "p73": {
+      "title": "Infographic Template Kit - 150+",
+      "desc": "150+ infographic templates in AI, PSD & PPT: charts, graphs & timelines"
+    },
+    "p74": {
+      "title": "Packaging Design Templates - 40+",
+      "desc": "40+ box, bag & bottle packaging templates in AI & PSD with dieline, print-ready"
+    },
+    "p75": {
+      "title": "Sublimation Design Bundle - 300+",
+      "desc": "300+ trendy sublimation designs for mugs & t-shirts in PNG & PSD at 300 DPI"
+    },
+    "p76": {
+      "title": "3D Text Effects - 50+ Styles",
+      "desc": "50+ 3D text effect styles for Photoshop: gold, neon, retro & modern in PSD"
+    },
+    "p77": {
+      "title": "Glitter Texture Collection - 80+",
+      "desc": "80+ gold, rose gold & holographic glitter textures in high resolution JPG & PNG"
+    },
+    "p78": {
+      "title": "YouTube Thumbnail Templates - 100+",
+      "desc": "100+ YouTube thumbnail templates for gaming, vlog & tutorials at 1280x720"
+    },
+    "p79": {
+      "title": "Wireframe UI Kit - 200+",
+      "desc": "200+ wireframe components for Figma & Sketch: web, mobile & prototyping"
+    },
+    "p80": {
+      "title": "Vintage Map Elements - 100+",
+      "desc": "100+ antique map elements: compass roses, globes & telescopes in AI & EPS"
+    },
+    "p81": {
+      "title": "Email Newsletter Templates - 30+",
+      "desc": "30+ responsive marketing email templates in HTML & PSD for Mailchimp"
+    },
+    "p82": {
+      "title": "Abstract Art Print Bundle - 50+",
+      "desc": "50+ high-resolution geometric & fluid abstract art prints for wall art"
+    },
+    "p83": {
+      "title": "Greeting Card Templates - 60+",
+      "desc": "60+ greeting card designs for birthday, wedding, baby & holidays in AI & PSD"
+    },
+    "p84": {
+      "title": "SVG Cut File Bundle - 500+",
+      "desc": "500+ Cricut & Silhouette cut files: mandalas, florals, layered & monogram designs"
+    }
+  }
+}
