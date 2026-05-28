@@ -1,6 +1,7 @@
 import { createContext, useContext, useCallback, useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type ar from '@/i18n/ar.json';
+import ar from '@/i18n/ar.json';
+import en from '@/i18n/en.json';
 
 type Lang = 'ar' | 'en';
 type Translations = typeof ar;
@@ -12,11 +13,15 @@ interface LangContextType {
   setLang: (l: Lang) => void;
 }
 
+const translationsMap: Record<Lang, Translations> = { ar, en };
+
 const LangContext = createContext<LangContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const lang = (i18n.language === 'en' ? 'en' : 'ar') as Lang;
+  // Raw translations object — t.admin.dash works
+  const t = translationsMap[lang];
 
   const setLang = useCallback((l: Lang) => {
     i18n.changeLanguage(l);
@@ -47,7 +52,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [i18n]);
 
   return (
-    <LangContext.Provider value={{ lang, t: t as unknown as Translations, toggleLang, setLang }}>
+    <LangContext.Provider value={{ lang, t, toggleLang, setLang }}>
       {children}
     </LangContext.Provider>
   );
