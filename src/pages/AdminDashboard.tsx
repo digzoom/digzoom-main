@@ -23,7 +23,7 @@ const CATEGORIES = [
 
 export default function AdminDashboard() {
   const { user, loading: authLoading, logout } = useSupabaseAuth();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dash');
   const [sidebarOpen, setSidebarOpen] = useState(true);
