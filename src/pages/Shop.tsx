@@ -6,7 +6,6 @@ import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { toast } from 'sonner';
 import AnimatedBackground from '@/components/AnimatedBackground';
-import ProductImage from '@/components/ProductImage';
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -213,7 +212,9 @@ export default function Shop() {
             {filtered.map(p => (
               <div key={p.id} className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/5">
                 <Link to={`/product/${p.id}`} className="block relative">
-                  <ProductImage src={p.image_url} alt={p.title} className="group-hover:scale-105 transition-transform duration-500" aspectRatio="3/4" />
+                  <div className="aspect-[3/4] overflow-hidden">
+                    <img src={p.image_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
                   {p.original_price && (
                     <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                       {t.shop.discount} {Math.round((1 - p.price / p.original_price) * 100)}%
@@ -248,7 +249,9 @@ export default function Shop() {
             {filtered.map(p => (
               <div key={p.id} className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all flex flex-col sm:flex-row">
                 <Link to={`/product/${p.id}`} className="sm:w-56 flex-shrink-0 relative">
-                  <ProductImage src={p.image_url} alt={p.title} className="sm:h-full group-hover:scale-105 transition-transform duration-500" aspectRatio="3/4" />
+                  <div className="aspect-[3/4] sm:aspect-auto sm:h-full overflow-hidden">
+                    <img src={p.image_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
                   {p.original_price && (
                     <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                       {t.shop.discount} {Math.round((1 - p.price / p.original_price) * 100)}%

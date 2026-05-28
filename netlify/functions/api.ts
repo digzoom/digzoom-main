@@ -5,7 +5,7 @@ import { verifySupabaseToken } from "../lib/trpc";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const appRouter: any = adminRouter;
 
-// Netlify Function handler — must ALWAYS return JSON, never HTML
+// Standard Netlify Function handler
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const handler = async (event: any, _context: any) => {
   // CORS preflight
@@ -15,28 +15,15 @@ export const handler = async (event: any, _context: any) => {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-trpc-source, x-trpc-version",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-trpc-source",
         "Access-Control-Max-Age": "86400",
       },
       body: "",
     };
   }
 
-  // Defensive: Netlify sometimes sends the body as object already parsed
-  let rawBody: string | undefined;
-  if (event.body) {
-    if (typeof event.body === "string") {
-      rawBody = event.body;
-    } else {
-      try {
-        rawBody = JSON.stringify(event.body);
-      } catch {
-        rawBody = undefined;
-      }
-    }
-  }
-
   try {
+    // Parse request body for tRPC
     const headers = new Headers();
     Object.entries(event.headers || {}).forEach(([k, v]) => {
       if (v !== undefined && v !== null) headers.set(k, String(v));
@@ -45,24 +32,15 @@ export const handler = async (event: any, _context: any) => {
     const req = new Request(event.rawUrl, {
       method: event.httpMethod,
       headers,
-      body:
-        rawBody && event.httpMethod !== "GET"
-          ? Buffer.from(
-              rawBody,
-              event.isBase64Encoded ? "base64" : "utf8"
-            )
-          : undefined,
+      body: event.body && event.httpMethod !== "GET"
+        ? Buffer.from(event.body, event.isBase64Encoded ? "base64" : "utf8")
+        : undefined,
     });
 
-    // Verify Supabase token from Authorization header
+    // Verify Supabase token
     let user = undefined;
-    const authHeader =
-      event.headers?.authorization || event.headers?.Authorization;
-    if (
-      authHeader &&
-      typeof authHeader === "string" &&
-      authHeader.startsWith("Bearer ")
-    ) {
+    const authHeader = event.headers?.authorization || event.headers?.Authorization;
+    if (authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
       user = await verifySupabaseToken(authHeader.slice(7));
     }
 
@@ -73,12 +51,7 @@ export const handler = async (event: any, _context: any) => {
       router: appRouter,
       createContext: async () => ({ user }),
       onError: (opts: any) => {
-        console.error(
-          "[tRPC error] path:",
-          opts.path,
-          "message:",
-          opts.error?.message
-        );
+        console.error("[tRPC error] path:", opts.path, "message:", opts.error?.message);
       },
     });
 
@@ -92,9 +65,9 @@ export const handler = async (event: any, _context: any) => {
     });
 
     return { statusCode: response.status, headers: resHeaders, body };
+
   } catch (err: any) {
     console.error("[api] FATAL:", err?.stack || err?.message || err);
-    // ALWAYS return JSON, even on catastrophic failure
     return {
       statusCode: 500,
       headers: {
@@ -102,12 +75,7 @@ export const handler = async (event: any, _context: any) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        error: {
-          json: {
-            message: "Internal error: " + (err?.message || "unknown"),
-            code: -32000,
-          },
-        },
+        error: { json: { message: "Internal error: " + (err?.message || "unknown"), code: -32000 } },
       }),
     };
   }

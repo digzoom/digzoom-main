@@ -3,7 +3,6 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useNavigate } from 'react-router';
 import { trpc } from '@/providers/trpc';
-import ProductImage from '@/components/ProductImage';
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Tag,
   Receipt, BarChart3, Bell, ClipboardList, Settings,
@@ -24,7 +23,7 @@ const CATEGORIES = [
 
 export default function AdminDashboard() {
   const { user, loading: authLoading, logout } = useSupabaseAuth();
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dash');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -40,7 +39,7 @@ export default function AdminDashboard() {
 
   useEffect(() => { if (!authLoading && !user) navigate('/login'); }, [user, authLoading, navigate]);
 
-  if (authLoading) return <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center text-gray-500">{t.admin.loading}</div>;
+  if (authLoading) return <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center text-gray-500">جاري التحميل...</div>;
   if (!user) return null;
 
   const isAr = lang === 'ar';
@@ -72,7 +71,7 @@ export default function AdminDashboard() {
             <ChevronLeft className={`w-5 h-5 transition-transform ${sidebarOpen ? '' : 'rotate-180'}`} />
           </button>
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-500">{t.admin.dash}</span><span className="text-gray-600">/</span>
+            <span className="text-gray-500">لوحة التحكم</span><span className="text-gray-600">/</span>
             <span className="text-white font-medium">{SIDEBAR_ITEMS.find((i) => i.key === tab)?.label}</span>
           </div>
           <div className="mr-auto flex items-center gap-4">
@@ -264,7 +263,7 @@ function ProductsTab() {
         </div>
       </div>
 
-      {isLoading ? <div className="text-gray-500 text-center py-20 text-sm">{t.admin.loading}</div> : (
+      {isLoading ? <div className="text-gray-500 text-center py-20 text-sm">جاري التحميل...</div> : (
         <div className="bg-[#131722] rounded-2xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -276,9 +275,7 @@ function ProductsTab() {
                   <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors ${!p.is_active ? 'opacity-50' : ''}`}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden">
-                          <ProductImage src={p.image_url} alt="" aspectRatio="1/1" className="rounded-lg" />
-                        </div>
+                        <img src={p.image_url} alt="" className="w-10 h-10 rounded-lg object-cover bg-[#1A1F2E] flex-shrink-0" style={{ objectFit: 'cover', aspectRatio: '1/1' }} loading="lazy" />
                         <div><div className="text-white font-medium text-sm">{p.title}</div><div className="text-xs text-gray-500">#{p.id} · {CATEGORIES.find(c => c.id === p.category_id)?.name}</div></div>
                       </div>
                     </td>
@@ -345,11 +342,7 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
           {/* Image Upload */}
           <div>
             <label className="text-gray-400 text-xs mb-1 block">{t.admin.productImage}</label>
-            {previewUrl && (
-              <div className="mb-2 rounded-xl overflow-hidden">
-                <ProductImage src={previewUrl} alt="" className="w-full h-40" aspectRatio="16/9" />
-              </div>
-            )}
+            {previewUrl && <img src={previewUrl} alt="" className="w-full h-40 object-cover rounded-xl mb-2 bg-[#1A1F2E]" style={{ objectFit: 'cover', aspectRatio: '16/9' }} />}
             <label className="flex items-center justify-center gap-2 bg-blue-600/15 text-blue-400 border border-blue-500/20 rounded-xl px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-600/25 transition-colors">
               <Upload className="w-4 h-4" />
               <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
@@ -438,7 +431,7 @@ function OrdersTab() {
     <div className="space-y-4">
       {toast && <div className="px-4 py-3 rounded-xl text-sm font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">{toast}</div>}
       <h2 className="text-xl font-bold text-white">{t.admin.orders}</h2>
-      {isLoading ? <div className="text-gray-500 text-center py-20 text-sm">{t.admin.loading}</div> : (
+      {isLoading ? <div className="text-gray-500 text-center py-20 text-sm">جاري التحميل...</div> : (
         <div className="bg-[#131722] rounded-2xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

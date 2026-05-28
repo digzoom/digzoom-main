@@ -11,7 +11,6 @@ import type { Product } from '@/types/database';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { toast } from 'sonner';
-import ProductImage from '@/components/ProductImage';
 
 /* ── Trust badges ── */
 const trustBadges = [
@@ -133,11 +132,11 @@ export default function ProductDetail() {
           {/* Image */}
           <div>
             <div className="relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#151520] group">
-              <ProductImage
+              <img
                 src={product.image_url}
                 alt={product.title}
-                className="w-full"
-                aspectRatio="4/3"
+                className="w-full aspect-[4/3] sm:aspect-square object-cover"
+                loading="lazy"
               />
               {discount > 0 && (
                 <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs sm:text-sm font-bold px-3 py-1 rounded-full">
@@ -295,12 +294,13 @@ export default function ProductDetail() {
                   to={`/product/${p.id}`}
                   className="group bg-[#151520] rounded-xl md:rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all"
                 >
-                  <ProductImage
-                    src={p.image_url}
-                    alt={p.title}
-                    className="group-hover:scale-105 transition-transform duration-500"
-                    aspectRatio="16/10"
-                  />
+                  <div className="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={p.image_url}
+                      alt={p.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
                   <div className="p-3 md:p-4">
                     <h3 className="text-white font-medium text-xs md:text-sm group-hover:text-blue-400 transition-colors line-clamp-1">
                       {p.title}
