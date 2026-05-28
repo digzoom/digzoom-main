@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { useNavigate } from 'react-router';
 import { trpc } from '@/providers/trpc';
 import {
@@ -12,15 +13,6 @@ import {
 
 type Tab = 'dash' | 'products' | 'orders' | 'customers' | 'coupons' | 'settings';
 
-const SIDEBAR_ITEMS: Array<{ key: Tab; label: string; icon: React.ReactNode }> = [
-  { key: 'dash', label: 'الرئيسية', icon: <LayoutDashboard className="w-5 h-5" /> },
-  { key: 'products', label: 'المنتجات', icon: <Package className="w-5 h-5" /> },
-  { key: 'orders', label: 'الطلبات', icon: <ShoppingBag className="w-5 h-5" /> },
-  { key: 'customers', label: 'العملاء', icon: <Users className="w-5 h-5" /> },
-  { key: 'coupons', label: 'الكوبونات', icon: <Tag className="w-5 h-5" /> },
-  { key: 'settings', label: 'الإعدادات', icon: <Settings className="w-5 h-5" /> },
-];
-
 const CATEGORIES = [
   { id: 1, name: 'جرافيكس' }, { id: 2, name: 'خطوط' },
   { id: 3, name: 'قوالب' }, { id: 4, name: 'فيديوهات' },
@@ -31,37 +23,49 @@ const CATEGORIES = [
 
 export default function AdminDashboard() {
   const { user, loading: authLoading, logout } = useSupabaseAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dash');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const SIDEBAR_ITEMS: Array<{ key: Tab; label: string; icon: React.ReactNode }> = [
+    { key: 'dash', label: t.admin.dash, icon: <LayoutDashboard className="w-5 h-5" /> },
+    { key: 'products', label: t.admin.products, icon: <Package className="w-5 h-5" /> },
+    { key: 'orders', label: t.admin.orders, icon: <ShoppingBag className="w-5 h-5" /> },
+    { key: 'customers', label: t.admin.customers, icon: <Users className="w-5 h-5" /> },
+    { key: 'coupons', label: t.admin.coupons, icon: <Tag className="w-5 h-5" /> },
+    { key: 'settings', label: t.admin.settings, icon: <Settings className="w-5 h-5" /> },
+  ];
 
   useEffect(() => { if (!authLoading && !user) navigate('/login'); }, [user, authLoading, navigate]);
 
   if (authLoading) return <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center text-gray-500">جاري التحميل...</div>;
   if (!user) return null;
 
+  const isAr = lang === 'ar';
+
   return (
-    <div className="min-h-screen bg-[#0B0E14] text-white" dir="rtl">
-      <aside className={`fixed top-0 right-0 h-full bg-[#131722] border-l border-white/5 z-50 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+    <div className="min-h-screen bg-[#0B0E14] text-white" dir={isAr ? 'rtl' : 'ltr'}>
+      <aside className={`fixed top-0 ${isAr ? 'right-0' : 'left-0'} h-full bg-[#131722] border-l border-white/5 z-50 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
         <div className="h-16 flex items-center px-6 border-b border-white/5">
           <span className="text-lg font-bold bg-gradient-to-l from-blue-400 to-purple-400 bg-clip-text text-transparent">digzoom</span>
         </div>
         <nav className="p-3 space-y-1">
           {SIDEBAR_ITEMS.map((item) => (
             <button key={item.key} onClick={() => setTab(item.key)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${tab === item.key ? 'bg-blue-600/15 text-blue-400 border-r-2 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${tab === item.key ? `bg-blue-600/15 text-blue-400 ${isAr ? 'border-r-2' : 'border-l-2'} border-blue-500` : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
               {item.icon}<span className="flex-1 text-right">{item.label}</span>
             </button>
           ))}
         </nav>
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-white/5">
           <button onClick={() => logout()} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
-            <LogOut className="w-5 h-5" /><span>تسجيل الخروج</span>
+            <LogOut className="w-5 h-5" /><span>{t.admin.logout}</span>
           </button>
         </div>
       </aside>
 
-      <main className={`transition-all duration-300 ${sidebarOpen ? 'mr-64' : 'mr-0'}`}>
+      <main className={`transition-all duration-300 ${sidebarOpen ? (isAr ? 'mr-64' : 'ml-64') : ''}`}>
         <header className="h-16 bg-[#131722]/80 backdrop-blur-xl border-b border-white/5 flex items-center px-6 sticky top-0 z-40">
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="ml-4 p-2 rounded-lg hover:bg-white/5 text-gray-400">
             <ChevronLeft className={`w-5 h-5 transition-transform ${sidebarOpen ? '' : 'rotate-180'}`} />
@@ -105,32 +109,33 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
 /* ─── Dashboard ─── */
 function DashTab() {
   const { data: stats, isLoading } = trpc.getStats?.useQuery?.() ?? {};
+  const { lang, t } = useLanguage();
   const s = stats as any;
 
-  if (isLoading) return <div className="text-gray-500 text-center py-20">جاري تحميل الإحصائيات...</div>;
+  if (isLoading) return <div className="text-gray-500 text-center py-20">{t.admin.loadingStats}</div>;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={<Package className="w-5 h-5 text-blue-400" />} label="المنتجات" value={String(s?.productCount ?? 0)} color="blue" />
-        <StatCard icon={<ShoppingCart className="w-5 h-5 text-amber-400" />} label="الطلبات" value={String(s?.orderCount ?? 0)} color="amber" />
-        <StatCard icon={<DollarSign className="w-5 h-5 text-purple-400" />} label="إجمالي المبيعات" value={`${s?.totalSales?.toLocaleString?.() ?? 0} ر.س`} color="purple" />
-        <StatCard icon={<Users className="w-5 h-5 text-emerald-400" />} label="العملاء" value={String(s?.customerCount ?? 0)} color="emerald" />
+        <StatCard icon={<Package className="w-5 h-5 text-blue-400" />} label={t.admin.productsCount} value={String(s?.productCount ?? 0)} color="blue" />
+        <StatCard icon={<ShoppingCart className="w-5 h-5 text-amber-400" />} label={t.admin.ordersCount} value={String(s?.orderCount ?? 0)} color="amber" />
+        <StatCard icon={<DollarSign className="w-5 h-5 text-purple-400" />} label={t.admin.totalSales} value={`${s?.totalSales?.toLocaleString?.() ?? 0} ${t.admin.currency}`} color="purple" />
+        <StatCard icon={<Users className="w-5 h-5 text-emerald-400" />} label={t.admin.customersCount} value={String(s?.customerCount ?? 0)} color="emerald" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Latest Products */}
         <div className="bg-[#131722] border border-white/5 rounded-2xl p-5">
-          <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Package className="w-4 h-4 text-blue-400" />آخر المنتجات المضافة</h3>
+          <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Package className="w-4 h-4 text-blue-400" />{t.admin.latestProducts}</h3>
           <div className="space-y-3">
-            {(s?.latestProducts ?? []).length === 0 && <div className="text-center text-gray-500 py-8">لا توجد منتجات</div>}
+            {(s?.latestProducts ?? []).length === 0 && <div className="text-center text-gray-500 py-8">{t.admin.noProducts}</div>}
             {(s?.latestProducts ?? []).map((p: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">{i + 1}</div>
-                  <div><div className="text-sm font-medium text-white">{p.title}</div><div className="text-xs text-gray-500">{p.price} ر.س</div></div>
+                  <div><div className="text-sm font-medium text-white">{p.title}</div><div className="text-xs text-gray-500">{p.price} {t.admin.currency}</div></div>
                 </div>
-                <span className="text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString('ar-SA')}</span>
+                <span className="text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US')}</span>
               </div>
             ))}
           </div>
@@ -138,13 +143,13 @@ function DashTab() {
 
         {/* Latest Orders */}
         <div className="bg-[#131722] border border-white/5 rounded-2xl p-5">
-          <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Receipt className="w-4 h-4 text-emerald-400" />آخر الطلبات</h3>
+          <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Receipt className="w-4 h-4 text-emerald-400" />{t.admin.latestOrders}</h3>
           <div className="space-y-3">
-            {(s?.latestOrders ?? []).length === 0 && <div className="text-center text-gray-500 py-8">لا توجد طلبات</div>}
+            {(s?.latestOrders ?? []).length === 0 && <div className="text-center text-gray-500 py-8">{t.admin.noOrders}</div>}
             {(s?.latestOrders ?? []).map((o: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02]">
-                <div><div className="text-sm font-medium text-white">{o.customer_name || 'عميل'}</div><div className="text-xs text-gray-500">{o.order_number}</div></div>
-                <div className="text-left"><div className="text-sm font-bold text-white">{o.total} ر.س</div><div className="text-[10px] text-emerald-400">{o.status}</div></div>
+                <div><div className="text-sm font-medium text-white">{o.customer_name || t.admin.customer}</div><div className="text-xs text-gray-500">{o.order_number}</div></div>
+                <div className="text-left"><div className="text-sm font-bold text-white">{o.total} {t.admin.currency}</div><div className="text-[10px] text-emerald-400">{o.status}</div></div>
               </div>
             ))}
           </div>
@@ -153,20 +158,20 @@ function DashTab() {
 
       {/* Activity Logs */}
       <div className="bg-[#131722] border border-white/5 rounded-2xl p-5">
-        <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Activity className="w-4 h-4 text-amber-400" />آخر عمليات الأدمن</h3>
+        <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Activity className="w-4 h-4 text-amber-400" />{t.admin.activityLogs}</h3>
         <div className="space-y-2">
-          {(s?.latestActivity ?? []).length === 0 && <div className="text-center text-gray-500 py-8">لا توجد عمليات مسجلة</div>}
+          {(s?.latestActivity ?? []).length === 0 && <div className="text-center text-gray-500 py-8">{t.admin.noActivity}</div>}
           {(s?.latestActivity ?? []).map((a: any, i: number) => (
             <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] text-sm">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-blue-400" />
                 <div>
                   <span className="text-white font-medium">{a.admin_email}</span>
-                  <span className="text-gray-500 mx-2">{a.action === 'create_product' ? 'أضاف' : a.action === 'update_product' ? 'عدّل' : a.action === 'delete_product' ? 'حذف' : a.action}</span>
+                  <span className="text-gray-500 mx-2">{a.action === 'create_product' ? t.admin.created : a.action === 'update_product' ? t.admin.updatedProduct : a.action === 'delete_product' ? t.admin.deletedProduct : a.action}</span>
                   <span className="text-blue-400">{a.product_title}</span>
                 </div>
               </div>
-              <span className="text-gray-500 text-xs">{new Date(a.created_at).toLocaleDateString('ar-SA')}</span>
+              <span className="text-gray-500 text-xs">{new Date(a.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US')}</span>
             </div>
           ))}
         </div>
@@ -184,24 +189,26 @@ function ProductsTab() {
   const [form, setForm] = useState({ title: '', description: '', price: '', original_price: '', discount_percent: '0', is_on_sale: false, image_url: '', category_id: '1', in_stock: true, is_active: true });
   const [editForm, setEditForm] = useState({ title: '', description: '', price: '', original_price: '', discount_percent: '0', is_on_sale: false, image_url: '', category_id: '1', in_stock: true, is_active: true });
   const [toast, setToast] = useState('');
+  const { lang, t } = useLanguage();
+  const isAr = lang === 'ar';
 
   const utils = trpc.useUtils();
   const { data: items, isLoading } = trpc.listProducts.useQuery({ limit: 100, search: search || undefined });
 
   const createMutation = trpc.createProduct.useMutation({
-    onSuccess: () => { setToast('تم الإضافة!'); setShowForm(false); resetForm(); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
+    onSuccess: () => { setToast(t.admin.added); setShowForm(false); resetForm(); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
     onError: (e) => setToast(e.message),
   });
   const updateMutation = trpc.updateProduct.useMutation({
-    onSuccess: () => { setToast('تم التعديل!'); setShowEdit(false); setEditProduct(null); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
+    onSuccess: () => { setToast(t.admin.saved); setShowEdit(false); setEditProduct(null); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
     onError: (e) => setToast(e.message),
   });
   const toggleMutation = trpc.toggleProduct.useMutation({
-    onSuccess: () => { setToast('تم التحديث!'); utils.listProducts.invalidate(); },
+    onSuccess: () => { setToast(t.admin.updated); utils.listProducts.invalidate(); },
     onError: (e) => setToast(e.message),
   });
   const deleteMutation = trpc.deleteProduct.useMutation({
-    onSuccess: () => { setToast('تم الحذف!'); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
+    onSuccess: () => { setToast(t.admin.deleted); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
     onError: (e) => setToast(e.message),
   });
 
@@ -209,7 +216,7 @@ function ProductsTab() {
 
   const save = () => {
     const price = Number(form.price);
-    if (!form.title || price <= 0) { setToast('عنوان وسعر مطلوبان'); return; }
+    if (!form.title || price <= 0) { setToast(t.admin.titleRequired); return; }
     createMutation.mutate({
       title: form.title, description: form.description, price,
       original_price: form.original_price ? Number(form.original_price) : undefined,
@@ -229,7 +236,7 @@ function ProductsTab() {
   const saveEdit = () => {
     if (!editProduct) return;
     const price = Number(editForm.price);
-    if (!editForm.title || price <= 0) { setToast('عنوان وسعر مطلوبان'); return; }
+    if (!editForm.title || price <= 0) { setToast(t.admin.titleRequired); return; }
     updateMutation.mutate({
       id: editProduct.id, title: editForm.title, description: editForm.description, price,
       original_price: editForm.original_price ? Number(editForm.original_price) : undefined,
@@ -241,18 +248,18 @@ function ProductsTab() {
   };
 
   const toggleField = (id: number, field: 'is_active' | 'in_stock', current: boolean) => { toggleMutation.mutate({ id, field, value: !current }); };
-  const del = (id: number) => { if (!confirm('حذف المنتج؟')) return; deleteMutation.mutate({ id }); };
+  const del = (id: number) => { if (!confirm(t.admin.deleteConfirm)) return; deleteMutation.mutate({ id }); };
 
   return (
     <div className="space-y-4">
-      {toast && <div className={`px-4 py-3 rounded-xl text-sm font-bold ${toast.includes('فشل') ? 'bg-red-500/15 text-red-400 border border-red-500/20' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'}`}>{toast}</div>}
+      {toast && <div className={`px-4 py-3 rounded-xl text-sm font-bold ${toast.includes('خطأ') || toast.includes('error') || toast.includes('failed') ? 'bg-red-500/15 text-red-400 border border-red-500/20' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'}`}>{toast}</div>}
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">المنتجات<span className="bg-blue-500/20 text-blue-400 text-xs px-2.5 py-1 rounded-full">{items?.length ?? 0}</span></h2>
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">{t.admin.products}<span className="bg-blue-500/20 text-blue-400 text-xs px-2.5 py-1 rounded-full">{items?.length ?? 0}</span></h2>
         <div className="flex gap-2">
-          <div className="relative"><Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="بحث..." className="bg-[#1A1F2E] border border-white/10 rounded-xl pr-10 pl-4 py-2.5 text-white text-sm w-48 focus:border-blue-500/50 focus:outline-none" />
+          <div className="relative"><Search className={`w-4 h-4 absolute ${isAr ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-500`} />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t.admin.search} className={`bg-[#1A1F2E] border border-white/10 rounded-xl ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 text-white text-sm w-48 focus:border-blue-500/50 focus:outline-none`} />
           </div>
-          <button onClick={() => setShowForm(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors"><Plus className="w-4 h-4" />إضافة منتج</button>
+          <button onClick={() => setShowForm(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors"><Plus className="w-4 h-4" />{t.admin.addProduct}</button>
         </div>
       </div>
 
@@ -261,7 +268,7 @@ function ProductsTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-white/5 text-gray-400 text-xs">
-                <th className="px-4 py-3 text-right">المنتج</th><th className="px-4 py-3">السعر</th><th className="px-4 py-3">الخصم</th><th className="px-4 py-3">الحالة</th><th className="px-4 py-3">المخزون</th><th className="px-4 py-3">الإجراء</th>
+                <th className={`px-4 py-3 ${isAr ? 'text-right' : 'text-left'}`}>{t.admin.product}</th><th className="px-4 py-3">{t.admin.price}</th><th className="px-4 py-3">{t.admin.discount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.stock}</th><th className="px-4 py-3">{t.admin.action}</th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
                 {(items as any[] | undefined)?.map((p: any) => (
@@ -276,24 +283,24 @@ function ProductsTab() {
                       {p.is_on_sale && p.original_price > p.price ? (
                         <div><div className="text-emerald-400 font-bold">{p.price} ر.س</div><div className="text-gray-500 text-xs line-through">{p.original_price} ر.س</div></div>
                       ) : (
-                        <span className="text-emerald-400 font-bold">{p.price} ر.س</span>
+                        <span className="text-emerald-400 font-bold">{p.price} {t.admin.currency}</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">{p.is_on_sale && p.discount_percent > 0 ? <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded-full font-bold">-{p.discount_percent}%</span> : <span className="text-gray-600">-</span>}</td>
-                    <td className="px-4 py-3 text-center"><button onClick={() => toggleField(p.id, 'is_active', p.is_active)} className={`text-xs px-3 py-1 rounded-full font-bold ${p.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-gray-500/15 text-gray-400'}`}>{p.is_active ? 'نشط' : 'معطل'}</button></td>
-                    <td className="px-4 py-3 text-center"><button onClick={() => toggleField(p.id, 'in_stock', p.in_stock)} className={`text-xs px-3 py-1 rounded-full font-bold ${p.in_stock ? 'bg-blue-500/15 text-blue-400' : 'bg-red-500/15 text-red-400'}`}>{p.in_stock ? 'متوفر' : 'نفذ'}</button></td>
+                    <td className="px-4 py-3 text-center"><button onClick={() => toggleField(p.id, 'is_active', p.is_active)} className={`text-xs px-3 py-1 rounded-full font-bold ${p.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-gray-500/15 text-gray-400'}`}>{p.is_active ? t.admin.active : t.admin.inactive}</button></td>
+                    <td className="px-4 py-3 text-center"><button onClick={() => toggleField(p.id, 'in_stock', p.in_stock)} className={`text-xs px-3 py-1 rounded-full font-bold ${p.in_stock ? 'bg-blue-500/15 text-blue-400' : 'bg-red-500/15 text-red-400'}`}>{p.in_stock ? t.admin.available : t.admin.outOfStock}</button></td>
                     <td className="px-4 py-3"><div className="flex gap-1 justify-center"><button onClick={() => startEdit(p)} className="p-2 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" title="تعديل"><Edit3 className="w-3.5 h-3.5" /></button><button onClick={() => del(p.id)} className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="حذف"><Trash2 className="w-3.5 h-3.5" /></button></div></td>
                   </tr>
                 ))}
-                {(!items || items.length === 0) && <tr><td colSpan={6} className="text-center text-gray-500 py-16">لا توجد منتجات</td></tr>}
+                {(!items || items.length === 0) && <tr><td colSpan={6} className="text-center text-gray-500 py-16">{t.admin.noProducts}</td></tr>}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {showForm && <ProductModal title="إضافة منتج" form={form} setForm={setForm} onSave={save} onClose={() => setShowForm(false)} isPending={createMutation.isPending} />}
-      {showEdit && editProduct && <ProductModal title="تعديل منتج" form={editForm} setForm={setEditForm} onSave={saveEdit} onClose={() => { setShowEdit(false); setEditProduct(null); }} isPending={updateMutation.isPending} />}
+      {showForm && <ProductModal title={t.admin.addProduct} form={form} setForm={setForm} onSave={save} onClose={() => setShowForm(false)} isPending={createMutation.isPending} />}
+      {showEdit && editProduct && <ProductModal title={t.admin.editProduct} form={editForm} setForm={setEditForm} onSave={saveEdit} onClose={() => { setShowEdit(false); setEditProduct(null); }} isPending={updateMutation.isPending} />}
     </div>
   );
 }
@@ -304,6 +311,7 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
 }) {
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(form.image_url || '');
+  const { t } = useLanguage();
   const uploadMutation = trpc.uploadImage?.useMutation?.({
     onSuccess: (data: any) => { setForm({ ...form, image_url: data.url }); setPreviewUrl(data.url); setUploading(false); },
     onError: () => setUploading(false),
@@ -333,32 +341,32 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
         <div className="space-y-3">
           {/* Image Upload */}
           <div>
-            <label className="text-gray-400 text-xs mb-1 block">صورة المنتج</label>
+            <label className="text-gray-400 text-xs mb-1 block">{t.admin.productImage}</label>
             {previewUrl && <img src={previewUrl} alt="" className="w-full h-40 object-cover rounded-xl mb-2 bg-[#1A1F2E]" style={{ objectFit: 'cover', aspectRatio: '16/9' }} />}
             <label className="flex items-center justify-center gap-2 bg-blue-600/15 text-blue-400 border border-blue-500/20 rounded-xl px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-600/25 transition-colors">
               <Upload className="w-4 h-4" />
               <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-              {uploading ? 'جاري الرفع...' : 'اختر صورة من الجهاز'}
+              {uploading ? t.admin.uploading : t.admin.chooseImage}
             </label>
-            <div className="text-center text-gray-500 text-[10px] my-1">أو</div>
-            <input value={form.image_url} onChange={(e) => { setForm({ ...form, image_url: e.target.value }); setPreviewUrl(e.target.value); }} placeholder="رابط الصورة https://..." className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
+            <div className="text-center text-gray-500 text-[10px] my-1">{t.admin.or}</div>
+            <input value={form.image_url} onChange={(e) => { setForm({ ...form, image_url: e.target.value }); setPreviewUrl(e.target.value); }} placeholder={t.admin.imageUrl} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
           </div>
 
           <div>
-            <label className="text-gray-400 text-xs mb-1 block">العنوان *</label>
-            <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="اسم المنتج" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" />
+            <label className="text-gray-400 text-xs mb-1 block">{t.admin.title} *</label>
+            <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t.admin.titlePlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" />
           </div>
           <div>
-            <label className="text-gray-400 text-xs mb-1 block">الوصف</label>
-            <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="وصف المنتج" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" />
+            <label className="text-gray-400 text-xs mb-1 block">{t.admin.description}</label>
+            <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t.admin.descriptionPlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">السعر *</label>
-              <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="30" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
+              <label className="text-gray-400 text-xs mb-1 block">{t.admin.price} *</label>
+              <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder={t.admin.pricePlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
             </div>
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">التصنيف</label>
+              <label className="text-gray-400 text-xs mb-1 block">{t.admin.category}</label>
               <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none">
                 {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
@@ -368,30 +376,30 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
           {/* Pricing & Discount */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">السعر الأصلي</label>
-              <input type="number" value={form.original_price} onChange={(e) => setForm({ ...form, original_price: e.target.value })} placeholder="50" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
+              <label className="text-gray-400 text-xs mb-1 block">{t.admin.originalPrice}</label>
+              <input type="number" value={form.original_price} onChange={(e) => setForm({ ...form, original_price: e.target.value })} placeholder={t.admin.originalPricePlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
             </div>
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">نسبة الخصم %</label>
+              <label className="text-gray-400 text-xs mb-1 block">{t.admin.discountPercent}</label>
               <input type="number" min="0" max="100" value={form.discount_percent} onChange={(e) => setForm({ ...form, discount_percent: e.target.value })} placeholder="0" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
             </div>
             <div className="flex items-end pb-2">
               <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
                 <input type="checkbox" checked={form.is_on_sale} onChange={(e) => setForm({ ...form, is_on_sale: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />
-                عرض خصم
+                {t.admin.onSale}
               </label>
             </div>
           </div>
 
           <div className="flex gap-6 pt-2">
-            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.in_stock} onChange={(e) => setForm({ ...form, in_stock: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />متوفر</label>
-            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />نشط</label>
+            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.in_stock} onChange={(e) => setForm({ ...form, in_stock: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />{t.admin.available}</label>
+            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />{t.admin.active}</label>
           </div>
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button onClick={onSave} disabled={isPending} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"><Save className="w-4 h-4" />حفظ</button>
-          <button onClick={onClose} className="flex-1 bg-white/5 hover:bg-white/10 text-gray-400 py-2.5 rounded-xl text-sm transition-colors">إلغاء</button>
+          <button onClick={onSave} disabled={isPending} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors"><Save className="w-4 h-4" />{t.admin.save}</button>
+          <button onClick={onClose} className="flex-1 bg-white/5 hover:bg-white/10 text-gray-400 py-2.5 rounded-xl text-sm transition-colors">{t.admin.cancel}</button>
         </div>
       </div>
     </div>
@@ -402,26 +410,33 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
 function OrdersTab() {
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
   const [toast, setToast] = useState('');
+  const { lang, t } = useLanguage();
   const utils = trpc.useUtils();
   const { data: orders, isLoading } = trpc.listOrders?.useQuery?.({ limit: 100 }) ?? { data: [], isLoading: false };
   const updateStatusMutation = trpc.updateOrderStatus?.useMutation?.({
-    onSuccess: () => { setToast('تم تحديث الحالة!'); utils.listOrders?.invalidate?.(); },
+    onSuccess: () => { setToast(t.admin.updated); utils.listOrders?.invalidate?.(); },
     onError: (e: any) => setToast(e.message),
   }) ?? { isPending: false, mutate: () => {} };
 
   const statusColors: Record<string, string> = { pending: 'bg-amber-500/15 text-amber-400', processing: 'bg-blue-500/15 text-blue-400', completed: 'bg-emerald-500/15 text-emerald-400', cancelled: 'bg-red-500/15 text-red-400', refunded: 'bg-gray-500/15 text-gray-400' };
-  const statusLabels: Record<string, string> = { pending: 'معلق', processing: 'قيد المعالجة', completed: 'مكتمل', cancelled: 'ملغي', refunded: 'مسترجع' };
+  const statusLabels: Record<string, string> = {
+    pending: t.admin.pending,
+    processing: t.admin.processing,
+    completed: t.admin.completed,
+    cancelled: t.admin.cancelled,
+    refunded: t.admin.refunded
+  };
 
   return (
     <div className="space-y-4">
       {toast && <div className="px-4 py-3 rounded-xl text-sm font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">{toast}</div>}
-      <h2 className="text-xl font-bold text-white">الطلبات</h2>
+      <h2 className="text-xl font-bold text-white">{t.admin.orders}</h2>
       {isLoading ? <div className="text-gray-500 text-center py-20 text-sm">جاري التحميل...</div> : (
         <div className="bg-[#131722] rounded-2xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-white/5 text-gray-400 text-xs">
-                <th className="px-4 py-3 text-right">الطلب</th><th className="px-4 py-3">العميل</th><th className="px-4 py-3">المبلغ</th><th className="px-4 py-3">الحالة</th><th className="px-4 py-3">الدفع</th><th className="px-4 py-3">التاريخ</th><th className="px-4 py-3"></th>
+                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.order}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.payment}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
                 {(orders as any[] | undefined)?.map((o: any) => (
@@ -429,23 +444,23 @@ function OrdersTab() {
                     <tr key={o.id} className="cursor-pointer hover:bg-white/[0.02]" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
                       <td className="px-4 py-3 text-white font-bold">{o.order_number}</td>
                       <td className="px-4 py-3"><div className="text-gray-300 text-sm">{o.customer_name}</div><div className="text-gray-500 text-xs">{o.customer_email}</div></td>
-                      <td className="px-4 py-3 text-center text-emerald-400 font-bold">{o.total} ر.س</td>
+                      <td className="px-4 py-3 text-center text-emerald-400 font-bold">{o.total} {t.admin.currency}</td>
                       <td className="px-4 py-3 text-center"><span className={`text-xs px-3 py-1 rounded-full font-bold ${statusColors[o.status] || statusColors.pending}`}>{statusLabels[o.status] || o.status}</span></td>
                       <td className="px-4 py-3 text-center text-gray-400 text-xs">{o.payment_status}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{new Date(o.created_at).toLocaleDateString('ar-SA')}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{new Date(o.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US')}</td>
                       <td className="px-4 py-3 text-center text-gray-500">{expandedOrder === o.id ? '▼' : '◀'}</td>
                     </tr>
                     {expandedOrder === o.id && (
                       <tr><td colSpan={7} className="px-4 py-4 bg-[#0B0E14]">
                         <div className="space-y-3">
-                          {o.items && o.items.length > 0 && <div className="space-y-2"><div className="text-gray-400 text-xs font-bold">المنتجات:</div>{o.items.map((item: any, i: number) => (<div key={i} className="flex justify-between text-gray-300 text-sm"><span>{item.product_name} × {item.quantity}</span><span className="text-emerald-400">{item.price} ر.س</span></div>))}</div>}
+                          {o.items && o.items.length > 0 && <div className="space-y-2"><div className="text-gray-400 text-xs font-bold">{t.admin.items}:</div>{o.items.map((item: any, i: number) => (<div key={i} className="flex justify-between text-gray-300 text-sm"><span>{item.product_name} × {item.quantity}</span><span className="text-emerald-400">{item.price} {t.admin.currency}</span></div>))}</div>}
                           <div className="flex gap-2 pt-2 flex-wrap">{Object.keys(statusLabels).map((s) => (<button key={s} onClick={() => (updateStatusMutation as any).mutate?.({ id: o.id, status: s })} className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${o.status === s ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>{statusLabels[s]}</button>))}</div>
                         </div>
                       </td></tr>
                     )}
                   </>
                 ))}
-                {(!orders || orders.length === 0) && <tr><td colSpan={7} className="text-center text-gray-500 py-16">لا توجد طلبات</td></tr>}
+                {(!orders || orders.length === 0) && <tr><td colSpan={7} className="text-center text-gray-500 py-16">{t.admin.noOrders}</td></tr>}
               </tbody>
             </table>
           </div>
@@ -456,6 +471,6 @@ function OrdersTab() {
 }
 
 /* ─── Placeholder Tabs ─── */
-function CustomersTab() { return <div className="space-y-4"><h2 className="text-xl font-bold text-white">العملاء</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Users className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">قريباً — إدارة العملاء</div></div></div>; }
-function CouponsTab() { return <div className="space-y-4"><h2 className="text-xl font-bold text-white">الكوبونات</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Tag className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">قريباً — إدارة الكوبونات</div></div></div>; }
-function SettingsTab() { return <div className="space-y-4"><h2 className="text-xl font-bold text-white">الإعدادات</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Settings className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">قريباً — إعدادات المتجر</div></div></div>; }
+function CustomersTab() { const { t } = useLanguage(); return <div className="space-y-4"><h2 className="text-xl font-bold text-white">{t.admin.customers}</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Users className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">{t.admin.comingSoon} — {t.admin.customersSoon}</div></div></div>; }
+function CouponsTab() { const { t } = useLanguage(); return <div className="space-y-4"><h2 className="text-xl font-bold text-white">{t.admin.coupons}</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Tag className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">{t.admin.comingSoon} — {t.admin.couponsSoon}</div></div></div>; }
+function SettingsTab() { const { t } = useLanguage(); return <div className="space-y-4"><h2 className="text-xl font-bold text-white">{t.admin.settings}</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Settings className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">{t.admin.comingSoon} — {t.admin.settingsSoon}</div></div></div>; }

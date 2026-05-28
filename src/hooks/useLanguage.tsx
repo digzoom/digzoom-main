@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import ar from '@/i18n/ar.json';
-import en from '@/i18n/en.json';
+import { createContext, useContext, useCallback, useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import type ar from '@/i18n/ar.json';
 
 type Lang = 'ar' | 'en';
 type Translations = typeof ar;
@@ -12,35 +12,42 @@ interface LangContextType {
   setLang: (l: Lang) => void;
 }
 
-const translationsMap: Record<Lang, Translations> = { ar, en };
-
 const LangContext = createContext<LangContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => {
-    const saved = localStorage.getItem('digzoom-lang');
-    return (saved === 'ar' || saved === 'en') ? saved : 'ar';
-  });
-
-  const t = translationsMap[lang];
+  const { i18n, t } = useTranslation();
+  const lang = (i18n.language === 'en' ? 'en' : 'ar') as Lang;
 
   const setLang = useCallback((l: Lang) => {
-    setLangState(l);
+    i18n.changeLanguage(l);
     localStorage.setItem('digzoom-lang', l);
-  }, []);
+  }, [i18n]);
 
   const toggleLang = useCallback(() => {
-    setLang(lang === 'ar' ? 'en' : 'ar');
+    const next = lang === 'ar' ? 'en' : 'ar';
+    setLang(next);
   }, [lang, setLang]);
 
+  // Sync document direction
   useEffect(() => {
-    document.documentElement.dir = t.dir;
+    const dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = dir;
     document.documentElement.lang = lang;
-    document.body.style.direction = t.dir as 'rtl' | 'ltr';
-  }, [lang, t.dir]);
+    document.body.style.direction = dir;
+  }, [lang]);
+
+  // Ensure i18n matches localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('digzoom-lang');
+    if (saved === 'ar' || saved === 'en') {
+      if (i18n.language !== saved) {
+        i18n.changeLanguage(saved);
+      }
+    }
+  }, [i18n]);
 
   return (
-    <LangContext.Provider value={{ lang, t, toggleLang, setLang }}>
+    <LangContext.Provider value={{ lang, t: t as unknown as Translations, toggleLang, setLang }}>
       {children}
     </LangContext.Provider>
   );
