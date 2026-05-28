@@ -148,4 +148,58 @@ export const adminRouter = createRouter({
       if (error) throw new Error(error.message);
       return { success: true };
     }),
+
+  /* ─── Image Upload ─── */
+  uploadImage: adminQuery
+    .input(z.object({
+      filename: z.string(),
+      base64: z.string(),
+      contentType: z.string().default("image/jpeg"),
+    }))
+    .mutation(async ({ input }) => {
+      const supabase = admin();
+      const buffer = Buffer.from(input.base64, "base64");
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(input.filename, buffer, {
+          contentType: input.contentType,
+          upsert: true,
+        });
+
+      if (uploadError) throw new Error("Upload failed: " + uploadError.message);
+
+      const { data: urlData } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(input.filename);
+
+      return { url: urlData.publicUrl };
+    }),
+
+  /* ─── Stats ─── */
+  getStats: adminQuery
+    .query(async () => {
+      const s = admin();
+
+      const { count: productCount } = await s.from("products").select("id", { count: "exact", head: true });
+      const { count: orderCount } = await s.from("orders").select("id", { count: "exact", head: true });
+
+      const { data: salesData } = await s.from("orders").select("total").eq("status", "completed");
+      const totalSales = (salesData ?? []).reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+
+      const { count: customerCount } = await s.from("profiles").select("id", { count: "exact", head: true });
+
+      const { data: latestOrders } = await s.from("orders")
+        .select("id,order_number,customer_name,total,status,created_at")
+        .order("id", { ascending: false })
+        .limit(5);
+
+      return {
+        productCount: productCount ?? 0,
+        orderCount: orderCount ?? 0,
+        totalSales,
+        customerCount: customerCount ?? 0,
+        latestOrders: latestOrders ?? [],
+      };
+    }),
 });

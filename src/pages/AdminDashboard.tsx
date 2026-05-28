@@ -218,39 +218,44 @@ function StatCard({
 
 /* ─── Dashboard Tab ─── */
 function DashTab() {
-  const { data: products } = trpc.listProducts.useQuery({ limit: 1 });
-  const { data: orders } = trpc.listOrders?.useQuery?.({ limit: 1 }) ?? {};
+  const { data: stats, isLoading: statsLoading } = trpc.getStats?.useQuery?.() ?? {};
+
+  if (statsLoading) {
+    return <div className="text-gray-500 text-center py-20">جاري تحميل الإحصائيات...</div>;
+  }
+
+  const s = stats as any;
 
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          icon={<UserPlus className="w-5 h-5 text-blue-400" />}
-          label="عملاء جدد"
-          value="12+"
-          sub="اليوم"
+          icon={<Package className="w-5 h-5 text-blue-400" />}
+          label="المنتجات"
+          value={String(s?.productCount ?? 0)}
+          sub="إجمالي المنتجات"
           color="blue"
-        />
-        <StatCard
-          icon={<DollarSign className="w-5 h-5 text-purple-400" />}
-          label="الأرباح"
-          value="١,٢٦٠ ر.س"
-          sub="هامش ٤٤%"
-          color="purple"
         />
         <StatCard
           icon={<ShoppingCart className="w-5 h-5 text-amber-400" />}
           label="الطلبات"
-          value={String((orders as any)?.length ?? 0)}
-          sub="٨ معلقة"
+          value={String(s?.orderCount ?? 0)}
+          sub="إجمالي الطلبات"
           color="amber"
         />
         <StatCard
-          icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
-          label="مبيعات اليوم"
-          value="٢,٨٤٧ ر.س"
-          sub="٣٤ طلب"
+          icon={<DollarSign className="w-5 h-5 text-purple-400" />}
+          label="إجمالي المبيعات"
+          value={`${s?.totalSales?.toLocaleString?.() ?? 0} ر.س`}
+          sub="الطلبات المكتملة"
+          color="purple"
+        />
+        <StatCard
+          icon={<Users className="w-5 h-5 text-emerald-400" />}
+          label="العملاء"
+          value={String(s?.customerCount ?? 0)}
+          sub="مسجلين في النظام"
           color="emerald"
         />
       </div>
@@ -325,16 +330,17 @@ function DashTab() {
             </h3>
           </div>
           <div className="space-y-3">
-            {[
-              { name: 'بطاقة PlayStation 50$', order: 'ORD-2847', price: '١٧,٣٥٥ ر.س', status: 'مكتمل' },
-            ].map((o, i) => (
+            {(s?.latestOrders ?? []).length === 0 && (
+              <div className="text-center text-gray-500 py-8 text-sm">لا توجد طلبات حتى الآن</div>
+            )}
+            {(s?.latestOrders ?? []).map((o: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02]">
                 <div>
-                  <div className="text-sm font-medium text-white">{o.name}</div>
-                  <div className="text-xs text-gray-500">{o.order}</div>
+                  <div className="text-sm font-medium text-white">{o.customer_name || 'عميل'}</div>
+                  <div className="text-xs text-gray-500">{o.order_number}</div>
                 </div>
                 <div className="text-left">
-                  <div className="text-sm font-bold text-white">{o.price}</div>
+                  <div className="text-sm font-bold text-white">{o.total} ر.س</div>
                   <div className="text-[10px] text-emerald-400">{o.status}</div>
                 </div>
               </div>
@@ -560,6 +566,34 @@ function ProductsTab() {
 function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
   title: string; form: any; setForm: any; onSave: () => void; onClose: () => void; isPending: boolean;
 }) {
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(form.image_url || '');
+  const uploadMutation = trpc.uploadImage?.useMutation?.({
+    onSuccess: (data: any) => {
+      setForm({ ...form, image_url: data.url });
+      setPreviewUrl(data.url);
+      setUploading(false);
+    },
+    onError: () => setUploading(false),
+  }) ?? null;
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !uploadMutation) return;
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = (reader.result as string).split(',')[1];
+      const ext = file.name.split('.').pop() || 'jpg';
+      uploadMutation.mutate({
+        filename: `product-${Date.now()}.${ext}`,
+        base64,
+        contentType: file.type || 'image/jpeg',
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-[#131722] rounded-2xl border border-white/10 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -571,6 +605,22 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
         </div>
 
         <div className="space-y-3">
+          {/* Image Upload */}
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">صورة المنتج</label>
+            {previewUrl && (
+              <img src={previewUrl} alt="" className="w-full h-32 object-cover rounded-xl mb-2 bg-[#1A1F2E]" />
+            )}
+            <div className="flex gap-2">
+              <label className="flex-1 flex items-center justify-center gap-2 bg-blue-600/15 text-blue-400 border border-blue-500/20 rounded-xl px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-600/25 transition-colors">
+                <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                {uploading ? 'جاري الرفع...' : 'اختر صورة'}
+              </label>
+            </div>
+            <div className="text-center text-gray-500 text-[10px] my-1">أو</div>
+            <input value={form.image_url} onChange={(e) => { setForm({ ...form, image_url: e.target.value }); setPreviewUrl(e.target.value); }} placeholder="https://..." className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
+          </div>
+
           <div>
             <label className="text-gray-400 text-xs mb-1 block">العنوان *</label>
             <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="اسم المنتج" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" />
