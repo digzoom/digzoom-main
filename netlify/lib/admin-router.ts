@@ -28,10 +28,19 @@ export const adminRouter = createRouter({
     }))
     .mutation(async ({ input }) => {
       const { data, error } = await admin().from("products").insert({
-        title: input.title, description: input.description, price: input.price,
-        image_url: input.image_url, category_id: input.category_id,
-        in_stock: input.in_stock, is_active: input.is_active,
-        slug: "p-" + Date.now(), features: [], file_type: "ZIP", file_size: "10 MB", rating: 5, reviews_count: 0,
+        title: input.title,
+        description: input.description ?? "",
+        price: input.price,
+        image_url: input.image_url && input.image_url.trim() !== "" ? input.image_url : "https://placehold.co/400x400/1a1a2e/FFF?text=" + encodeURIComponent(input.title.substring(0, 10)),
+        category_id: input.category_id ?? 1,
+        in_stock: input.in_stock,
+        is_active: input.is_active,
+        slug: "p-" + Date.now(),
+        features: [],
+        file_type: "ZIP",
+        file_size: "10 MB",
+        rating: 5,
+        reviews_count: 0,
       }).select().single();
       if (error) throw new Error(error.message);
       return data;

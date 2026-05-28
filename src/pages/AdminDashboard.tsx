@@ -230,10 +230,21 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending, t }: {
           <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={t('العنوان', 'Title') + ' *'} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" />
           <input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder={t('الوصف', 'Description')} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" />
           <div className="grid grid-cols-2 gap-2">
-            <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder={t('السعر', 'Price') + ' *'} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" />
-            <input type="number" value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })} placeholder={t('التصنيف', 'Category')} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" />
+            <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder={t('السعر', 'Price') + ' *'} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" dir="ltr" />
+            <select value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })} className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none">
+              <option value="1">جرافيكس</option>
+              <option value="2">خطوط</option>
+              <option value="3">قوالب</option>
+              <option value="4">فيديوهات</option>
+              <option value="5">كتب إلكترونية</option>
+              <option value="6">صوتيات</option>
+              <option value="7">أكواد</option>
+              <option value="8">تصميم ويب</option>
+              <option value="9">نماذج 3D</option>
+              <option value="10">صور</option>
+            </select>
           </div>
-          <input value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} placeholder="Image URL" className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" dir="ltr" />
+          <input value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} placeholder="Image URL (optional) - auto-generated if empty" className="w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" dir="ltr" />
           <div className="flex gap-4 pt-1">
             <label className="flex items-center gap-1.5 text-gray-300 text-xs cursor-pointer"><input type="checkbox" checked={form.in_stock} onChange={e => setForm({ ...form, in_stock: e.target.checked })} className="accent-blue-600" />{t('متوفر', 'In Stock')}</label>
             <label className="flex items-center gap-1.5 text-gray-300 text-xs cursor-pointer"><input type="checkbox" checked={form.is_active} onChange={e => setForm({ ...form, is_active: e.target.checked })} className="accent-blue-600" />{t('نشط', 'Active')}</label>
