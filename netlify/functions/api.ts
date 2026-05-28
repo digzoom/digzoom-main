@@ -29,26 +29,27 @@ export const handler = async (event: any, _context: any) => {
       if (v !== undefined && v !== null) headers.set(k, String(v));
     });
 
-    // Defensive body parsing: Netlify may send body as string, object, or Buffer
-    let bodyBuffer: Buffer | undefined;
+    // Defensive body parsing: Netlify may send body as string, object, or Buffer.
+    // CRITICAL: Pass as string to Request(). Buffer silently breaks body reading
+    // in the Netlify function env — fetchRequestHandler sees empty body.
+    let bodyStr: string | undefined;
     if (event.body && event.httpMethod !== "GET") {
-      if (Buffer.isBuffer(event.body)) {
-        bodyBuffer = event.body;
-      } else if (typeof event.body === "string") {
-        bodyBuffer = Buffer.from(
-          event.body,
-          event.isBase64Encoded ? "base64" : "utf8"
-        );
+      if (typeof event.body === "string") {
+        bodyStr = event.isBase64Encoded
+          ? Buffer.from(event.body, "base64").toString("utf8")
+          : event.body;
       } else if (typeof event.body === "object") {
         // Netlify pre-parsed the body as JSON — re-serialize
-        bodyBuffer = Buffer.from(JSON.stringify(event.body), "utf8");
+        bodyStr = JSON.stringify(event.body);
+      } else if (Buffer.isBuffer(event.body)) {
+        bodyStr = event.body.toString("utf8");
       }
     }
 
     const req = new Request(event.rawUrl, {
       method: event.httpMethod,
       headers,
-      body: bodyBuffer,
+      body: bodyStr,
     });
 
     // Verify Supabase token
