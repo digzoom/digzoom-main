@@ -3,11 +3,19 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# tRPC batch endpoint — exact match for /api (no trailing slash)
+[[redirects]]
+  from = "/api"
+  to = "/.netlify/functions/api"
+  status = 200
+
+# tRPC sub-paths (if any)
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
 
+# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
