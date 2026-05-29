@@ -1,5 +1,4 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "";
 const ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || "";
@@ -10,7 +9,9 @@ interface TrpcContext {
   user?: { id: string; role: string; email?: string };
 }
 
-const t = initTRPC.context<TrpcContext>().create({ transformer: superjson });
+// NOTE: superjson transformer removed — both client and server use plain JSON.
+// This fixes the batch payload format mismatch.
+const t = initTRPC.context<TrpcContext>().create();
 
 export const createRouter = t.router;
 export const publicQuery = t.procedure;
@@ -51,8 +52,6 @@ export async function verifySupabaseToken(
 
     // Step 2: Read role from profiles table
     // CRITICAL: Use SERVICE_ROLE_KEY as apikey to bypass RLS.
-    // The new sb_secret_* format is NOT a valid JWT, so it cannot
-    // be used as Bearer — but works perfectly as apikey.
     const roleKey = SERVICE_ROLE_KEY || ANON_KEY;
     const profileRes = await fetch(
       `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`,

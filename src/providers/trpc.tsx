@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCReact, httpBatchLink } from '@trpc/react-query';
 import { useState, type ReactNode } from 'react';
-import superjson from 'superjson';
 
 // Backend router type — not imported to avoid bundling server code
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,7 +21,8 @@ export function TRPCProvider({ children }: { children: ReactNode }) {
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      transformer: superjson,
+      // NOTE: superjson transformer removed — causes bundling issues.
+      // tRPC uses plain JSON serialization which matches the batch format.
       links: [
         httpBatchLink({
           url: '/api',
