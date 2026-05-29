@@ -56,8 +56,11 @@ export const adminRouter = createRouter({
         .limit(input?.limit ?? 100);
       if (input?.search) query = query.ilike("title", `%${input.search}%`);
       const { data, error } = await query;
-      if (error) throw new Error(error.message);
-      return data ?? [];
+      if (error) {
+        console.error("[listProducts] DB error:", error.message);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
     }),
 
   createProduct: adminQuery
@@ -258,9 +261,12 @@ export const adminRouter = createRouter({
         .limit(input?.limit ?? 100);
       if (input?.status) query = query.eq("status", input.status);
       const { data, error } = await query;
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("[listOrders] DB error:", error.message);
+        return [];
+      }
 
-      const orders = (data ?? []).map((o: any) => ({
+      const orders = Array.isArray(data) ? data.map((o: any) => ({
         id: o.id,
         order_number: o.order_number,
         customer_name: o.customer_name,
@@ -478,7 +484,10 @@ export const adminRouter = createRouter({
         .select("*")
         .order("created_at", { ascending: false })
         .limit(input?.limit ?? 20);
-      if (error) throw new Error(error.message);
-      return data ?? [];
+      if (error) {
+        console.error("[listActivityLogs] DB error:", error.message);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
     }),
 });

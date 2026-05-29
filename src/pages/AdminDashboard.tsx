@@ -128,8 +128,8 @@ function DashTab() {
         <div className="bg-[#131722] border border-white/5 rounded-2xl p-5">
           <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Package className="w-4 h-4 text-blue-400" />{t.admin.latestProducts}</h3>
           <div className="space-y-3">
-            {(s?.latestProducts ?? []).length === 0 && <div className="text-center text-gray-500 py-8">{t.admin.noProducts}</div>}
-            {(s?.latestProducts ?? []).map((p: any, i: number) => (
+            {(!Array.isArray(s?.latestProducts) || s.latestProducts.length === 0) && <div className="text-center text-gray-500 py-8">{t.admin.noProducts}</div>}
+            {(Array.isArray(s?.latestProducts) ? s.latestProducts : []).map((p: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">{i + 1}</div>
@@ -145,8 +145,8 @@ function DashTab() {
         <div className="bg-[#131722] border border-white/5 rounded-2xl p-5">
           <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Receipt className="w-4 h-4 text-emerald-400" />{t.admin.latestOrders}</h3>
           <div className="space-y-3">
-            {(s?.latestOrders ?? []).length === 0 && <div className="text-center text-gray-500 py-8">{t.admin.noOrders}</div>}
-            {(s?.latestOrders ?? []).map((o: any, i: number) => (
+            {(!Array.isArray(s?.latestOrders) || s.latestOrders.length === 0) && <div className="text-center text-gray-500 py-8">{t.admin.noOrders}</div>}
+            {(Array.isArray(s?.latestOrders) ? s.latestOrders : []).map((o: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02]">
                 <div><div className="text-sm font-medium text-white">{o.customer_name || t.admin.customer}</div><div className="text-xs text-gray-500">{o.order_number}</div></div>
                 <div className="text-left"><div className="text-sm font-bold text-white">{o.total} {t.admin.currency}</div><div className="text-[10px] text-emerald-400">{o.status}</div></div>
@@ -160,8 +160,8 @@ function DashTab() {
       <div className="bg-[#131722] border border-white/5 rounded-2xl p-5">
         <h3 className="font-bold text-white mb-4 flex items-center gap-2"><Activity className="w-4 h-4 text-amber-400" />{t.admin.activityLogs}</h3>
         <div className="space-y-2">
-          {(s?.latestActivity ?? []).length === 0 && <div className="text-center text-gray-500 py-8">{t.admin.noActivity}</div>}
-          {(s?.latestActivity ?? []).map((a: any, i: number) => (
+          {(!Array.isArray(s?.latestActivity) || s.latestActivity.length === 0) && <div className="text-center text-gray-500 py-8">{t.admin.noActivity}</div>}
+          {(Array.isArray(s?.latestActivity) ? s.latestActivity : []).map((a: any, i: number) => (
             <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] text-sm">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-blue-400" />
@@ -271,7 +271,7 @@ function ProductsTab() {
                 <th className={`px-4 py-3 ${isAr ? 'text-right' : 'text-left'}`}>{t.admin.product}</th><th className="px-4 py-3">{t.admin.price}</th><th className="px-4 py-3">{t.admin.discount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.stock}</th><th className="px-4 py-3">{t.admin.action}</th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
-                {(items as any[] | undefined)?.map((p: any) => (
+                {(Array.isArray(items) ? items : []).map((p: any) => (
                   <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors ${!p.is_active ? 'opacity-50' : ''}`}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -439,7 +439,7 @@ function OrdersTab() {
                 <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.order}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.payment}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
-                {(orders as any[] | undefined)?.map((o: any) => (
+                {(Array.isArray(orders) ? orders : []).map((o: any) => (
                   <>
                     <tr key={o.id} className="cursor-pointer hover:bg-white/[0.02]" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
                       <td className="px-4 py-3 text-white font-bold">{o.order_number}</td>
@@ -453,7 +453,7 @@ function OrdersTab() {
                     {expandedOrder === o.id && (
                       <tr><td colSpan={7} className="px-4 py-4 bg-[#0B0E14]">
                         <div className="space-y-3">
-                          {o.items && o.items.length > 0 && <div className="space-y-2"><div className="text-gray-400 text-xs font-bold">{t.admin.items}:</div>{o.items.map((item: any, i: number) => (<div key={i} className="flex justify-between text-gray-300 text-sm"><span>{item.product_name} × {item.quantity}</span><span className="text-emerald-400">{item.price} {t.admin.currency}</span></div>))}</div>}
+                          {Array.isArray(o.items) && o.items.length > 0 && <div className="space-y-2"><div className="text-gray-400 text-xs font-bold">{t.admin.items}:</div>{o.items.map((item: any, i: number) => (<div key={i} className="flex justify-between text-gray-300 text-sm"><span>{item.product_name} × {item.quantity}</span><span className="text-emerald-400">{item.price} {t.admin.currency}</span></div>))}</div>}
                           <div className="flex gap-2 pt-2 flex-wrap">{Object.keys(statusLabels).map((s) => (<button key={s} onClick={() => (updateStatusMutation as any).mutate?.({ id: o.id, status: s })} className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${o.status === s ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>{statusLabels[s]}</button>))}</div>
                         </div>
                       </td></tr>
