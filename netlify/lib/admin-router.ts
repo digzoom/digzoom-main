@@ -276,7 +276,7 @@ export const adminRouter = createRouter({
         payment_status: o.payment_status,
         created_at: o.created_at,
         items: [] as any[],
-      }));
+      })) : [];
 
       // Fetch items separately (more compatible than embedded query)
       if (orders.length > 0) {
