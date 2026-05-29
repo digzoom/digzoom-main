@@ -217,14 +217,16 @@ function ProductsTab() {
   const save = () => {
     const price = Number(form.price);
     if (!form.title || price <= 0) { setToast(t.admin.titleRequired); return; }
-    createMutation.mutate({
+    const payload = {
       title: form.title, description: form.description, price,
       original_price: form.original_price ? Number(form.original_price) : undefined,
       discount_percent: Number(form.discount_percent) || 0,
       is_on_sale: form.is_on_sale,
       image_url: form.image_url, category_id: Number(form.category_id),
       in_stock: form.in_stock, is_active: form.is_active,
-    });
+    };
+    console.log("[FRONTEND] createProduct payload:", JSON.stringify(payload));
+    createMutation.mutate(payload);
   };
 
   const startEdit = (p: any) => {
@@ -325,7 +327,9 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
     reader.onloadend = () => {
       const base64 = (reader.result as string).split(',')[1];
       const ext = file.name.split('.').pop() || 'jpg';
-      uploadMutation.mutate({ filename: `product-${Date.now()}.${ext}`, base64, contentType: file.type || 'image/jpeg' });
+      const payload = { filename: `product-${Date.now()}.${ext}`, base64, contentType: file.type || 'image/jpeg' };
+      console.log("[FRONTEND] uploadImage payload:", JSON.stringify({ filename: payload.filename, contentType: payload.contentType, base64Length: payload.base64.length }));
+      uploadMutation.mutate(payload);
     };
     reader.readAsDataURL(file);
   };

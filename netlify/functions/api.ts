@@ -69,6 +69,17 @@ export const handler = async (event: any, _context: any) => {
       body: bodyStr,
     });
 
+    // DEBUG: Verify body is readable by cloning
+    if (bodyStr) {
+      try {
+        const cloned = req.clone();
+        const text = await cloned.text();
+        console.log("[api] body readable:", text.substring(0, 500));
+      } catch (e: any) {
+        console.error("[api] body NOT readable:", e.message);
+      }
+    }
+
     // Verify Supabase token
     let user = undefined;
     const authHeader =
