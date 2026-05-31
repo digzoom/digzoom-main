@@ -233,7 +233,7 @@ function CouponsTab() {
   const [showForm, setShowForm] = useState(false);
   const [editCoupon, setEditCoupon] = useState<any>(null);
   const [toast, setToast] = useState('');
-  const [form, setForm] = useState({ code: '', discount_type: 'percent' as 'percent' | 'fixed', discount_value: '', expires_at: '', usage_limit: '' });
+  const [form, setForm] = useState({ code: '', discount_percent: '', max_uses: '', valid_until: '', min_order_amount: '' });
 
   const utils = trpc.useUtils();
   const { data: coupons, isLoading } = trpc.listCoupons.useQuery({ limit: 100 });
@@ -241,14 +241,18 @@ function CouponsTab() {
   const toggleMutation = trpc.toggleCoupon.useMutation({ onSuccess: () => { utils.listCoupons.invalidate(); }, onError: (e: any) => setToast(e.message) });
   const deleteMutation = trpc.deleteCoupon.useMutation({ onSuccess: () => { setToast(t.admin.couponDeleted); utils.listCoupons.invalidate(); }, onError: (e: any) => setToast(e.message) });
 
-  const resetForm = () => setForm({ code: '', discount_type: 'percent', discount_value: '', expires_at: '', usage_limit: '' });
+  const resetForm = () => setForm({ code: '', discount_percent: '', max_uses: '', valid_until: '', min_order_amount: '' });
 
   const save = () => {
-    if (!form.code || !form.discount_value) { setToast('Code and discount required'); return; }
-    createMutation.mutate({ code: form.code, discount_type: form.discount_type, discount_value: Number(form.discount_value), expires_at: form.expires_at || undefined, usage_limit: form.usage_limit ? Number(form.usage_limit) : undefined });
+    if (!form.code || !form.discount_percent) { setToast('Code and discount required'); return; }
+    createMutation.mutate({
+      code: form.code,
+      discount_percent: Number(form.discount_percent),
+      max_uses: form.max_uses ? Number(form.max_uses) : undefined,
+      valid_until: form.valid_until || undefined,
+      min_order_amount: form.min_order_amount ? Number(form.min_order_amount) : undefined,
+    });
   };
-
-  const isExpired = (c: any) => c.expires_at && new Date(c.expires_at) < new Date();
 
   return (
     <div className="space-y-4">
@@ -263,10 +267,10 @@ function CouponsTab() {
           <h3 className="font-bold text-white">{t.admin.addCoupon}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.couponCode}</label><input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="SUMMER25" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
-            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.discountType}</label><select value={form.discount_type} onChange={(e) => setForm({ ...form, discount_type: e.target.value as 'percent' | 'fixed' })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm"><option value="percent">{t.admin.percent}</option><option value="fixed">{t.admin.fixed}</option></select></div>
-            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.discountValue}</label><input type="number" value={form.discount_value} onChange={(e) => setForm({ ...form, discount_value: e.target.value })} placeholder={form.discount_type === 'percent' ? '25' : '50'} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
-            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.expiresAt}</label><input type="date" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
-            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.usageLimit}</label><input type="number" value={form.usage_limit} onChange={(e) => setForm({ ...form, usage_limit: e.target.value })} placeholder={t.admin.unlimited} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.discountPercent}</label><input type="number" min="1" max="100" value={form.discount_percent} onChange={(e) => setForm({ ...form, discount_percent: e.target.value })} placeholder="25" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.usageLimit}</label><input type="number" value={form.max_uses} onChange={(e) => setForm({ ...form, max_uses: e.target.value })} placeholder={t.admin.unlimited} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.expiresAt}</label><input type="date" value={form.valid_until} onChange={(e) => setForm({ ...form, valid_until: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">الحد الأدنى للطلب</label><input type="number" value={form.min_order_amount} onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })} placeholder="0" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" dir="ltr" /></div>
           </div>
           <div className="flex gap-2">
             <button onClick={save} disabled={createMutation.isPending} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-xl text-sm font-bold"><Save className="w-4 h-4 inline mr-1" />{t.admin.save}</button>
@@ -284,14 +288,14 @@ function CouponsTab() {
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
                 {(Array.isArray(coupons) ? coupons : []).map((c: any) => (
-                  <tr key={c.id} className={`hover:bg-white/[0.02] ${!c.is_active || isExpired(c) ? 'opacity-50' : ''}`}>
+                  <tr key={c.id} className={`hover:bg-white/[0.02] ${!c.is_active ? 'opacity-50' : ''}`}>
                     <td className="px-4 py-3"><div className="flex items-center gap-2"><Tag className="w-4 h-4 text-amber-400" /><span className="text-white font-mono font-bold text-sm">{c.code}</span></div></td>
-                    <td className="px-4 py-3 text-center">{c.discount_type === 'percent' ? <span className="text-emerald-400 font-bold">{c.discount_value}%</span> : <span className="text-emerald-400 font-bold">{c.discount_value} {t.admin.currency}</span>}</td>
-                    <td className="px-4 py-3 text-center text-gray-400 text-xs">{c.expires_at ? new Date(c.expires_at).toLocaleDateString('ar-SA') : <span className="text-gray-600">—</span>}</td>
-                    <td className="px-4 py-3 text-center"><span className="text-gray-400 text-xs">{c.used_count ?? 0} / {c.usage_limit ?? '∞'}</span></td>
+                    <td className="px-4 py-3 text-center"><span className="text-emerald-400 font-bold">{c.discount_percent}%</span></td>
+                    <td className="px-4 py-3 text-center text-gray-400 text-xs">{c.valid_until ? new Date(c.valid_until).toLocaleDateString('ar-SA') : <span className="text-gray-600">—</span>}</td>
+                    <td className="px-4 py-3 text-center"><span className="text-gray-400 text-xs">{c.used_count ?? 0} / {c.max_uses ?? '∞'}</span></td>
                     <td className="px-4 py-3 text-center">
-                      <button onClick={() => toggleMutation.mutate({ id: c.id })} className={`text-xs px-3 py-1 rounded-full font-bold ${c.is_active && !isExpired(c) ? 'bg-emerald-500/15 text-emerald-400' : 'bg-gray-500/15 text-gray-400'}`}>
-                        {c.is_active && !isExpired(c) ? t.admin.couponActive : isExpired(c) ? 'منتهي' : t.admin.couponInactive}
+                      <button onClick={() => toggleMutation.mutate({ id: c.id })} className={`text-xs px-3 py-1 rounded-full font-bold ${c.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-gray-500/15 text-gray-400'}`}>
+                        {c.is_active ? t.admin.couponActive : t.admin.couponInactive}
                       </button>
                     </td>
                     <td className="px-4 py-3"><button onClick={() => { if (confirm('حذف الكوبون؟')) deleteMutation.mutate({ id: c.id }); }} className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash2 className="w-3.5 h-3.5" /></button></td>

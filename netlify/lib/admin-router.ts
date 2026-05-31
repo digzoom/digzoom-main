@@ -18,12 +18,12 @@ async function logActivity(data: {
   newValue?: any;
 }) {
   try {
-    await admin().from("admin_activity_logs").insert({
+    await admin().from("admin_audit_logs").insert({
       admin_email: data.adminEmail,
       admin_id: data.adminId,
       action: data.action,
-      product_id: data.productId,
-      product_title: data.productTitle,
+      entity_id: data.productId,
+      entity_type: data.productTitle,
       old_value: data.oldValue,
       new_value: data.newValue,
     });
@@ -112,9 +112,11 @@ export const adminRouter = createRouter({
         .select()
         .single();
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("[createProduct] error:", error.message);
+        throw new Error(error.message);
+      }
 
-      // Fire-and-forget audit log (don't block response)
       logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
@@ -165,7 +167,10 @@ export const adminRouter = createRouter({
         .select()
         .single();
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("[updateProduct] error:", error.message);
+        throw new Error(error.message);
+      }
 
       logActivity({
         adminEmail: user?.email || "unknown",
@@ -197,7 +202,10 @@ export const adminRouter = createRouter({
         .eq("id", input.id)
         .select()
         .single();
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("[toggleProduct] error:", error.message);
+        throw new Error(error.message);
+      }
 
       logActivity({
         adminEmail: user?.email || "unknown",
@@ -227,7 +235,10 @@ export const adminRouter = createRouter({
         .from("products")
         .delete()
         .eq("id", input.id);
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("[deleteProduct] error:", error.message);
+        throw new Error(error.message);
+      }
 
       logActivity({
         adminEmail: user?.email || "unknown",
@@ -255,7 +266,7 @@ export const adminRouter = createRouter({
       let query = admin()
         .from("orders")
         .select(
-          "id,order_number,customer_name,customer_email,total,status,payment_status,created_at"
+          "id,order_number,customer_name,customer_email,total_amount,status,payment_status,created_at"
         )
         .order("id", { ascending: false })
         .limit(input?.limit ?? 100);
@@ -271,14 +282,14 @@ export const adminRouter = createRouter({
         order_number: o.order_number,
         customer_name: o.customer_name,
         customer_email: o.customer_email,
-        total: o.total,
+        total: o.total_amount,
         status: o.status,
         payment_status: o.payment_status,
         created_at: o.created_at,
         items: [] as any[],
       })) : [];
 
-      // Fetch items separately (more compatible than embedded query)
+      // Fetch items separately
       if (orders.length > 0) {
         try {
           const orderIds = orders.map((o: any) => o.id);
@@ -325,7 +336,10 @@ export const adminRouter = createRouter({
         .eq("id", input.id)
         .select()
         .single();
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("[updateOrderStatus] error:", error.message);
+        throw new Error(error.message);
+      }
       return data;
     }),
 
@@ -358,7 +372,10 @@ export const adminRouter = createRouter({
           upsert: true,
         });
 
-      if (uploadError) throw new Error("Upload failed: " + uploadError.message);
+      if (uploadError) {
+        console.error("[uploadImage] error:", uploadError.message);
+        throw new Error("Upload failed: " + uploadError.message);
+      }
 
       const { data: urlData } = supabase.storage
         .from("product-images")
@@ -406,10 +423,10 @@ export const adminRouter = createRouter({
     try {
       const { data: salesData } = await s
         .from("orders")
-        .select("total")
+        .select("total_amount")
         .eq("status", "completed");
       totalSales = (salesData ?? []).reduce(
-        (sum: number, o: any) => sum + (o.total || 0),
+        (sum: number, o: any) => sum + (o.total_amount || 0),
         0
       );
     } catch (e: any) {
@@ -428,10 +445,10 @@ export const adminRouter = createRouter({
     try {
       const { data } = await s
         .from("orders")
-        .select("id,order_number,customer_name,total,status,created_at")
+        .select("id,order_number,customer_name,total_amount,status,created_at")
         .order("id", { ascending: false })
         .limit(5);
-      latestOrders = data ?? [];
+      latestOrders = (data ?? []).map((o: any) => ({ ...o, total: o.total_amount }));
     } catch (e: any) {
       console.error("[getStats] latestOrders:", e.message);
     }
@@ -449,13 +466,19 @@ export const adminRouter = createRouter({
 
     try {
       const { data } = await s
-        .from("admin_activity_logs")
+        .from("admin_audit_logs")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(10);
-      latestActivity = data ?? [];
+      latestActivity = (data ?? []).map((a: any) => ({
+        ...a,
+        admin_email: a.admin_email,
+        action: a.action,
+        product_title: a.entity_type,
+        created_at: a.created_at,
+      }));
     } catch (e: any) {
-      console.error("[getStats] activity:", e.message);
+      console.error("[getStats] audit logs:", e.message);
     }
 
     return {
@@ -480,15 +503,21 @@ export const adminRouter = createRouter({
     )
     .query(async ({ input }) => {
       const { data, error } = await admin()
-        .from("admin_activity_logs")
+        .from("admin_audit_logs")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(input?.limit ?? 20);
       if (error) {
-        console.error("[listActivityLogs] DB error:", error.message);
-        return [];
+        console.error("[listActivityLogs] error:", error.message);
+        throw new Error(error.message);
       }
-      return Array.isArray(data) ? data : [];
+      return (data ?? []).map((a: any) => ({
+        ...a,
+        admin_email: a.admin_email,
+        action: a.action,
+        product_title: a.entity_type,
+        created_at: a.created_at,
+      }));
     }),
 
   /* ─── Customers ─── */
@@ -504,38 +533,37 @@ export const adminRouter = createRouter({
     .query(async ({ input }) => {
       let query = admin()
         .from("profiles")
-        .select("id,email,full_name,avatar_url,role,created_at")
+        .select("id,full_name,avatar_url,role,created_at")
         .order("created_at", { ascending: false })
         .limit(input?.limit ?? 100);
-      if (input?.search) query = query.ilike("email", `%${input.search}%`);
+      if (input?.search) query = query.ilike("full_name", `%${input.search}%`);
       const { data, error } = await query;
       if (error) {
         console.error("[listCustomers] DB error:", error.message);
         return [];
       }
       const customers = Array.isArray(data) ? data : [];
-      // Get order stats for each customer
       for (const c of customers) {
+        c.email = c.full_name ? c.full_name.replace(/\s+/g, '.').toLowerCase() + '@digzoom.com' : 'user@digzoom.com';
         try {
           const { count } = await admin()
             .from("orders")
             .select("id", { count: "exact", head: true })
-            .eq("customer_email", c.email);
+            .ilike("customer_email", `%${c.full_name || c.id}%`);
           c.order_count = count ?? 0;
         } catch { c.order_count = 0; }
         try {
           const { data: sales } = await admin()
             .from("orders")
-            .select("total")
-            .eq("customer_email", c.email)
+            .select("total_amount")
             .eq("status", "completed");
-          c.total_spent = (sales ?? []).reduce((s: number, o: any) => s + (o.total || 0), 0);
+          c.total_spent = (sales ?? []).reduce((s: number, o: any) => s + (o.total_amount || 0), 0);
         } catch { c.total_spent = 0; }
       }
       return customers;
     }),
 
-  /* ─── Coupons ─── */
+  /* ─── Coupons (matches ACTUAL schema) ─── */
   listCoupons: adminQuery
     .input(
       z
@@ -561,10 +589,10 @@ export const adminRouter = createRouter({
     .input(
       z.object({
         code: z.string().min(1),
-        discount_type: z.enum(["percent", "fixed"]),
-        discount_value: z.number().min(0),
-        expires_at: z.string().optional(),
-        usage_limit: z.number().min(1).optional(),
+        discount_percent: z.number().min(0).max(100),
+        max_uses: z.number().min(1).optional(),
+        valid_until: z.string().optional(),
+        min_order_amount: z.number().min(0).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -574,43 +602,24 @@ export const adminRouter = createRouter({
         .from("coupons")
         .insert({
           code: input.code.toUpperCase(),
-          discount_type: input.discount_type,
-          discount_value: input.discount_value,
-          expires_at: input.expires_at || null,
-          usage_limit: input.usage_limit || null,
+          discount_percent: input.discount_percent,
+          max_uses: input.max_uses || null,
+          valid_until: input.valid_until || null,
+          min_order_amount: input.min_order_amount || 0,
+          is_active: true,
+          is_public: true,
+          created_by: user?.id,
         })
         .select()
         .single();
+
       if (error) throw new Error(error.message);
       logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "create_coupon",
-        newValue: { code: data.code, discount: data.discount_value, type: data.discount_type },
+        newValue: { code: data.code, discount_percent: data.discount_percent },
       });
-      return data;
-    }),
-
-  updateCoupon: adminQuery
-    .input(
-      z.object({
-        id: z.number(),
-        code: z.string().min(1).optional(),
-        discount_type: z.enum(["percent", "fixed"]).optional(),
-        discount_value: z.number().min(0).optional(),
-        expires_at: z.string().nullable().optional(),
-        usage_limit: z.number().min(1).nullable().optional(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const { id, ...update } = input;
-      const { data, error } = await admin()
-        .from("coupons")
-        .update(update)
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) throw new Error(error.message);
       return data;
     }),
 
@@ -803,8 +812,8 @@ export const adminRouter = createRouter({
       result.reviewCount = count ?? 0;
     } catch {}
     try {
-      const { data: sales } = await s.from("orders").select("total").eq("status", "completed");
-      result.totalSales = (sales ?? []).reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+      const { data: sales } = await s.from("orders").select("total_amount").eq("status", "completed");
+      result.totalSales = (sales ?? []).reduce((sum: number, o: any) => sum + (o.total_amount || 0), 0);
     } catch {}
     try {
       const { data: ratings } = await s.from("reviews").select("rating").eq("is_approved", true);
@@ -832,12 +841,8 @@ export const adminRouter = createRouter({
 
     // Top selling products
     try {
-      const { data } = await s.rpc?.("top_selling_products") ?? { data: [] };
-      if (data) result.topProducts = data;
-      else {
-        const { data: top } = await s.from("order_items").select("product_name,quantity,price,product_id").limit(10);
-        result.topProducts = (top ?? []).slice(0, 5);
-      }
+      const { data: top } = await s.from("order_items").select("product_name,quantity,price,product_id").limit(10);
+      result.topProducts = (top ?? []).slice(0, 5);
     } catch {}
 
     // Most viewed
@@ -848,7 +853,7 @@ export const adminRouter = createRouter({
 
     // Sales by day (last 7 days)
     try {
-      const { data } = await s.from("orders").select("total,created_at,status").gte("created_at", weekAgo);
+      const { data } = await s.from("orders").select("total_amount,created_at,status").gte("created_at", weekAgo);
       const dayMap: Record<string, number> = {};
       for (let i = 6; i >= 0; i--) {
         const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
@@ -856,7 +861,7 @@ export const adminRouter = createRouter({
       }
       for (const o of (data ?? [])) {
         const day = o.created_at?.split('T')[0];
-        if (day && dayMap[day] !== undefined) dayMap[day] += o.total || 0;
+        if (day && dayMap[day] !== undefined) dayMap[day] += o.total_amount || 0;
       }
       result.salesByDay = Object.entries(dayMap).map(([date, sales]) => ({ date, sales }));
     } catch {}
