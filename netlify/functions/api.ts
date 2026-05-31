@@ -25,7 +25,9 @@ export const handler = async (event: any, _context: any) => {
   try {
     // Build headers
     const headers = new Headers();
-    Object.entries(event.headers || {}).forEach(([k, v]) => {
+    const eventHeaders = event.headers || {};
+    console.log("[api] event.headers keys:", Object.keys(eventHeaders).join(", "));
+    Object.entries(eventHeaders).forEach(([k, v]) => {
       if (v !== undefined && v !== null) headers.set(k, String(v));
     });
 
@@ -62,13 +64,17 @@ export const handler = async (event: any, _context: any) => {
     let user = undefined;
     const authHeader =
       event.headers?.authorization || event.headers?.Authorization;
-    if (
-      authHeader &&
-      typeof authHeader === "string" &&
-      authHeader.startsWith("Bearer ")
-    ) {
-      user = await verifySupabaseToken(authHeader.slice(7));
+    console.log("[api] authHeader exists?", !!authHeader, "startsWith Bearer?", authHeader?.startsWith?.("Bearer "));
+    if (authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      console.log("[api] token length:", token.length, "token prefix:", token.substring(0, 20));
+      user = await verifySupabaseToken(token);
+      console.log("[api] verifySupabaseToken result:", user ? `user=${user.id}, role=${user.role}` : "undefined/null");
+    } else {
+      console.warn("[api] NO AUTH HEADER FOUND");
     }
+
+    console.log("[api] ctx.user being passed:", user ? `id=${user.id}, role=${user.role}` : "undefined");
 
     // Route tRPC request
     const response = await fetchRequestHandler({
