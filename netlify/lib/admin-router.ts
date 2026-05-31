@@ -50,7 +50,7 @@ export const adminRouter = createRouter({
       let query = admin()
         .from("products")
         .select(
-          "id,title,price,original_price,discount_percent,is_on_sale,image_url,in_stock,is_active,category_id,created_at,updated_at,description,added_by,updated_by"
+          "id,title,price,original_price,discount_percent,is_on_sale,image_url,in_stock,is_active,category_id,created_at,updated_at,description"
         )
         .order("id", { ascending: false })
         .limit(input?.limit ?? 100);
@@ -582,7 +582,17 @@ export const adminRouter = createRouter({
         console.error("[listCoupons] DB error:", error.message);
         return [];
       }
-      return Array.isArray(data) ? data : [];
+      // Map DB columns (discount_type/discount_value) to frontend fields
+      return (Array.isArray(data) ? data : []).map((c: any) => ({
+        ...c,
+        discount_percent: c.discount_type === 'percent' ? Math.round(c.discount_value || 0) : 0,
+        max_uses: c.usage_limit ?? null,
+        valid_until: c.expires_at ?? null,
+        used_count: c.used_count || 0,
+        is_active: c.is_active ?? true,
+        min_order_amount: 0,
+        is_public: true,
+      }));
     }),
 
   createCoupon: adminQuery
@@ -602,13 +612,12 @@ export const adminRouter = createRouter({
         .from("coupons")
         .insert({
           code: input.code.toUpperCase(),
-          discount_percent: input.discount_percent,
-          max_uses: input.max_uses || null,
-          valid_until: input.valid_until || null,
-          min_order_amount: input.min_order_amount || 0,
+          discount_type: 'percent',
+          discount_value: input.discount_percent,
+          expires_at: input.valid_until || null,
+          usage_limit: input.max_uses || null,
+          used_count: 0,
           is_active: true,
-          is_public: true,
-          created_by: user?.id,
         })
         .select()
         .single();

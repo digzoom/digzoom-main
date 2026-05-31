@@ -51,17 +51,21 @@ export async function verifySupabaseToken(
     if (!authUser.id) return undefined;
 
     // Step 2: Read role from profiles table
-    // CRITICAL: Use SERVICE_ROLE_KEY as apikey to bypass RLS.
-    const roleKey = SERVICE_ROLE_KEY || ANON_KEY;
+    // CRITICAL: Use ANON_KEY as apikey + SERVICE_ROLE_KEY as Bearer to bypass RLS.
     const profileRes = await fetch(
       `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`,
       {
-        headers: { apikey: roleKey },
+        headers: {
+          apikey: ANON_KEY,
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        },
         signal: AbortSignal.timeout(5000),
       }
     );
     const profiles = await profileRes.json().catch(() => []);
-    const role = profiles?.[0]?.role || "user";
+    const role = Array.isArray(profiles) && profiles.length > 0
+      ? profiles[0].role
+      : "user";
 
     return { id: authUser.id, role, email: authUser.email };
   } catch {
