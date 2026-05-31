@@ -18,12 +18,9 @@ export const publicQuery = t.procedure;
 
 // Auth middleware — verifies Supabase token
 const requireAuth = t.middleware(async (opts) => {
-  console.log("[requireAuth] ctx.user?", !!opts.ctx.user, "path:", opts.path);
   if (!opts.ctx.user) {
-    console.warn("[requireAuth] REJECTED — no ctx.user for path:", opts.path);
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Login required" });
   }
-  console.log("[requireAuth] OK — user:", opts.ctx.user.id, "role:", opts.ctx.user.role, "path:", opts.path);
   return opts.next({ ctx: { user: opts.ctx.user } });
 });
 
@@ -55,25 +52,23 @@ export async function verifySupabaseToken(
 
     // Step 2: Read role from profiles table
     // CRITICAL: Use ANON_KEY as apikey + SERVICE_ROLE_KEY as Bearer to bypass RLS.
-    const profileUrl = `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`;
-    const profileRes = await fetch(profileUrl, {
-      headers: {
-        apikey: ANON_KEY,
-        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-      },
-      signal: AbortSignal.timeout(5000),
-    });
-    console.log("[verifySupabaseToken] profileRes status:", profileRes.status, "ok:", profileRes.ok);
-    const profiles = await profileRes.json().catch((e) => { console.error("[verifySupabaseToken] profile JSON parse error:", e.message); return []; });
-    console.log("[verifySupabaseToken] profiles:", JSON.stringify(profiles));
+    const profileRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`,
+      {
+        headers: {
+          apikey: ANON_KEY,
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        },
+        signal: AbortSignal.timeout(5000),
+      }
+    );
+    const profiles = await profileRes.json().catch(() => []);
     const role = Array.isArray(profiles) && profiles.length > 0
       ? profiles[0].role
       : "user";
-    console.log("[verifySupabaseToken] resolved role:", role, "for user:", authUser.id);
 
     return { id: authUser.id, role, email: authUser.email };
-  } catch (e: any) {
-    console.error("[verifySupabaseToken] exception:", e?.message || String(e));
+  } catch {
     return undefined;
   }
 }
