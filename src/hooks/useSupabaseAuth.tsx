@@ -51,6 +51,8 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   // Check saved session on mount
   useEffect(() => {
     const token = localStorage.getItem('sb_access_token');
+    const refresh = localStorage.getItem('sb_refresh_token');
+    console.log('[SupabaseAuthProvider mount] sb_access_token exists?', !!token, 'length:', token?.length || 0, 'sb_refresh_token exists?', !!refresh);
     if (token) {
       loadUser(token).finally(() => setLoading(false));
     } else {
@@ -59,6 +61,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadUser = async (token: string): Promise<boolean> => {
+    console.log('[loadUser] token length:', token.length);
     try {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
         headers: {
@@ -67,7 +70,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         },
         signal: AbortSignal.timeout(10000),
       });
+      console.log('[loadUser] /auth/v1/user res.ok?', res.ok, 'status:', res.status);
       if (!res.ok) {
+        console.warn('[loadUser] /auth/v1/user FAILED - removing token');
         localStorage.removeItem('sb_access_token');
         setUser(null);
         return false;
@@ -85,6 +90,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       );
       const profiles = await profileRes.json().catch(() => []);
       const profile = profiles?.[0] || {};
+      console.log('[loadUser] profile role:', profile.role, 'name:', profile.full_name);
 
       setUser({
         id: authUser.id,
@@ -103,10 +109,17 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Email/Password Login
   const login = useCallback(async (email: string, password: string) => {
+    console.log('[login] attempting login for:', email);
     const { ok, data } = await authApi('token?grant_type=password', { email, password });
-    if (!ok || !data.access_token) return { error: data.msg || data.message || 'Login failed' };
+    console.log('[login] authApi ok?', ok, 'has access_token?', !!data?.access_token, 'token length:', data?.access_token?.length || 0);
+    if (!ok || !data.access_token) {
+      console.error('[login] FAILED:', data?.msg || data?.message || 'No access_token');
+      return { error: data.msg || data.message || 'Login failed' };
+    }
+    console.log('[login] SUCCESS - saving token to localStorage');
     localStorage.setItem('sb_access_token', data.access_token);
     localStorage.setItem('sb_refresh_token', data.refresh_token || '');
+    console.log('[login] localStorage sb_access_token set?', !!localStorage.getItem('sb_access_token'));
     await loadUser(data.access_token);
     return {};
   }, []);

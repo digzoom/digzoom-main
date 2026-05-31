@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useNavigate } from 'react-router';
@@ -28,6 +28,12 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dash');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Debug: log auth state and token
+  useEffect(() => {
+    const token = localStorage.getItem('sb_access_token');
+    console.log('[AdminDashboard] user?', !!user, 'user.id:', user?.id, 'user.role:', user?.role, 'token?', !!token, 'token length:', token?.length || 0);
+  }, [user]);
 
   const SIDEBAR_ITEMS: Array<{ key: Tab; label: string; icon: React.ReactNode }> = [
     { key: 'dash', label: t.admin.dash, icon: <LayoutDashboard className="w-5 h-5" /> },
