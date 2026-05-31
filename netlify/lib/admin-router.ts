@@ -490,4 +490,385 @@ export const adminRouter = createRouter({
       }
       return Array.isArray(data) ? data : [];
     }),
+
+  /* ─── Customers ─── */
+  listCustomers: adminQuery
+    .input(
+      z
+        .object({
+          limit: z.number().min(1).max(500).default(100),
+          search: z.string().optional(),
+        })
+        .optional()
+    )
+    .query(async ({ input }) => {
+      let query = admin()
+        .from("profiles")
+        .select("id,email,full_name,avatar_url,role,created_at")
+        .order("created_at", { ascending: false })
+        .limit(input?.limit ?? 100);
+      if (input?.search) query = query.ilike("email", `%${input.search}%`);
+      const { data, error } = await query;
+      if (error) {
+        console.error("[listCustomers] DB error:", error.message);
+        return [];
+      }
+      const customers = Array.isArray(data) ? data : [];
+      // Get order stats for each customer
+      for (const c of customers) {
+        try {
+          const { count } = await admin()
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .eq("customer_email", c.email);
+          c.order_count = count ?? 0;
+        } catch { c.order_count = 0; }
+        try {
+          const { data: sales } = await admin()
+            .from("orders")
+            .select("total")
+            .eq("customer_email", c.email)
+            .eq("status", "completed");
+          c.total_spent = (sales ?? []).reduce((s: number, o: any) => s + (o.total || 0), 0);
+        } catch { c.total_spent = 0; }
+      }
+      return customers;
+    }),
+
+  /* ─── Coupons ─── */
+  listCoupons: adminQuery
+    .input(
+      z
+        .object({
+          limit: z.number().min(1).max(500).default(100),
+        })
+        .optional()
+    )
+    .query(async ({ input }) => {
+      const { data, error } = await admin()
+        .from("coupons")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(input?.limit ?? 100);
+      if (error) {
+        console.error("[listCoupons] DB error:", error.message);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
+    }),
+
+  createCoupon: adminQuery
+    .input(
+      z.object({
+        code: z.string().min(1),
+        discount_type: z.enum(["percent", "fixed"]),
+        discount_value: z.number().min(0),
+        expires_at: z.string().optional(),
+        usage_limit: z.number().min(1).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const user = (ctx as any).user;
+      const { data, error } = await admin()
+        .from("coupons")
+        .insert({
+          code: input.code.toUpperCase(),
+          discount_type: input.discount_type,
+          discount_value: input.discount_value,
+          expires_at: input.expires_at || null,
+          usage_limit: input.usage_limit || null,
+        })
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      logActivity({
+        adminEmail: user?.email || "unknown",
+        adminId: user?.id,
+        action: "create_coupon",
+        newValue: { code: data.code, discount: data.discount_value, type: data.discount_type },
+      });
+      return data;
+    }),
+
+  updateCoupon: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        code: z.string().min(1).optional(),
+        discount_type: z.enum(["percent", "fixed"]).optional(),
+        discount_value: z.number().min(0).optional(),
+        expires_at: z.string().nullable().optional(),
+        usage_limit: z.number().min(1).nullable().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...update } = input;
+      const { data, error } = await admin()
+        .from("coupons")
+        .update(update)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }),
+
+  toggleCoupon: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const { data: current } = await admin()
+        .from("coupons")
+        .select("is_active")
+        .eq("id", input.id)
+        .single();
+      const { data, error } = await admin()
+        .from("coupons")
+        .update({ is_active: !current?.is_active })
+        .eq("id", input.id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }),
+
+  deleteCoupon: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const { error } = await admin()
+        .from("coupons")
+        .delete()
+        .eq("id", input.id);
+      if (error) throw new Error(error.message);
+      return { success: true };
+    }),
+
+  /* ─── Reviews ─── */
+  listReviews: adminQuery
+    .input(
+      z
+        .object({
+          limit: z.number().min(1).max(500).default(100),
+          productId: z.number().optional(),
+          status: z.enum(["approved", "pending", "all"]).default("all"),
+        })
+        .optional()
+    )
+    .query(async ({ input }) => {
+      let query = admin()
+        .from("reviews")
+        .select("*,products(title)")
+        .order("created_at", { ascending: false })
+        .limit(input?.limit ?? 100);
+      if (input?.productId) query = query.eq("product_id", input.productId);
+      if (input?.status === "approved") query = query.eq("is_approved", true);
+      if (input?.status === "pending") query = query.eq("is_approved", false);
+      const { data, error } = await query;
+      if (error) {
+        console.error("[listReviews] DB error:", error.message);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
+    }),
+
+  approveReview: adminQuery
+    .input(z.object({ id: z.number(), approve: z.boolean() }))
+    .mutation(async ({ input }) => {
+      const { data, error } = await admin()
+        .from("reviews")
+        .update({ is_approved: input.approve })
+        .eq("id", input.id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }),
+
+  deleteReview: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const { error } = await admin()
+        .from("reviews")
+        .delete()
+        .eq("id", input.id);
+      if (error) throw new Error(error.message);
+      return { success: true };
+    }),
+
+  /* ─── Product Images ─── */
+  listProductImages: adminQuery
+    .input(z.object({ productId: z.number() }))
+    .query(async ({ input }) => {
+      const { data, error } = await admin()
+        .from("product_images")
+        .select("*")
+        .eq("product_id", input.productId)
+        .order("sort_order", { ascending: true });
+      if (error) {
+        console.error("[listProductImages] DB error:", error.message);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
+    }),
+
+  addProductImage: adminQuery
+    .input(
+      z.object({
+        productId: z.number(),
+        imageUrl: z.string().min(1),
+        isPrimary: z.boolean().default(false),
+      })
+    )
+    .mutation(async ({ input }) => {
+      if (input.isPrimary) {
+        await admin()
+          .from("product_images")
+          .update({ is_primary: false })
+          .eq("product_id", input.productId);
+      }
+      const { data, error } = await admin()
+        .from("product_images")
+        .insert({
+          product_id: input.productId,
+          image_url: input.imageUrl,
+          is_primary: input.isPrimary,
+        })
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }),
+
+  removeProductImage: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const { error } = await admin()
+        .from("product_images")
+        .delete()
+        .eq("id", input.id);
+      if (error) throw new Error(error.message);
+      return { success: true };
+    }),
+
+  setPrimaryImage: adminQuery
+    .input(z.object({ id: z.number(), productId: z.number() }))
+    .mutation(async ({ input }) => {
+      await admin()
+        .from("product_images")
+        .update({ is_primary: false })
+        .eq("product_id", input.productId);
+      const { data, error } = await admin()
+        .from("product_images")
+        .update({ is_primary: true })
+        .eq("id", input.id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    }),
+
+  /* ─── Analytics ─── */
+  getAnalytics: adminQuery.query(async () => {
+    const s = admin();
+    const result: any = {
+      productCount: 0,
+      orderCount: 0,
+      totalSales: 0,
+      customerCount: 0,
+      reviewCount: 0,
+      avgRating: 0,
+      viewsToday: 0,
+      viewsWeek: 0,
+      viewsMonth: 0,
+      topProducts: [],
+      mostViewed: [],
+      salesByDay: [],
+      ordersByStatus: {},
+    };
+
+    try {
+      const { count } = await s.from("products").select("id", { count: "exact", head: true });
+      result.productCount = count ?? 0;
+    } catch {}
+    try {
+      const { count } = await s.from("orders").select("id", { count: "exact", head: true });
+      result.orderCount = count ?? 0;
+    } catch {}
+    try {
+      const { count } = await s.from("profiles").select("id", { count: "exact", head: true });
+      result.customerCount = count ?? 0;
+    } catch {}
+    try {
+      const { count } = await s.from("reviews").select("id", { count: "exact", head: true });
+      result.reviewCount = count ?? 0;
+    } catch {}
+    try {
+      const { data: sales } = await s.from("orders").select("total").eq("status", "completed");
+      result.totalSales = (sales ?? []).reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+    } catch {}
+    try {
+      const { data: ratings } = await s.from("reviews").select("rating").eq("is_approved", true);
+      const r = ratings ?? [];
+      result.avgRating = r.length > 0 ? r.reduce((s: number, x: any) => s + x.rating, 0) / r.length : 0;
+    } catch {}
+
+    // Views
+    const now = new Date();
+    const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    try {
+      const { count } = await s.from("product_views").select("id", { count: "exact", head: true }).gte("viewed_at", dayAgo);
+      result.viewsToday = count ?? 0;
+    } catch {}
+    try {
+      const { count } = await s.from("product_views").select("id", { count: "exact", head: true }).gte("viewed_at", weekAgo);
+      result.viewsWeek = count ?? 0;
+    } catch {}
+    try {
+      const { count } = await s.from("product_views").select("id", { count: "exact", head: true }).gte("viewed_at", monthAgo);
+      result.viewsMonth = count ?? 0;
+    } catch {}
+
+    // Top selling products
+    try {
+      const { data } = await s.rpc?.("top_selling_products") ?? { data: [] };
+      if (data) result.topProducts = data;
+      else {
+        const { data: top } = await s.from("order_items").select("product_name,quantity,price,product_id").limit(10);
+        result.topProducts = (top ?? []).slice(0, 5);
+      }
+    } catch {}
+
+    // Most viewed
+    try {
+      const { data } = await s.from("product_views").select("product_id,count").limit(5);
+      result.mostViewed = data ?? [];
+    } catch {}
+
+    // Sales by day (last 7 days)
+    try {
+      const { data } = await s.from("orders").select("total,created_at,status").gte("created_at", weekAgo);
+      const dayMap: Record<string, number> = {};
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        dayMap[d.toISOString().split('T')[0]] = 0;
+      }
+      for (const o of (data ?? [])) {
+        const day = o.created_at?.split('T')[0];
+        if (day && dayMap[day] !== undefined) dayMap[day] += o.total || 0;
+      }
+      result.salesByDay = Object.entries(dayMap).map(([date, sales]) => ({ date, sales }));
+    } catch {}
+
+    // Orders by status
+    try {
+      const { data } = await s.from("orders").select("status");
+      const counts: Record<string, number> = {};
+      for (const o of (data ?? [])) { counts[o.status] = (counts[o.status] || 0) + 1; }
+      result.ordersByStatus = counts;
+    } catch {}
+
+    return result;
+  }),
 });
