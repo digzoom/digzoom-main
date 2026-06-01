@@ -48,6 +48,11 @@ export default function AdminDashboard() {
 
   if (authLoading) return <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center text-gray-500">{t.admin.loading}</div>;
 
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
+
   const isAr = lang === 'ar';
 
   return (

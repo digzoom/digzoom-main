@@ -1,4 +1,4 @@
-import { Target, Users, Globe, Zap, Award, TrendingUp } from 'lucide-react';
+import { Target, Users, Globe, Zap, Award, TrendingUp, Mail, Download, Briefcase, Layers } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function About() {
@@ -24,6 +24,35 @@ export default function About() {
         <div className="text-center mb-20">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">{t.about.title}</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">{t.about.heroText}</p>
+          <div className="mt-6 inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full px-4 py-2 text-sm">
+            <Mail className="w-4 h-4" /> info@digzoom.com
+          </div>
+        </div>
+
+        {/* What We Offer — Stripe Compliance Section */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-white text-center mb-4">
+            {t.lang === 'ar' ? 'ماذا نقدم' : 'What We Offer'}
+          </h2>
+          <p className="text-gray-400 text-center max-w-xl mx-auto mb-10">
+            {t.lang === 'ar'
+              ? 'نحن سوق رقمي متخصص في المنتجات والملفات الرقمية القابلة للتحميل'
+              : 'We are a digital marketplace specializing in downloadable digital products and files'}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: <Download className="w-6 h-6 text-blue-400" />, title: t.lang === 'ar' ? 'تنزيلات رقمية' : 'Digital Downloads', desc: t.lang === 'ar' ? 'قوالب، تصاميم، ملفات جرافيك جاهزة للتحميل الفوري' : 'Templates, designs, and graphic files available for instant download' },
+              { icon: <Briefcase className="w-6 h-6 text-purple-400" />, title: t.lang === 'ar' ? 'موارد الأعمال' : 'Business Resources', desc: t.lang === 'ar' ? 'خطط أعمال، نماذج احترافية، أدلة تعليمية' : 'Business plans, professional templates, educational guides' },
+              { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: t.lang === 'ar' ? 'قوالب وقوالب' : 'Templates & Assets', desc: t.lang === 'ar' ? 'قوالب فيديو، ملفات صوتية، كتب إلكترونية' : 'Video templates, audio files, ebooks' },
+              { icon: <Globe className="w-6 h-6 text-emerald-400" />, title: t.lang === 'ar' ? 'دعم عالمي' : 'Global Support', desc: t.lang === 'ar' ? 'نخدم الأفراد والشركات في جميع أنحاء العالم' : 'Serving individuals and businesses worldwide' },
+            ].map((item, i) => (
+              <div key={i} className="bg-[#151520] rounded-2xl p-6 border border-white/[0.04] text-center hover:border-white/[0.08] transition-all group">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.03] mb-4 group-hover:bg-white/[0.06] transition-colors">{item.icon}</div>
+                <h3 className="text-white font-semibold mb-2">{item.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Brand Identity */}

@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   ArrowLeft, ArrowRight, Sparkles, Download, ShieldCheck, Zap,
   ShoppingCart, Instagram, Youtube, Twitter, MessageSquare,
@@ -57,7 +58,7 @@ const testimonials = [
   { name: 'محمد السيد', role: 'صانع محتوى', avatar: 'م', text: 'أفضل سوق عربي للمنتجات الرقمية. جودة المنتجات ممتازة والدعم سريع جداً. أنصح الجميع بالتجربة!' },
   { name: 'سارة أحمد', role: 'مصممة جرافيك', avatar: 'س', text: 'قوالب التصميم رائعة وتوفر عليّ ساعات طويلة من العمل. أسعار منافسة جداً مقارنة بالمواقع الأجنبية.' },
   { name: 'عبدالله الخالد', role: 'مسوق إلكتروني', avatar: 'ع', text: 'منتجات PLR ساعدتني في بناء مشروعي الخاص بسرعة. التحميل فوري والجودة ممتازة. شكراً digzoom!' },
-  { name: 'نورة الفهد', role: 'مدونة', avatar: 'ن', text: 'خدمات السوشال ميديا ممتازة والنتائج سريعة. زاد تفاعل حسابي بنسبة 300% خلال أسبوع واحد فقط.' },
+  { name: 'نورة الفهد', role: 'مدونة', avatar: 'ن', text: 'القوالب والتصاميم الرقمية ممتازة والجودة عالية. وفرت عليّ الكثير من الوقت في إعداد محتوى احترافي.' },
   { name: 'خالد المنصور', role: 'مطور تطبيقات', avatar: 'خ', text: 'مكتبة الأكواد والتقنيات شاملة ومحدثة. وفرت عليّ الكثير من الوقت في تطوير مشاريعي.' },
   { name: 'فاطمة الزهراء', role: 'صاحبة متجر', avatar: 'ف', text: 'الكتب الإلكترونية والقوالب ساعدتني في تطوير متجري الإلكتروني. تجربة شراء سلسة ودعم رائع.' },
 ];
@@ -66,6 +67,7 @@ const testimonials = [
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -146,8 +148,8 @@ export default function Home() {
               تصفح المنتجات
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <Link to="/social" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/10 text-white hover:bg-white/5 px-8 py-4 text-base rounded-xl transition-all font-medium">
-              خدمات السوشال ميديا
+            <Link to="/about" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/10 text-white hover:bg-white/5 px-8 py-4 text-base rounded-xl transition-all font-medium">
+              {lang === 'ar' ? 'تعرف علينا' : 'About Us'}
             </Link>
           </div>
 
@@ -171,36 +173,6 @@ export default function Home() {
               <div className="text-gray-500 text-sm">{s.label}</div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* ─── Social Media Services ─── */}
-      <section className="py-16 bg-gradient-to-b from-[#0a0a0f] via-[#0f0a1a] to-[#0a0a0f]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
-              <TrendingUp className="w-4 h-4 text-purple-400" />
-              <span className="text-purple-300 text-xs font-bold">خدمات السوشال ميديا</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-              10 منصات، خدمات احترافية
-            </h2>
-            <p className="text-gray-400 text-sm max-w-xl mx-auto">
-              أكثر من 500 خدمة متاحة لتنمية حساباتك بأسعار تنافسية وسرعة تنفيذ
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {platforms.map((p) => (
-              <Link key={p.id} to={`/social/${p.id}`} className="group relative p-5 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-purple-500/20 transition-all text-center">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${p.color} mb-3 text-white`}>
-                  {p.icon}
-                </div>
-                <div className="font-semibold text-white text-sm">{p.name}</div>
-                <div className="text-gray-500 text-xs mt-1">50+ خدمة</div>
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -373,11 +345,12 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-3">الخدمات</h4>
+              <h4 className="font-semibold text-white mb-3">المتجر</h4>
               <div className="space-y-2 text-sm">
-                {['سوشال ميديا', 'تسويق رقمي', 'الاشتراكات'].map((item, i) => (
-                  <Link key={i} to={['/social', '/marketing', '/subscriptions'][i]} className="block text-gray-500 hover:text-white transition-colors">{item}</Link>
-                ))}
+                <Link to="/shop?category=pdf" className="block text-gray-500 hover:text-white transition-colors">كتب إلكترونية</Link>
+                <Link to="/shop?category=templates" className="block text-gray-500 hover:text-white transition-colors">قوالب</Link>
+                <Link to="/shop?category=graphics" className="block text-gray-500 hover:text-white transition-colors">تصاميم</Link>
+                <Link to="/shop?category=videos" className="block text-gray-500 hover:text-white transition-colors">فيديوهات</Link>
               </div>
             </div>
             <div>
@@ -386,11 +359,13 @@ export default function Home() {
                 <Link to="/privacy" className="block text-gray-500 hover:text-white transition-colors">سياسة الخصوصية</Link>
                 <Link to="/terms" className="block text-gray-500 hover:text-white transition-colors">شروط الاستخدام</Link>
                 <Link to="/refund" className="block text-gray-500 hover:text-white transition-colors">سياسة الاسترجاع</Link>
+                <Link to="/delivery" className="block text-gray-500 hover:text-white transition-colors">سياسة التسليم</Link>
+                <Link to="/acceptable-use" className="block text-gray-500 hover:text-white transition-colors">سياسة الاستخدام</Link>
               </div>
             </div>
           </div>
           <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-600 text-sm">© 2025 digzoom. جميع الحقوق محفوظة.</p>
+            <p className="text-gray-600 text-sm">© 2025 DigZoom. info@digzoom.com</p>
             <div className="flex items-center gap-4 text-sm">
               <Link to="/privacy" className="text-gray-600 hover:text-gray-400 transition-colors">سياسة الخصوصية</Link>
               <Link to="/terms" className="text-gray-600 hover:text-gray-400 transition-colors">شروط الاستخدام</Link>
