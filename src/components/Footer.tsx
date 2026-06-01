@@ -41,7 +41,7 @@ export default function Footer() {
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">{t.footer.desc}</p>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-gray-400 text-sm"><Mail className="w-4 h-4 text-blue-400" /><span>support@digzoom.com</span></div>
+              <div className="flex items-center gap-3 text-gray-400 text-sm"><Mail className="w-4 h-4 text-blue-400" /><span>info@digzoom.com</span></div>
               <div className="flex items-center gap-3 text-gray-400 text-sm" dir="ltr"><Phone className="w-4 h-4 text-purple-400" /><span>+966 56 988 8456</span></div>
               <a href="https://wa.me/00966569888456" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-emerald-400 transition-colors" dir="ltr"><MessageCircle className="w-4 h-4 text-emerald-400" /><span>+966 56 988 8456</span></a>
             </div>

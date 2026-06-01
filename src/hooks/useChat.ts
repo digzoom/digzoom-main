@@ -58,7 +58,7 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['دعم', 'مساعدة', 'مساعدتي', 'مشكلة', 'مشكلتي', 'مساعدة', 'ساعدني', 'ساعد', 'فزعة', 'مساعده', 'تواصل', 'واتس', 'واتساب', 'اتصال', 'كلم', 'رقم', 'تلفون', 'جوال', 'هاتف', 'whatsapp', 'اتصل', 'شكوى', 'ابلاغ'],
-      response: 'فريق الدعم جاهز يساعدك! 🛎️\n\n📱 واتساب: 00966569888456\n📧 بريد: support@digzoom.com\n💬 أو ابقى معي أنا مساعدك الذكي!\n\nمتاحين 24/7 على مدار الساعة 🕐',
+      response: 'فريق الدعم جاهز يساعدك! 🛎️\n\n📱 واتساب: 00966569888456\n📧 بريد: info@digzoom.com\n💬 أو ابقى معي أنا مساعدك الذكي!\n\nمتاحين 24/7 على مدار الساعة 🕐',
       suggestions: ['مشكلة في التحميل', 'المنتج ما يشتغل', 'طلب استرجاع']
     },
     {
@@ -125,7 +125,7 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['support', 'help', 'assist', 'contact', 'whatsapp', 'phone', 'call', 'number', 'reach', 'complaint', 'report', 'customer service'],
-      response: 'Our support team is ready to help! 🛎️\n\n📱 WhatsApp: 00966569888456\n📧 Email: support@digzoom.com\n💬 Or chat with me - I\'m your AI assistant!\n\nAvailable 24/7 around the clock 🕐',
+      response: 'Our support team is ready to help! 🛎️\n\n📱 WhatsApp: 00966569888456\n📧 Email: info@digzoom.com\n💬 Or chat with me - I\'m your AI assistant!\n\nAvailable 24/7 around the clock 🕐',
       suggestions: ['Download issue', 'Product not working', 'Refund request']
     },
     {

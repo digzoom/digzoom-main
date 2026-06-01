@@ -292,7 +292,7 @@ export default function Admin() {
                 </div>
                 <div>
                   <label className="block text-gray-500 text-sm mb-2">{lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</label>
-                  <input type="email" defaultValue="support@digzoom.com" className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm" dir="ltr" />
+                  <input type="email" defaultValue="info@digzoom.com" className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm" dir="ltr" />
                 </div>
               </div>
             </div>

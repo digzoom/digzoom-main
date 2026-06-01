@@ -76,7 +76,7 @@ export default function Privacy() {
               إذا كان لديك أي استفسار حول سياسة الخصوصية، يرجى التواصل معنا:
             </p>
             <div className="space-y-1 text-gray-300 text-sm">
-              <p>البريد الإلكتروني: support@digzoom.com</p>
+              <p>البريد الإلكتروني: info@digzoom.com</p>
               <p>واتساب: +966 56 988 8456</p>
             </div>
           </div>

@@ -94,7 +94,7 @@ export default function Refund() {
             <ol className="space-y-3 text-gray-400 text-sm md:text-base">
               <li className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                <span>أرسل طلب الاسترجاع عبر البريد support@digzoom.com أو واتساب</span>
+                <span>أرسل طلب الاسترجاع عبر البريد info@digzoom.com أو واتساب</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
@@ -114,7 +114,7 @@ export default function Refund() {
           <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-5 md:p-6 mt-10">
             <h3 className="text-white font-semibold mb-3 text-sm md:text-base">للتواصل بخصوص الاسترجاع</h3>
             <div className="space-y-1 text-gray-300 text-sm">
-              <p>البريد الإلكتروني: support@digzoom.com</p>
+              <p>البريد الإلكتروني: info@digzoom.com</p>
               <p>واتساب: +966 56 988 8456</p>
             </div>
           </div>

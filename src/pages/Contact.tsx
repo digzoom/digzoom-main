@@ -19,7 +19,7 @@ export default function Contact() {
   };
 
   const contactInfo = [
-    { icon: <Mail className="w-5 h-5 text-blue-400" />, title: t.contact.email, value: 'support@digzoom.com', color: 'blue' },
+    { icon: <Mail className="w-5 h-5 text-blue-400" />, title: t.contact.email, value: 'info@digzoom.com', color: 'blue' },
     { icon: <Phone className="w-5 h-5 text-purple-400" />, title: t.contact.phone, value: '+966 56 988 8456', color: 'purple' },
     { icon: <MessageCircle className="w-5 h-5 text-emerald-400" />, title: t.contact.whatsapp, value: '+966 56 988 8456', color: 'emerald', link: 'https://wa.me/00966569888456' },
     { icon: <MapPin className="w-5 h-5 text-orange-400" />, title: t.contact.location, value: t.contact.locationValue, color: 'orange' },
