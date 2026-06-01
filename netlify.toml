@@ -3,6 +3,12 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# Contact form submission — MUST be before /api/*
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/contact"
+  status = 200
+
 # tRPC batch endpoint — exact match for /api (no trailing slash)
 [[redirects]]
   from = "/api"
@@ -13,12 +19,6 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
-  status = 200
-
-# Contact form submission
-[[redirects]]
-  from = "/api/contact"
-  to = "/.netlify/functions/contact"
   status = 200
 
 # SPA fallback

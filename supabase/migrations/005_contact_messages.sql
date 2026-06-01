@@ -13,9 +13,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status);
 CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(created_at DESC);
 
--- Enable RLS
+-- Enable RLS: blocks ALL access by default
+-- Netlify Function uses SERVICE_ROLE_KEY which bypasses RLS automatically
+-- No policies needed — service role is the only way to access this table
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
-
--- Only service role (backend) can insert/select
-CREATE POLICY "Service role full access" ON contact_messages
-  USING (true) WITH CHECK (true);
