@@ -582,16 +582,9 @@ export const adminRouter = createRouter({
         console.error("[listCoupons] DB error:", error.message);
         return [];
       }
-      // Map DB columns (discount_type/discount_value) to frontend fields
       return (Array.isArray(data) ? data : []).map((c: any) => ({
         ...c,
-        discount_percent: c.discount_type === 'percent' ? Math.round(c.discount_value || 0) : 0,
-        max_uses: c.usage_limit ?? null,
-        valid_until: c.expires_at ?? null,
         used_count: c.used_count || 0,
-        is_active: c.is_active ?? true,
-        min_order_amount: 0,
-        is_public: true,
       }));
     }),
 
@@ -612,10 +605,9 @@ export const adminRouter = createRouter({
         .from("coupons")
         .insert({
           code: input.code.toUpperCase(),
-          discount_type: 'percent',
-          discount_value: input.discount_percent,
-          expires_at: input.valid_until || null,
-          usage_limit: input.max_uses || null,
+          discount_percent: input.discount_percent,
+          max_uses: input.max_uses || null,
+          valid_until: input.valid_until || null,
           used_count: 0,
           is_active: true,
         })
