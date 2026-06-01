@@ -32,12 +32,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="w-11 h-11 rounded-lg overflow-hidden ring-2 ring-white/10">
-                <img src="/images/logo-light.jpg" alt="digzoom" className="w-full h-full object-cover" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-white leading-none">dig<span className="text-blue-400">zoom</span></span>
-                <span className="text-[9px] text-gray-500 tracking-[0.2em] mt-0.5">Digital Products Marketplace</span>
+              <div className="h-12 w-auto overflow-hidden rounded-xl ring-1 ring-white/10">
+                <img
+                  src="/images/logo-main.jpg"
+                  alt="DigZoom"
+                  className="h-full w-auto object-contain"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
               </div>
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">

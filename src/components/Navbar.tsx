@@ -43,16 +43,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-blue-500/50 transition-all">
-              <img src="/images/logo-light.jpg" alt="digzoom" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold text-white tracking-tight leading-none">
-                dig<span className="text-blue-400">zoom</span>
-              </span>
-              <span className="text-[8px] text-gray-500 tracking-[0.2em] uppercase mt-0.5">
-                {isAr ? 'ديجي زوم' : 'Digital Products'}
-              </span>
+            <div className="h-10 w-auto flex-shrink-0 overflow-hidden rounded-lg ring-2 ring-white/10 group-hover:ring-blue-500/50 transition-all">
+              <img
+                src="/images/logo-main.jpg"
+                alt="DigZoom"
+                className="h-full w-auto object-contain"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
             </div>
           </Link>
 

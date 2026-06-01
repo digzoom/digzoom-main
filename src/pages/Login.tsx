@@ -111,13 +111,14 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg overflow-hidden ring-2 ring-white/10 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">DZ</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white">dig<span className="text-blue-400">zoom</span></span>
-              <span className="text-[9px] text-gray-500 tracking-[0.2em]">{lang === 'ar' ? 'ديجي زوم' : 'Digzoom'}</span>
+          <Link to="/" className="inline-block">
+            <div className="h-16 w-auto overflow-hidden rounded-xl ring-1 ring-white/10 mx-auto">
+              <img
+                src="/images/logo-main.jpg"
+                alt="DigZoom"
+                className="h-full w-auto object-contain"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
             </div>
           </Link>
         </div>
