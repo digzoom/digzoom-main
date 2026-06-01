@@ -26,9 +26,7 @@ const requireAuth = t.middleware(async (opts) => {
 
 // Admin middleware — requires role === "admin"
 const requireAdmin = t.middleware(async (opts) => {
-  console.log("[requireAdmin] user?", !!opts.ctx.user, "role:", opts.ctx.user?.role, "path:", opts.path);
   if (!opts.ctx.user || opts.ctx.user.role !== "admin") {
-    console.warn("[requireAdmin] REJECTED — role is:", opts.ctx.user?.role, "expected: admin");
     throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
   }
   return opts.next({ ctx: { user: opts.ctx.user } });
@@ -53,27 +51,25 @@ export async function verifySupabaseToken(
     if (!authUser.id) return undefined;
 
     // Step 2: Read role from profiles table
-    // CRITICAL: Use ANON_KEY as apikey + SERVICE_ROLE_KEY as Bearer to bypass RLS.
+    // CRITICAL: Use SERVICE_ROLE_KEY as apikey to bypass RLS.
+    // SERVICE_ROLE_KEY has format "sb_secret_*" which is NOT a valid JWT.
+    // It must be sent as apikey (not as Bearer token).
     const profileRes = await fetch(
       `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`,
       {
         headers: {
-          apikey: ANON_KEY,
-          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          apikey: SERVICE_ROLE_KEY || ANON_KEY,
         },
         signal: AbortSignal.timeout(5000),
       }
     );
     const profiles = await profileRes.json().catch(() => []);
-    console.log("[verifySupabaseToken] profile query status:", profileRes.status, "profiles:", JSON.stringify(profiles));
     const role = Array.isArray(profiles) && profiles.length > 0
       ? profiles[0].role
       : "user";
-    console.log("[verifySupabaseToken] resolved:", { id: authUser.id, email: authUser.email, role });
 
     return { id: authUser.id, role, email: authUser.email };
   } catch {
-    console.error("[verifySupabaseToken] EXCEPTION");
     return undefined;
   }
 }

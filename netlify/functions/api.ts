@@ -62,12 +62,8 @@ export const handler = async (event: any, _context: any) => {
     let user = undefined;
     const authHeader =
       event.headers?.authorization || event.headers?.Authorization;
-    console.log("[api] authHeader?", !!authHeader, "path:", event.path || event.rawUrl);
     if (authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
       user = await verifySupabaseToken(authHeader.slice(7));
-      console.log("[api] user:", user?.id, "role:", user?.role);
-    } else {
-      console.warn("[api] NO AUTH HEADER");
     }
 
     // Route tRPC request
