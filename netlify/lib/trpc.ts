@@ -26,7 +26,9 @@ const requireAuth = t.middleware(async (opts) => {
 
 // Admin middleware — requires role === "admin"
 const requireAdmin = t.middleware(async (opts) => {
+  console.log("[requireAdmin] user?", !!opts.ctx.user, "role:", opts.ctx.user?.role, "path:", opts.path);
   if (!opts.ctx.user || opts.ctx.user.role !== "admin") {
+    console.warn("[requireAdmin] REJECTED — role is:", opts.ctx.user?.role, "expected: admin");
     throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
   }
   return opts.next({ ctx: { user: opts.ctx.user } });
@@ -63,12 +65,15 @@ export async function verifySupabaseToken(
       }
     );
     const profiles = await profileRes.json().catch(() => []);
+    console.log("[verifySupabaseToken] profile query status:", profileRes.status, "profiles:", JSON.stringify(profiles));
     const role = Array.isArray(profiles) && profiles.length > 0
       ? profiles[0].role
       : "user";
+    console.log("[verifySupabaseToken] resolved:", { id: authUser.id, email: authUser.email, role });
 
     return { id: authUser.id, role, email: authUser.email };
   } catch {
+    console.error("[verifySupabaseToken] EXCEPTION");
     return undefined;
   }
 }
