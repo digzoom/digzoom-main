@@ -14,6 +14,8 @@ export default function Footer() {
   const companyLinks = [
     { name: t.navbar.about, path: '/about' },
     { name: t.navbar.contact, path: '/contact' },
+    { name: lang === 'ar' ? 'معلومات الشركة' : 'Company Information', path: '/company' },
+    { name: lang === 'ar' ? 'الثقة والأمان' : 'Trust & Security', path: '/trust-security' },
   ];
   const legalLinks = [
     { name: lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy', path: '/privacy' },
@@ -71,10 +73,17 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-16 pt-8 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} DigZoom. {lang === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
-          <div className="flex items-center gap-6">
-            <span className="text-gray-500 text-sm">info@digzoom.com</span>
+        <div className="mt-16 pt-8 border-t border-white/[0.04]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+            <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} DigZoom. {lang === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
+            <div className="flex items-center gap-6">
+              <span className="text-gray-500 text-sm">info@digzoom.com</span>
+            </div>
+          </div>
+          <div className="text-center pt-4 border-t border-white/[0.02]">
+            <p className="text-gray-600 text-xs uppercase tracking-wider">
+              DIGZOOM LIMITED LIABILITY COMPANY &middot; WYOMING, USA &middot; info@digzoom.com
+            </p>
           </div>
         </div>
       </div>

@@ -21,6 +21,8 @@ import Terms from './pages/Terms';
 import Refund from './pages/Refund';
 import DeliveryPolicy from './pages/DeliveryPolicy';
 import AcceptableUsePolicy from './pages/AcceptableUsePolicy';
+import CompanyInformation from './pages/CompanyInformation';
+import TrustSecurity from './pages/TrustSecurity';
 
 export default function App() {
   return (
@@ -47,6 +49,8 @@ export default function App() {
               <Route path="/refund" element={<Refund />} />
               <Route path="/delivery" element={<DeliveryPolicy />} />
               <Route path="/acceptable-use" element={<AcceptableUsePolicy />} />
+              <Route path="/company" element={<CompanyInformation />} />
+              <Route path="/trust-security" element={<TrustSecurity />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

@@ -1,8 +1,8 @@
-import { Target, Users, Globe, Zap, Award, TrendingUp, Mail, Download, Briefcase, Layers } from 'lucide-react';
+import { Target, Users, Globe, Zap, Award, TrendingUp, Mail, Download, Briefcase, Layers, Building2, Headphones, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const values = [
     { icon: <Target className="w-6 h-6 text-blue-400" />, title: t.about.v1Title, desc: t.about.v1Desc },
@@ -88,6 +88,39 @@ export default function About() {
           </div>
           <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
             <img src="/images/brand-mockup.jpg" alt="digzoom brand" className="w-full h-full object-cover" />
+          </div>
+        </div>
+
+        {/* Who We Are */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-white text-center mb-4">
+            {lang === 'ar' ? 'من نحن' : 'Who We Are'}
+          </h2>
+          <p className="text-gray-400 text-center max-w-3xl mx-auto leading-relaxed mb-8">
+            {lang === 'ar'
+              ? 'DigZoom هي شركة أمريكية مسجلة متخصصة في التجارة الرقمية، نركز على تقديم منتجات رقمية عالية الجودة، وموارد أعمال، وقوالب، وأدلة، وحلول رقمية احترافية للأفراد والشركات في جميع أنحاء العالم.'
+              : 'DigZoom is a U.S.-registered digital commerce company focused on delivering high-quality digital products, business resources, templates, guides, and professional digital solutions for individuals and businesses worldwide.'}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+            {(lang === 'ar' ? [
+              { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'شركة أمريكية مسجلة', desc: 'LLC في وايومنغ' },
+              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'تسليم رقمي آمن', desc: 'تحميل فوري بعد الدفع' },
+              { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'دعم احترافي', desc: 'رد خلال 24 ساعة' },
+              { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'منتجات رقمية', desc: 'قوالب، كتب، ملفات' },
+              { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'ممارسات شفافة', desc: 'أمان وموثوقية' },
+            ] : [
+              { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'U.S. Registered', desc: 'Wyoming LLC' },
+              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'Secure Delivery', desc: 'Instant downloads' },
+              { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'Pro Support', desc: '24-hour response' },
+              { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'Digital Products', desc: 'Templates, ebooks' },
+              { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'Transparent', desc: 'Safe & trusted' },
+            ]).map((item, i) => (
+              <div key={i} className="bg-[#151520] rounded-2xl p-5 border border-white/[0.04] text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] mb-3">{item.icon}</div>
+                <h4 className="text-white font-semibold text-sm mb-1">{item.title}</h4>
+                <p className="text-gray-500 text-xs">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
 
