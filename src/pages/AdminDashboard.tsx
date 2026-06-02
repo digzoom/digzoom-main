@@ -29,11 +29,12 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState<Tab>('dash');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Debug: log auth state and token
+  // Admin guard: only allow admin users
   useEffect(() => {
-    const token = localStorage.getItem('sb_access_token');
-    console.log('[AdminDashboard] user?', !!user, 'user.id:', user?.id, 'user.role:', user?.role, 'token?', !!token, 'token length:', token?.length || 0);
-  }, [user]);
+    if (!authLoading && user && user.role !== 'admin') {
+      navigate('/');
+    }
+  }, [authLoading, user, navigate]);
 
   const SIDEBAR_ITEMS: Array<{ key: Tab; label: string; icon: React.ReactNode }> = [
     { key: 'dash', label: t.admin.dash, icon: <LayoutDashboard className="w-5 h-5" /> },

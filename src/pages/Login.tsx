@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Zap, LogIn, UserPlus, ArrowLeft, Globe } from 'lucide-react';
+import { Zap, LogIn, UserPlus, ArrowLeft, Globe, Eye, EyeOff } from 'lucide-react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -11,6 +11,7 @@ export default function Login() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -194,16 +195,27 @@ export default function Login() {
             </div>
             <div>
               <label className="block text-gray-400 text-sm mb-2">{lang === 'ar' ? 'كلمة المرور' : 'Password'}</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/40 transition-colors"
-                placeholder="••••••••"
-                dir="ltr"
-                required
-                minLength={6}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 pr-12 text-white text-sm focus:outline-none focus:border-blue-500/40 transition-colors"
+                  placeholder="••••••••"
+                  dir="ltr"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors p-1"
+                  tabIndex={-1}
+                  aria-label={showPassword ? (lang === 'ar' ? 'إخفاء' : 'Hide') : (lang === 'ar' ? 'إظهار' : 'Show')}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               <p className="text-gray-600 text-xs mt-1">
                 {lang === 'ar' ? '6 أحرف على الأقل' : 'At least 6 characters'}
               </p>
