@@ -2,6 +2,7 @@ import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 
 interface ContactPayload {
@@ -30,7 +31,7 @@ async function saveToSupabase(payload: ContactPayload) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_messages`, {
     method: "POST",
     headers: {
-      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      apikey: ANON_KEY,
       Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
       "Content-Type": "application/json",
       Prefer: "return=minimal",
