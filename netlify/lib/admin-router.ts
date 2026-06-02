@@ -36,6 +36,87 @@ export const adminRouter = createRouter({
   // Health check — no auth
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
 
+  /* ─── Create Order (public — guest checkout, no auth required) ─── */
+  createOrder: publicQuery
+    .input(
+      z.object({
+        customer_name: z.string().min(1),
+        customer_email: z.string().email(),
+        customer_phone: z.string().optional(),
+        items: z.array(
+          z.object({
+            product_id: z.number(),
+            quantity: z.number().min(1),
+            price: z.number().min(0),
+            title: z.string(),
+            product_type: z.string().default("digital_download"),
+          })
+        ),
+        subtotal: z.number().min(0),
+        tax_amount: z.number().min(0).default(0),
+        total_amount: z.number().min(0),
+        discount_amount: z.number().min(0).default(0),
+        coupon_code: z.string().optional(),
+        coupon_discount: z.number().min(0).default(0),
+        customer_notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const orderId = `DZ-${Date.now().toString(36).toUpperCase()}`;
+
+      // 1. Insert order
+      const { error: orderError } = await admin()
+        .from("orders")
+        .insert({
+          id: orderId,
+          status: "pending",
+          subtotal: input.subtotal,
+          tax_amount: input.tax_amount,
+          total_amount: input.total_amount,
+          discount_amount: input.discount_amount,
+          payment_method: "pending",
+          customer_name: input.customer_name,
+          customer_email: input.customer_email,
+          customer_phone: input.customer_phone || null,
+          coupon_code: input.coupon_code || null,
+          coupon_discount: input.coupon_discount || 0,
+          customer_notes: input.customer_notes || null,
+          customer_input: {},
+          payment_payload: {},
+        });
+
+      if (orderError) {
+        console.error("[createOrder] order insert error:", orderError.message);
+        throw new Error("Failed to create order: " + orderError.message);
+      }
+
+      // 2. Insert order items
+      const orderItems = input.items.map((item) => ({
+        order_id: orderId,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price_at_time: item.price,
+        product_title: item.title,
+        product_type: item.product_type,
+        delivery_status: "pending",
+        max_downloads: 5,
+        download_count: 0,
+      }));
+
+      const { error: itemsError } = await admin()
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) {
+        console.error("[createOrder] items insert error:", itemsError.message);
+        // Attempt cleanup — best effort
+        await admin().from("orders").delete().eq("id", orderId);
+        throw new Error("Failed to create order items: " + itemsError.message);
+      }
+
+      return { orderId, status: "pending" };
+    }),
+
   /* ─── Products ─── */
   listProducts: adminQuery
     .input(
@@ -268,7 +349,7 @@ export const adminRouter = createRouter({
         .select(
           "id,order_number,customer_name,customer_email,total_amount,status,payment_status,created_at"
         )
-        .order("id", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(input?.limit ?? 100);
       if (input?.status) query = query.eq("status", input.status);
       const { data, error } = await query;

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
 
 /* ── Secure payment UI ── */
@@ -39,6 +40,13 @@ export default function Checkout() {
     phone: '',
   });
 
+  const createOrder = trpc.createOrder.useMutation({
+    onError: (error) => {
+      toast.error(lang === 'ar' ? 'فشل في إنشاء الطلب: ' + error.message : 'Failed to create order: ' + error.message);
+      setLoading(false);
+    },
+  });
+
   const tax = Math.round(totalPrice * 0.15);
   const total = totalPrice + tax;
 
@@ -68,34 +76,31 @@ export default function Checkout() {
 
     setLoading(true);
 
-    // Simulate a brief processing delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
     try {
-      const orderId = `DZ${Date.now().toString(36).toUpperCase()}`;
-      const orderData = {
-        id: orderId,
-        items: items.map(item => ({ product: item, quantity: item.quantity })),
-        customer: { name: form.name, email: form.email, phone: form.phone },
-        total: total,
-        tax: tax,
+      const result = await createOrder.mutateAsync({
+        customer_name: form.name,
+        customer_email: form.email,
+        customer_phone: form.phone || undefined,
+        items: items.map(item => ({
+          product_id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          title: item.title,
+        })),
         subtotal: totalPrice,
-        status: 'completed',
-        createdAt: new Date().toISOString(),
-      };
+        tax_amount: tax,
+        total_amount: total,
+      });
 
-      localStorage.setItem('lastOrder', JSON.stringify(orderData.items));
-      const history = JSON.parse(localStorage.getItem('digzoom_orders') || '[]');
-      history.unshift(orderData);
-      localStorage.setItem('digzoom_orders', JSON.stringify(history));
+      // Store minimal order reference for thank-you page
+      localStorage.setItem('lastOrderId', result.orderId);
 
       setOrderCompleted(true);
-      toast.success(lang === 'ar' ? 'تم الطلب بنجاح!' : 'Order placed successfully!');
+      toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح!' : 'Order created successfully!');
       clearCart();
     } catch (error: any) {
       console.error('Checkout error:', error);
       toast.error(error.message || (lang === 'ar' ? 'فشل في إتمام الطلب' : 'Failed to complete order'));
-    } finally {
       setLoading(false);
     }
   };
