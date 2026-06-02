@@ -21,6 +21,12 @@ function corsHeaders(origin?: string) {
 }
 
 async function saveToSupabase(payload: ContactPayload) {
+  // DEBUG: log env var presence (true/false only, no values)
+  console.log("[contact:debug] SUPABASE_URL present?", !!SUPABASE_URL);
+  console.log("[contact:debug] SUPABASE_SERVICE_ROLE_KEY present?", !!SUPABASE_SERVICE_ROLE_KEY);
+  console.log("[contact:debug] Key starts with sb_secret?", SUPABASE_SERVICE_ROLE_KEY.startsWith("sb_secret"));
+  console.log("[contact:debug] Key length:", SUPABASE_SERVICE_ROLE_KEY.length);
+
   const res = await fetch(`${SUPABASE_URL}/rest/v1/contact_messages`, {
     method: "POST",
     headers: {
@@ -37,6 +43,16 @@ async function saveToSupabase(payload: ContactPayload) {
       status: "new",
     }),
   });
+
+  // DEBUG: log Supabase response on failure
+  if (!res.ok) {
+    const body = await res.text();
+    console.error("[contact:debug] Supabase status:", res.status, res.statusText);
+    console.error("[contact:debug] Supabase response:", body);
+  } else {
+    console.log("[contact:debug] Supabase insert OK, status:", res.status);
+  }
+
   return res.ok;
 }
 
