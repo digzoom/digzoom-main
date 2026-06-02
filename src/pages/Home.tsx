@@ -1,7 +1,8 @@
 import { Link } from 'react-router';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCart } from '@/hooks/useCart';
+import ChatBot from '@/components/ChatBot';
 import { products } from '@/data/products';
 import { marketingServices } from '@/data/marketingServices';
 import {
@@ -26,7 +27,7 @@ const agencyServices = [
     icon: <Users className="w-7 h-7" />,
     titleAr: 'إدارة حسابات التواصل الاجتماعي',
     titleEn: 'Social Media Management',
-    descAr: 'نشر يومي وتفاعل احترافي لزيادة متابعين حقيقيين',
+    descAr: 'إدارة محتوى احترافية ونشر منظم لحساباتك على المنصات المختلفة',
     color: 'from-purple-600 to-blue-600',
     bgColor: 'bg-purple-500/10 border-purple-500/20',
     iconColor: 'text-purple-400',
@@ -88,14 +89,14 @@ const whyFeatures = [
   { icon: <Award className="w-6 h-6" />, titleAr: 'منتجات متميزة', descAr: 'نختار أفضل المنتجات بعناية لضمان أعلى جودة' },
 ];
 
-/* ── Testimonials ── */
-const testimonials = [
-  { name: 'محمد السيد', role: 'صانع محتوى', avatar: 'م', text: 'أفضل سوق عربي للمنتجات الرقمية. جودة المنتجات ممتازة والدعم سريع جداً. أنصح الجميع بالتجربة!' },
-  { name: 'سارة أحمد', role: 'مصممة جرافيك', avatar: 'س', text: 'قوالب التصميم رائعة وتوفر عليّ ساعات طويلة من العمل. أسعار منافسة جداً مقارنة بالمواقع الأجنبية.' },
-  { name: 'عبدالله الخالد', role: 'مسوق إلكتروني', avatar: 'ع', text: 'منتجات PLR ساعدتني في بناء مشروعي الخاص بسرعة. التحميل فوري والجودة ممتازة. شكراً digzoom!' },
-  { name: 'نورة الفهد', role: 'مدونة', avatar: 'ن', text: 'القوالب والتصاميم الرقمية ممتازة والجودة عالية. وفرت عليّ الكثير من الوقت في إعداد محتوى احترافي.' },
-  { name: 'خالد المنصور', role: 'مطور تطبيقات', avatar: 'خ', text: 'مكتبة الأكواد والتقنيات شاملة ومحدثة. وفرت عليّ الكثير من الوقت في تطوير مشاريعي.' },
-  { name: 'فاطمة الزهراء', role: 'صاحبة متجر', avatar: 'ف', text: 'الكتب الإلكترونية والقوالب ساعدتني في تطوير متجري الإلكتروني. تجربة شراء سلسة ودعم رائع.' },
+/* ── Customer Expectations (honest first impressions) ── */
+const expectations = [
+  { text: 'واجهة واضحة وسهلة تساعد على الوصول للمنتجات بسرعة.' },
+  { text: 'المنتجات مرتبة بطريقة تساعد على الاختيار المناسب.' },
+  { text: 'فكرة الجمع بين المنتجات والخدمات الرقمية مفيدة لأصحاب المشاريع.' },
+  { text: 'تجربة الشراء تبدو مباشرة ومنظمة من البداية للنهاية.' },
+  { text: 'التصنيفات واضحة وتسهل البحث عن نوع معين من المحتوى الرقمي.' },
+  { text: 'الدعم عبر البريد يعطي إحساس بالمصداقية والاحترافية.' },
 ];
 
 /* ── Animated Counter Hook ── */
@@ -221,8 +222,8 @@ function ServiceCard({ service }: { service: typeof agencyServices[0] }) {
 
 /* ── Main Component ── */
 export default function Home() {
-  const { lang } = useLanguage();
-  const { addToCart } = useCart();
+  const { lang, toggleLang } = useLanguage();
+  const { addToCart, totalItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -244,7 +245,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2.5">
-              <img src="/images/tiger-logo.png" alt="DigZoom" className="w-9 h-9" />
+              <img src="/images/tiger-main.jpg" alt="DigZoom" className="w-9 h-9 rounded-lg object-cover" />
               <span className="text-2xl font-black tracking-tight">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">dig</span>
                 <span className="text-white">zoom</span>
@@ -259,10 +260,30 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link to="/cart" className="relative p-2 text-gray-300 hover:text-white transition-colors">
+            <div className="flex items-center gap-2">
+              {/* Language Toggle */}
+              <button onClick={toggleLang}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                <Globe className="w-4 h-4" />
+                <span className="hidden sm:inline">{lang === 'ar' ? 'EN' : 'عربي'}</span>
+              </button>
+
+              {/* Cart with count badge */}
+              <Link to="/cart" className="relative p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
                 <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
+                    {totalItems}
+                  </span>
+                )}
               </Link>
+
+              {/* Login */}
+              <Link to="/login" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                <LogIn className="w-4 h-4" />
+                <span>{lang === 'ar' ? 'دخول' : 'Login'}</span>
+              </Link>
+
               <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-300">
                 {mobileOpen ? <span className="text-xl">✕</span> : <span className="text-xl">☰</span>}
               </button>
@@ -293,22 +314,22 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
-          {/* Tiger Logo — Large & Prominent */}
+          {/* Center Tiger Logo */}
           <div className="mb-6 flex justify-center">
-            <div className="relative">
+            <div className="relative group">
               <img
-                src="/images/tiger-logo.png"
+                src="/images/hero-tiger.jpg"
                 alt="DigZoom Tiger"
-                className="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_40px_rgba(139,92,246,0.3)] animate-pulse"
+                className="w-40 h-52 sm:w-48 sm:h-60 md:w-56 md:h-72 object-cover rounded-3xl drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] transition-all duration-500 group-hover:drop-shadow-[0_0_80px_rgba(139,92,246,0.6)] group-hover:scale-105"
               />
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-2xl -z-10" />
+              <div className="absolute -inset-6 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-orange-600/20 rounded-full blur-3xl -z-10 animate-pulse" />
             </div>
           </div>
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-6">
             <Flame className="w-4 h-4 text-orange-400" />
-            <span className="text-gray-300 text-sm">أكثر من 300 منتج رقمي مميز</span>
+            <span className="text-gray-300 text-sm">+50 منتج رقمي مختار</span>
           </div>
 
           {/* Headline */}
@@ -370,13 +391,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════ ANIMATED STATS ═══════════ */}
+      {/* ═══════════ TRUST HIGHLIGHTS ═══════════ */}
       <section className="py-10 border-y border-white/5 bg-gradient-to-b from-[#0a0a0f] to-[#0d0d18]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCounter end={300} suffix="+" label="منتج رقمي" icon={<Box className="w-6 h-6" />} />
-          <StatCounter end={10000} suffix="+" label="عميل سعيد" icon={<Users className="w-6 h-6" />} />
-          <StatCounter end={50} suffix="K+" label="طلب مكتمل" icon={<ShoppingCart className="w-6 h-6" />} />
-          <StatCounter end={99} suffix="%" label="نسبة الرضا" icon={<Heart className="w-6 h-6" />} />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">تجربة شراء رقمية سلسة</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Box className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">منتجات مختارة بعناية</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Download className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">تسليم رقمي منظم</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Headphones className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">دعم سريع عند الحاجة</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Users className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">مناسب للأفراد وأصحاب المشاريع</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Package className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">باقات قابلة للتطوير</div>
+          </div>
         </div>
       </section>
 
@@ -393,7 +446,7 @@ export default function Home() {
                 منتجاتنا <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500">الأكثر مبيعاً</span>
               </h2>
               <p className="text-gray-400 text-sm mt-2 max-w-lg">
-                الأكثر طلباً بين آلاف العملاء — جودة مضمونة وتحميل فوري
+                منتجات مختارة بعناية — جودة مضمونة وتحميل فوري
               </p>
             </div>
             <Link to="/shop" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-medium text-sm shrink-0">
@@ -453,10 +506,10 @@ export default function Home() {
               <span className="text-blue-300 text-xs font-bold">لماذا digzoom؟</span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
-              نحن <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">الأفضل</span> لأننا نهتم
+              ما الذي <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">يميز التجربة؟</span>
             </h2>
             <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto">
-              نقدم لك تجربة شراء سلسة وآمنة مع أفضل المنتجات الرقمية المختارة بعناية
+              نركز على تقديم تجربة شراء واضحة مع منتجات رقمية منظمة ودعم مباشر
             </p>
           </div>
 
@@ -474,40 +527,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════ TESTIMONIALS ═══════════ */}
+      {/* ═══════════ CUSTOMER EXPECTATIONS ═══════════ */}
       <section className="py-16 md:py-20 border-y border-white/5 bg-gradient-to-b from-[#0a0a0f] via-[#0f0a1a] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10 md:mb-14">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
-              <Star className="w-4 h-4 text-purple-400" />
-              <span className="text-purple-300 text-xs font-bold">آراء العملاء</span>
+              <Eye className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-300 text-xs font-bold">تجربة المستخدم</span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
-              ما يقوله <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">عملاؤنا</span>
+              ماذا يتوقع <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">العملاء</span> من DigZoom؟
             </h2>
             <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto">
-              انضم لآلاف العملاء السعداء الذين يثقون بـ digzoom
+              انطباعات أولية عن تجربة التصفح والشراء
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-            {testimonials.map((t, i) => (
-              <div key={i} className="group p-5 md:p-6 rounded-2xl border border-white/[0.04] bg-[#13131f]/60 hover:bg-[#1a1a2e] hover:border-purple-500/10 transition-all">
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-400 fill-yellow-400" />
-                  ))}
+            {expectations.map((exp, i) => (
+              <div key={i} className="group p-5 md:p-6 rounded-2xl border border-white/[0.04] bg-[#13131f]/60 hover:bg-[#1a1a2e] hover:border-purple-500/10 transition-all flex items-start gap-3">
+                <div className="mt-0.5 shrink-0">
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
                 </div>
-                <p className="text-gray-300 text-xs md:text-sm leading-relaxed mb-4 md:mb-5">"{t.text}"</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-white/[0.04]">
-                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium text-sm">{t.name}</p>
-                    <p className="text-gray-500 text-xs">{t.role}</p>
-                  </div>
-                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">{exp.text}</p>
               </div>
             ))}
           </div>
@@ -549,12 +591,12 @@ export default function Home() {
           <div className="absolute w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-purple-600/8 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-4 text-center">
-          <img src="/images/tiger-logo.png" alt="" className="w-16 h-16 mx-auto mb-6 opacity-50" />
+          <img src="/images/tiger-main.jpg" alt="" className="w-16 h-16 mx-auto mb-6 opacity-50 rounded-xl object-cover" />
           <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4">
             جاهز تبدأ رحلتك في عالم المنتجات الرقمية؟
           </h2>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            انضم لأكثر من 10,000 عميل سعيد. اشتري مرة واستفيد مدى الحياة.
+            ابدأ رحلتك في عالم المنتجات الرقمية. اشتري مرة واستفيد مدى الحياة.
           </p>
           <Link to="/shop" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:-translate-y-0.5 font-bold">
             <MousePointerClick className="w-5 h-5" />
@@ -570,13 +612,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <img src="/images/tiger-logo.png" alt="" className="w-7 h-7" />
+                <img src="/images/tiger-main.jpg" alt="" className="w-7 h-7 rounded-md object-cover" />
                 <span className="text-2xl font-black">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">dig</span>
                   <span className="text-white">zoom</span>
                 </span>
               </div>
-              <p className="text-gray-500 text-sm leading-relaxed">أكبر سوق عربي للمنتجات الرقمية وخدمات التسويق. اشتري مرة واستفيد مدى الحياة.</p>
+              <p className="text-gray-500 text-sm leading-relaxed">منصة عربية للمنتجات الرقمية وخدمات التسويق. نعمل على بناء تجربة موثوقة ومستدامة.</p>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-3">روابط سريعة</h4>
@@ -615,6 +657,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ChatBot Widget */}
+      <ChatBot />
     </div>
   );
 }

@@ -58,7 +58,7 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['دعم', 'مساعدة', 'مساعدتي', 'مشكلة', 'مشكلتي', 'مساعدة', 'ساعدني', 'ساعد', 'فزعة', 'مساعده', 'تواصل', 'واتس', 'واتساب', 'اتصال', 'كلم', 'رقم', 'تلفون', 'جوال', 'هاتف', 'whatsapp', 'اتصل', 'شكوى', 'ابلاغ'],
-      response: 'فريق الدعم جاهز يساعدك! 🛎️\n\n📱 واتساب: 00966569888456\n📧 بريد: info@digzoom.com\n💬 أو ابقى معي أنا مساعدك الذكي!\n\nمتاحين 24/7 على مدار الساعة 🕐',
+      response: 'فريق الدعم جاهز يساعدك! 🛎️\n\n📱 واتساب: 00966569888456\n📧 بريد: info@digzoom.com\n💬 أو ابقى معي هنا في الدردشة!\n\nمتاحين 24/7 على مدار الساعة 🕐',
       suggestions: ['مشكلة في التحميل', 'المنتج ما يشتغل', 'طلب استرجاع']
     },
     {
@@ -125,7 +125,7 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['support', 'help', 'assist', 'contact', 'whatsapp', 'phone', 'call', 'number', 'reach', 'complaint', 'report', 'customer service'],
-      response: 'Our support team is ready to help! 🛎️\n\n📱 WhatsApp: 00966569888456\n📧 Email: info@digzoom.com\n💬 Or chat with me - I\'m your AI assistant!\n\nAvailable 24/7 around the clock 🕐',
+      response: 'Our support team is ready to help! 🛎️\n\n📱 WhatsApp: 00966569888456\n📧 Email: info@digzoom.com\n💬 Or chat with me right here!\n\nAvailable 24/7 around the clock 🕐',
       suggestions: ['Download issue', 'Product not working', 'Refund request']
     },
     {
@@ -173,8 +173,8 @@ export function useChat(lang: 'ar' | 'en' = 'ar') {
       const welcomeMsg: ChatMessage = {
         id: 'welcome',
         text: lang === 'ar'
-          ? 'أهلاً وسهلاً بك في digzoom! 🎉 أنا مساعدك الذكي، كيف أقدر أساعدك اليوم؟'
-          : 'Welcome to digzoom! 🎉 I\'m your AI assistant. How can I help you today?',
+          ? 'أهلاً وسهلاً بك في digzoom! 🎉 كيف أقدر أساعدك اليوم؟'
+          : 'Welcome to digzoom! 🎉 How can I help you today?',
         sender: 'bot',
         timestamp: new Date(),
       };
