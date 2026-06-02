@@ -22,7 +22,6 @@ function corsHeaders(origin?: string) {
 async function saveToSupabase(payload: ContactPayload) {
   try {
     const supabase = getSupabaseAdmin();
-    console.log("[contact:debug] getSupabaseAdmin() returned client");
 
     const { error } = await supabase
       .from("contact_messages")
@@ -35,14 +34,13 @@ async function saveToSupabase(payload: ContactPayload) {
       });
 
     if (error) {
-      console.error("[contact:debug] Supabase insert error:", error.code, error.message);
+      console.error("[contact] Supabase insert error:", error.code, error.message);
       return false;
     }
 
-    console.log("[contact:debug] Supabase insert OK");
     return true;
   } catch (e: any) {
-    console.error("[contact:debug] Supabase exception:", e?.message || String(e));
+    console.error("[contact] Supabase exception:", e?.message || String(e));
     return false;
   }
 }
