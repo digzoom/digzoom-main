@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { Mail, Phone, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import LogoImage from './LogoImage';
 
 export default function Footer() {
   const { lang, t } = useLanguage();
@@ -32,14 +33,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-auto overflow-hidden rounded-xl ring-1 ring-white/10">
-                <img
-                  src="/images/logo-main.jpg"
-                  alt="DigZoom"
-                  className="h-full w-auto object-contain"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-              </div>
+              <LogoImage className="h-12 w-12 object-contain" />
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">
               {lang === 'ar'

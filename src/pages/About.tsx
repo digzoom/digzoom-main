@@ -1,5 +1,6 @@
 import { Target, Users, Globe, Zap, Award, TrendingUp, Mail, Download, Briefcase, Layers, Building2, Headphones, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import LogoImage from '@/components/LogoImage';
 
 export default function About() {
   const { t, lang } = useLanguage();
@@ -22,10 +23,8 @@ export default function About() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="text-center mb-20">
-          <img
-            src="/images/about-tiger.jpg"
-            alt="DigZoom Brand"
-            className="w-full max-w-md mx-auto rounded-2xl mb-8 shadow-2xl shadow-blue-500/10 border border-white/[0.06]"
+          <LogoImage
+            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 object-contain"
           />
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">{t.about.title}</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">{t.about.heroText}</p>
@@ -157,8 +156,7 @@ export default function About() {
                 <div className="text-gray-500 text-sm">{h.label}</div>
               </div>
             ))}
-          </div>
-        </div>
+          </div>        </div>
       </div>
     </div>
   );

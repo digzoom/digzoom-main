@@ -4,6 +4,7 @@ import { ShoppingCart, Menu, X, Globe, LogIn, LogOut, ShieldCheck } from 'lucide
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import LogoImage from './LogoImage';
 
 const getNavLinks = (t: { navbar: { home: string; shop: string; about: string; contact: string } }) => [
   { name: t.navbar.home, path: '/' },
@@ -43,14 +44,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="h-10 w-auto flex-shrink-0 overflow-hidden rounded-lg ring-2 ring-white/10 group-hover:ring-blue-500/50 transition-all">
-              <img
-                src="/images/logo-main.jpg"
-                alt="DigZoom"
-                className="h-full w-auto object-contain"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
-            </div>
+            <LogoImage className="h-10 w-10 object-contain flex-shrink-0" />
           </Link>
 
           {/* Desktop Nav */}
