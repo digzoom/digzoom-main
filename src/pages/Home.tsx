@@ -450,16 +450,15 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
-          {/* Center Tiger Logo — seamless, no borders */}
+          {/* Center Tiger Logo — seamless, borderless */}
           <div className="mb-6 flex justify-center">
             <div className="relative group">
               <img
                 src="/images/hero-tiger.jpg"
                 alt="DigZoom Tiger"
-                className="w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain transition-all duration-500 group-hover:scale-105"
-                style={{ filter: 'drop-shadow(0 0 40px rgba(59,130,246,0.3))' }}
+                className="w-64 h-64 sm:w-72 sm:h-72 md:w-96 md:h-96 object-contain transition-all duration-500 group-hover:scale-105"
+                style={{ filter: 'drop-shadow(0 0 60px rgba(59,130,246,0.4)) drop-shadow(0 0 120px rgba(139,92,246,0.15))' }}
               />
-              <div className="absolute -inset-8 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-orange-600/10 rounded-full blur-3xl -z-10 animate-pulse" />
             </div>
           </div>
 
