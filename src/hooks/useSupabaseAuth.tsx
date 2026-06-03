@@ -1,5 +1,21 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
+
+// ——— Recovery code exchange — uses Supabase client (PKCE flow) ———
+async function exchangeRecoveryCode(code: string): Promise<{ error?: string }> {
+  try {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error || !data.session) {
+      return { error: error?.message || 'Invalid or expired recovery code' };
+    }
+    // Save tokens same as login flow
+    localStorage.setItem('sb_access_token', data.session.access_token);
+    localStorage.setItem('sb_refresh_token', data.session.refresh_token);
+    return {};
+  } catch {
+    return { error: 'Failed to process recovery link' };
+  }
+}
 import type { UserRole } from '@/types/database';
 
 interface User {
@@ -16,6 +32,9 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
   register: (email: string, password: string, name: string) => Promise<{ error?: string }>;
+  resetPassword: (email: string) => Promise<{ error?: string; success?: boolean }>;
+  updatePassword: (newPassword: string) => Promise<{ error?: string }>;
+  exchangeRecoveryCode: (code: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   isAdmin: boolean;
@@ -155,15 +174,55 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  // Password Reset — send recovery email
+  const resetPassword = useCallback(async (email: string) => {
+    const { ok, data } = await authApi('recover', {
+      email,
+    });
+    if (!ok) return { error: data.msg || data.message || 'Failed to send reset email' };
+    return { success: true };
+  }, []);
+
+  // Password Reset — update password (requires valid session/token)
+  const updatePassword = useCallback(async (newPassword: string) => {
+    const token = localStorage.getItem('sb_access_token');
+    if (!token) return { error: 'No active session. Please use the recovery link again.' };
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: {
+        'apikey': ANON_KEY,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: newPassword }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { error: data.msg || data.message || 'Failed to update password' };
+    }
+    return {};
+  }, []);
+
   // Google OAuth
   const signInWithGoogle = useCallback(async () => {
-    const redirectTo = `${window.location.origin}/`;
+    const redirectTo = `${window.location.origin}/#/`;
     const { ok, data } = await authApi('authorize', {
       provider: 'google',
       redirect_to: redirectTo,
     });
     if (ok && data?.url) {
       window.location.href = data.url;
+    } else {
+      // Extract error from all possible Supabase response fields
+      const errMsg =
+        data?.error_description ||
+        data?.error ||
+        data?.msg ||
+        data?.message ||
+        (typeof data === 'string' ? data : null) ||
+        'Google login is not configured in Supabase. Please add Client ID and Client Secret.';
+      throw new Error(errMsg);
     }
   }, []);
 
@@ -176,6 +235,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       loading,
       login,
       register,
+      resetPassword,
+      updatePassword,
+      exchangeRecoveryCode,
       logout,
       signInWithGoogle,
       isAdmin,
