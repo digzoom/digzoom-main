@@ -557,6 +557,81 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════ 3 PILLARS: Digital Growth Platform ═══════════ */}
+      <section className="py-14 md:py-20 bg-[#0a0a0f]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
+              <Sparkles className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-300 text-xs font-bold">{lang === 'ar' ? 'منظومة DigZoom المتكاملة' : 'The DigZoom Ecosystem'}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400">
+                {lang === 'ar' ? 'ثلاثة أركان للنمو الرقمي' : 'Three Pillars of Digital Growth'}
+              </span>
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              {lang === 'ar'
+                ? 'DigZoom ليست متجراً فقط ولا وكالة تسويق فقط — نحن منصة نمو رقمي متكاملة'
+                : 'DigZoom is not just a store or a marketing agency — we are an integrated Digital Growth Platform'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Pillar 1: Digital Products */}
+            <div className="group bg-gradient-to-b from-blue-500/[0.04] to-transparent rounded-2xl p-8 border border-blue-500/10 hover:border-blue-500/20 transition-all text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/10 text-blue-400 mb-5 group-hover:scale-110 transition-transform">
+                <Package className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'المنتجات الرقمية' : 'Digital Products'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                {lang === 'ar'
+                  ? 'قوالب، كتب، أدوات، دورات — آلاف المنتجات الرقمية الجاهزة لشراء مرة واحدة واستخدام مدى الحياة.'
+                  : 'Templates, ebooks, tools, courses — thousands of ready-made digital products for one-time purchase and lifetime use.'}
+              </p>
+              <Link to="/shop" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+                {lang === 'ar' ? 'تصفح المنتجات' : 'Browse Products'}
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Pillar 2: Marketing Services */}
+            <div className="group bg-gradient-to-b from-purple-500/[0.04] to-transparent rounded-2xl p-8 border border-purple-500/10 hover:border-purple-500/20 transition-all text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/10 text-purple-400 mb-5 group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'الخدمات التسويقية' : 'Marketing Services'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                {lang === 'ar'
+                  ? 'إدارة حملات، SEO، إعلانات، تحليلات — استراتيجيات تسويقية احترافية مدفوعة الأجر.'
+                  : 'Campaign management, SEO, ads, analytics — professional paid marketing strategies.'}
+              </p>
+              <Link to="/marketing" className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors">
+                {lang === 'ar' ? 'استكشف الخدمات' : 'Explore Services'}
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Pillar 3: Growth Solutions */}
+            <div className="group bg-gradient-to-b from-emerald-500/[0.04] to-transparent rounded-2xl p-8 border border-emerald-500/10 hover:border-emerald-500/20 transition-all text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/10 text-emerald-400 mb-5 group-hover:scale-110 transition-transform">
+                <Zap className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'حلول النمو الرقمي' : 'Growth Solutions'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                {lang === 'ar'
+                  ? 'تطوير متاجر، تحول رقمي، استشارات — حلول متكاملة لنمو أعمالك الرقمي.'
+                  : 'Store development, digital transformation, consulting — integrated solutions for your digital business growth.'}
+              </p>
+              <Link to="/contact" className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors">
+                {lang === 'ar' ? 'احجز استشارة' : 'Book a Consultation'}
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════ BESTSELLER PRODUCTS ═══════════ */}
       <section className="py-16 md:py-20 bg-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
