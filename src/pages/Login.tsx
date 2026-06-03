@@ -155,7 +155,7 @@ export default function Login() {
 
           {/* Google OAuth */}
           <button
-            onClick={signInWithGoogle}
+            onClick={async () => { try { await signInWithGoogle(); } catch (e: any) { setError(e?.message || (lang === 'ar' ? 'فشل الدخول بحساب Google' : 'Google login failed')); } }}
             className="w-full flex items-center justify-center gap-3 bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] text-white py-3 rounded-xl text-sm font-medium transition-all mb-4"
           >
             <Globe className="w-4 h-4 text-blue-400" />
