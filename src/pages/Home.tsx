@@ -428,12 +428,12 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
-          {/* Center Tiger Logo — clean PNG with transparent background */}
+          {/* Center Tiger Logo */}
           <div className="mb-6 flex justify-center">
             <img
-              src="/images/hero-tiger-clean.png"
+              src="/images/hero-tiger-new.jpg"
               alt="DigZoom Tiger"
-              className="w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72 object-contain drop-shadow-[0_0_50px_rgba(59,130,246,0.35)] transition-all duration-500 hover:scale-105"
+              className="w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] transition-all duration-500 hover:scale-105"
             />
           </div>
 
