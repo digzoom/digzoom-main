@@ -205,13 +205,20 @@ function StatCounter({ end, suffix, label, icon }: { end: number; suffix: string
 }
 
 /* ── Product Card ── */
-function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (p: typeof products[0]) => void }) {
+function ProductCard({ product, onAdd, cartQty = 0 }: { product: typeof products[0]; onAdd: (p: typeof products[0]) => void; cartQty?: number }) {
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
+  const [flash, setFlash] = useState(false);
+
+  const handleAdd = () => {
+    onAdd(product);
+    setFlash(true);
+    setTimeout(() => setFlash(false), 600);
+  };
 
   return (
-    <div className="group bg-[#13131f] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-purple-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/5 flex flex-col">
+    <div className={`group bg-[#13131f] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-purple-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/5 flex flex-col ${flash ? 'ring-2 ring-emerald-500/50' : ''}`}>
       <Link to={`/product/${product.id}`} className="block relative">
         <div className="aspect-[4/3] overflow-hidden bg-[#1a1a2e]">
           <img
@@ -230,6 +237,12 @@ function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (
           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
           {product.rating}
         </div>
+        {cartQty > 0 && (
+          <div className="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-sm text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 animate-pulse">
+            <ShoppingCart className="w-3 h-3" />
+            {cartQty > 1 ? `في السلة: ${cartQty}` : 'في السلة'}
+          </div>
+        )}
       </Link>
 
       <div className="p-4 flex flex-col flex-1">
@@ -248,8 +261,8 @@ function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (
             )}
           </div>
           <button
-            onClick={() => onAdd(product)}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-purple-500/20"
+            onClick={handleAdd}
+            className={`p-2.5 rounded-xl transition-all active:scale-95 shadow-lg ${cartQty > 0 ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-purple-500/20'} text-white`}
             aria-label="Add to cart"
           >
             <ShoppingCart className="w-4 h-4" />
@@ -365,25 +378,34 @@ export default function Home() {
                   </button>
                   
                   {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl py-2 z-50">
-                      <Link to="/account" className="flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl py-2 z-50">
+                      {/* User header */}
+                      <div className="px-4 py-2 border-b border-white/10 mb-1">
+                        <p className="text-white text-sm font-medium truncate">{user.name}</p>
+                        <p className="text-gray-500 text-xs truncate" dir="ltr">{user.email}</p>
+                      </div>
+                      <Link to="/account" className="flex items-center gap-2.5 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
                         <Users className="w-4 h-4" />
                         {lang === 'ar' ? 'حسابي' : 'My Account'}
                       </Link>
-                      <Link to="/orders" className="flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
+                      <Link to="/orders" className="flex items-center gap-2.5 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
                         <Package className="w-4 h-4" />
                         {lang === 'ar' ? 'طلباتي' : 'My Orders'}
                       </Link>
+                      <Link to="/shop" className="flex items-center gap-2.5 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
+                        <ShoppingCart className="w-4 h-4" />
+                        {lang === 'ar' ? 'متابعة التسوق' : 'Continue Shopping'}
+                      </Link>
                       {user.role === 'admin' && (
-                        <Link to="/admin" className="flex items-center gap-2 px-4 py-2.5 text-purple-400 hover:text-purple-300 hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
+                        <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-purple-400 hover:text-purple-300 hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
                           <Zap className="w-4 h-4" />
-                          {lang === 'ar' ? 'لوحة التحكم' : 'Admin'}
+                          {lang === 'ar' ? 'لوحة التحكم' : 'Admin Dashboard'}
                         </Link>
                       )}
                       <div className="border-t border-white/10 my-1" />
                       <button
                         onClick={() => { logout(); setUserMenuOpen(false); }}
-                        className="w-full flex items-center gap-2 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-white/5 text-sm text-right"
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-white/5 text-sm text-right transition-colors"
                       >
                         <LogIn className="w-4 h-4" />
                         {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
@@ -570,7 +592,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {bestsellers.map((product) => (
-              <ProductCard key={product.id} product={product} onAdd={handleAddToCart} />
+              <ProductCard key={product.id} product={product} onAdd={handleAddToCart} cartQty={items.find(i => i.id === product.id)?.quantity || 0} />
             ))}
           </div>
         </div>

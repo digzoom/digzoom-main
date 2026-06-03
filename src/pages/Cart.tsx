@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router';
 import {
   Minus, Plus, Trash2, ArrowRight, ArrowLeft, PackageOpen,
-  ShoppingBag, Sparkles, Tag
+  ShoppingBag, Sparkles, Tag, Store, Home, CreditCard
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -155,8 +155,26 @@ export default function Cart() {
                 onClick={() => navigate('/checkout')}
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 active:scale-[0.98] text-white py-3.5 md:py-4 rounded-xl transition-all font-medium text-sm md:text-base shadow-lg shadow-blue-500/15"
               >
-                {t.cart.btnCheckout} <Arrow className="w-4 h-4" />
+                <CreditCard className="w-5 h-5" />
+                {lang === 'ar' ? 'إتمام الشراء' : 'Complete Purchase'}
               </button>
+
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <Link
+                  to="/shop"
+                  className="flex items-center justify-center gap-1.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] text-gray-300 hover:text-white py-2.5 rounded-xl text-xs font-medium transition-all"
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  {lang === 'ar' ? 'متابعة التسوق' : 'Continue Shopping'}
+                </Link>
+                <Link
+                  to="/"
+                  className="flex items-center justify-center gap-1.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] text-gray-300 hover:text-white py-2.5 rounded-xl text-xs font-medium transition-all"
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  {lang === 'ar' ? 'العودة للرئيسية' : 'Back to Home'}
+                </Link>
+              </div>
             </div>
 
             {/* Trust mini badges */}
