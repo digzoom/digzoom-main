@@ -23,9 +23,9 @@ export default function About() {
         {/* Hero */}
         <div className="text-center mb-20">
           <img
-            src="/images/about-tiger.jpg"
+            src="/images/hero-tiger-new.jpg"
             alt="DigZoom Brand"
-            className="w-full max-w-md mx-auto rounded-2xl mb-8 shadow-2xl shadow-blue-500/10 border border-white/[0.06]"
+            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.35)]"
           />
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">{t.about.title}</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">{t.about.heroText}</p>
