@@ -37,10 +37,10 @@ export default function About() {
         {/* What We Offer — Stripe Compliance Section */}
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            {t.lang === 'ar' ? 'ماذا نقدم' : 'What We Offer'}
+            {lang === 'ar' ? 'ماذا نقدم' : 'What We Offer'}
           </h2>
           <p className="text-gray-400 text-center max-w-xl mx-auto mb-10">
-            {t.lang === 'ar'
+            {lang === 'ar'
               ? 'نحن سوق رقمي متخصص في المنتجات والملفات الرقمية القابلة للتحميل'
               : 'We are a digital marketplace specializing in downloadable digital products and files'}
           </p>
@@ -63,10 +63,10 @@ export default function About() {
         {/* Brand Identity */}
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            {t.lang === 'ar' ? 'هوية digzoom' : 'The digzoom Identity'}
+            {lang === 'ar' ? 'هوية digzoom' : 'The digzoom Identity'}
           </h2>
           <p className="text-gray-400 text-center max-w-xl mx-auto mb-10">
-            {t.lang === 'ar'
+            {lang === 'ar'
               ? 'النمر الرقمي — رمز القوة والتقنية في عالم المنتجات الرقمية'
               : 'The Digital Tiger — a symbol of power and technology in the digital products world'}
           </p>

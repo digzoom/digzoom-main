@@ -16,7 +16,7 @@ i18n
     resources,
     fallbackLng: 'ar',
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       lookupLocalStorage: 'digzoom-lang',
       caches: ['localStorage'],
     },
