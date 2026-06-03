@@ -80,19 +80,14 @@ export default function About() {
         </div>
 
         {/* Mission & Vision */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">{t.about.mission}</h2>
-              <p className="text-gray-400 leading-relaxed">{t.about.missionText}</p>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">{t.about.vision}</h2>
-              <p className="text-gray-400 leading-relaxed">{t.about.visionText}</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+          <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04]">
+            <h2 className="text-2xl font-bold text-white mb-4">{t.about.mission}</h2>
+            <p className="text-gray-400 leading-relaxed">{t.about.missionText}</p>
           </div>
-          <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
-            <img src="/images/brand-mockup.jpg" alt="digzoom brand" className="w-full h-full object-cover" />
+          <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04]">
+            <h2 className="text-2xl font-bold text-white mb-4">{t.about.vision}</h2>
+            <p className="text-gray-400 leading-relaxed">{t.about.visionText}</p>
           </div>
         </div>
 
