@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { ShoppingCart, Menu, X, Globe, LogIn, LogOut, ShieldCheck } from 'lucide-react';
+import { ShoppingCart, Menu, X, LogIn, LogOut, ShieldCheck } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
-const getNavLinks = (t: { navbar: { home: string; shop: string; about: string; contact: string } }) => [
-  { name: t.navbar.home, path: '/' },
-  { name: t.navbar.shop, path: '/shop' },
-  { name: t.navbar.about, path: '/about' },
-  { name: t.navbar.contact, path: '/contact' },
-];
+const getNavLinks = (lang: string) => {
+  const isAr = lang === 'ar';
+  return [
+    { name: isAr ? 'الرئيسية' : 'Home', path: '/' },
+    { name: isAr ? 'المتجر' : 'Shop', path: '/shop' },
+    { name: isAr ? 'خدمات النمو الرقمي' : 'Growth Services', path: '/marketing' },
+    { name: isAr ? 'دراسات الحالة' : 'Case Studies', path: '/case-studies' },
+    { name: isAr ? 'الأسعار' : 'Pricing', path: '/pricing' },
+    { name: isAr ? 'من نحن' : 'About', path: '/about' },
+    { name: isAr ? 'الأسئلة الشائعة' : 'FAQ', path: '/faq' },
+    { name: isAr ? 'اتصل بنا' : 'Contact', path: '/contact' },
+  ];
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -21,7 +28,7 @@ export default function Navbar() {
   const location = useLocation();
   const isAr = lang === 'ar';
 
-  const navLinks = getNavLinks(t);
+  const navLinks = getNavLinks(lang);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -75,11 +82,12 @@ export default function Navbar() {
                 <ShieldCheck className="w-4 h-4" /> ADMIN
               </Link>
             )}
-            {/* Language Switcher */}
+            {/* Language Switcher — AR | EN */}
             <button onClick={toggleLang}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-              <Globe className="w-4 h-4" />
-              <span>{lang === 'ar' ? 'EN' : 'عربي'}</span>
+              className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5">
+              <span className={lang === 'ar' ? 'text-gray-500' : 'text-white'}>EN</span>
+              <span className="text-gray-600">|</span>
+              <span className={lang === 'ar' ? 'text-white' : 'text-gray-500'}>AR</span>
             </button>
 
             {/* Cart */}

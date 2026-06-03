@@ -78,10 +78,20 @@ export default function About() {
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-orange-600/10 rounded-3xl blur-2xl -z-10" />
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">{t.about.title}</h1>
-          <p className="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed mb-6">
+          <p className="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed mb-4">
             {lang === 'ar'
-              ? 'DigZoom منصة نمو رقمي متكاملة تجمع بين المنتجات الرقمية والخدمات التسويقية الاحترافية تحت سقف واحد. نساعد الأفراد والشركات على بناء حضور رقمي أقوى وتحقيق نمو مستدام.'
-              : 'DigZoom is an integrated Digital Growth Platform combining digital products and professional marketing services under one roof. We help individuals and businesses build a stronger digital presence and achieve sustainable growth.'}
+              ? 'ديج زوم (DigZoom) منصة نمو رقمي متكاملة تجمع بين المنتجات الرقمية والخدمات التسويقية الاحترافية تحت سقف واحد.'
+              : 'DigZoom is an integrated Digital Growth Platform combining digital products and professional marketing services under one roof.'}
+          </p>
+          <p className="text-gray-400 text-base max-w-3xl mx-auto leading-relaxed mb-4">
+            {lang === 'ar'
+              ? 'نساعد الأفراد والشركات على بناء حضور رقمي أقوى وتحقيق نمو مستدام من خلال المنتجات الرقمية، إدارة التسويق الرقمي، الحملات الإعلانية، تحسين محركات البحث (SEO)، تطوير المتاجر الإلكترونية، وصناعة المحتوى.'
+              : 'We help individuals and businesses build a stronger digital presence and achieve sustainable growth through digital products, digital marketing management, advertising campaigns, SEO, e-commerce development, and content creation.'}
+          </p>
+          <p className="text-gray-400 text-base max-w-3xl mx-auto leading-relaxed mb-6">
+            {lang === 'ar'
+              ? 'نعمل على توفير حلول عملية تساعد عملاءنا على زيادة الظهور الرقمي وتحقيق نتائج قابلة للقياس من خلال استراتيجيات واضحة وتنفيذ احترافي ومتابعة مستمرة.'
+              : 'We provide practical solutions that help our clients increase their digital visibility and achieve measurable results through clear strategies, professional execution, and continuous follow-up.'}
           </p>
           <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full px-4 py-2 text-sm">
             <Mail className="w-4 h-4" /> info@digzoom.com
@@ -192,8 +202,8 @@ export default function About() {
             <h2 className="text-2xl font-bold text-white mb-4">{lang === 'ar' ? 'رؤيتنا' : 'Our Vision'}</h2>
             <p className="text-gray-400 leading-relaxed">
               {lang === 'ar'
-                ? 'أن تصبح DigZoom الوجهة العربية الرائدة للحلول الرقمية المتكاملة والشريك الموثوق للنمو الرقمي في المنطقة.'
-                : 'To make DigZoom the leading Arabic destination for integrated digital solutions and the trusted partner for digital growth in the region.'}
+                ? 'أن تصبح DigZoom الوجهة العربية والعالمية الرائدة للحلول الرقمية المتكاملة والشريك الموثوق للنمو الرقمي.'
+                : 'To make DigZoom the leading Arabic and global destination for integrated digital solutions and the trusted partner for digital growth.'}
             </p>
           </div>
         </div>

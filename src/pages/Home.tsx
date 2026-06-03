@@ -314,27 +314,33 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2.5">
-              <img src="/images/tiger-main.jpg" alt="DigZoom" className="w-9 h-9 rounded-lg object-cover" />
+              <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="w-9 h-9 rounded-lg object-cover" />
               <span className="text-2xl font-black tracking-tight">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">dig</span>
                 <span className="text-white">zoom</span>
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8">
-              {[t.navbar.home, t.navbar.shop, 'خدمات التسويق', t.navbar.about].map((item, i) => (
-                <Link key={i} to={['/', '/shop', '/marketing', '/about'][i]} className="text-gray-300 hover:text-white text-sm font-medium transition-colors">
-                  {item}
+            <div className="hidden md:flex items-center gap-6">
+              {[
+                { name: 'الرئيسية', path: '/' },
+                { name: 'المتجر', path: '/shop' },
+                { name: 'خدمات النمو الرقمي', path: '/marketing' },
+                { name: 'من نحن', path: '/about' },
+              ].map((item, i) => (
+                <Link key={i} to={item.path} className="text-gray-300 hover:text-white text-sm font-medium transition-colors">
+                  {item.name}
                 </Link>
               ))}
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Language Toggle */}
+              {/* Language Toggle — AR | EN */}
               <button onClick={toggleLang}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">{lang === 'ar' ? 'EN' : 'عربي'}</span>
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5">
+                <span className={lang === 'ar' ? 'text-gray-500' : 'text-white'}>EN</span>
+                <span className="text-gray-600">|</span>
+                <span className={lang === 'ar' ? 'text-white' : 'text-gray-500'}>AR</span>
               </button>
 
               {/* Cart with count badge */}
@@ -407,9 +413,18 @@ export default function Home() {
 
         {mobileOpen && (
           <div className="md:hidden bg-[#0a0a0f]/95 backdrop-blur-md border-t border-white/5 px-4 py-4 space-y-1">
-            {['الرئيسية', 'المتجر', 'خدمات التسويق', 'من نحن'].map((item, i) => (
-              <Link key={i} to={['/', '/shop', '/marketing', '/about'][i]} className="block py-2.5 text-gray-300 hover:text-white font-medium" onClick={() => setMobileOpen(false)}>
-                {item}
+            {[
+              { name: 'الرئيسية', path: '/' },
+              { name: 'المتجر', path: '/shop' },
+              { name: 'خدمات النمو الرقمي', path: '/marketing' },
+              { name: 'دراسات الحالة', path: '/case-studies' },
+              { name: 'الأسعار', path: '/pricing' },
+              { name: 'من نحن', path: '/about' },
+              { name: 'الأسئلة الشائعة', path: '/faq' },
+              { name: 'اتصل بنا', path: '/contact' },
+            ].map((item, i) => (
+              <Link key={i} to={item.path} className="block py-2.5 text-gray-300 hover:text-white font-medium" onClick={() => setMobileOpen(false)}>
+                {item.name}
               </Link>
             ))}
           </div>
