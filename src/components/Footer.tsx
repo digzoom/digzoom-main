@@ -32,11 +32,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-auto overflow-hidden rounded-xl ring-1 ring-white/10">
+              <div className="h-12 w-12 overflow-hidden rounded-xl ring-1 ring-white/10">
                 <img
-                  src="/images/logo-main.jpg"
+                  src="/images/digzoom-logo-side-new.jpg"
                   alt="DigZoom"
-                  className="h-full w-auto object-contain"
+                  className="h-full w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               </div>

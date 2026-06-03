@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router';
 import { Toaster } from '@/components/ui/sonner';
+import ScrollToTop from '@/components/ScrollToTop';
 import { LanguageProvider } from '@/hooks/useLanguage.tsx';
 import { CartProvider } from '@/hooks/useCart.tsx';
 import { AuthProvider } from '@/hooks/useAuth.tsx';
@@ -30,6 +31,7 @@ export default function App() {
       <CartProvider>
         <AuthProvider>
           <SupabaseAuthProvider>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
