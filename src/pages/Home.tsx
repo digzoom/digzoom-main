@@ -290,7 +290,7 @@ function ServiceCard({ service }: { service: { icon: React.ReactNode; title: str
 /* ── Main Component ── */
 export default function Home() {
   const { lang, t, toggleLang } = useLanguage();
-  const { addToCart, totalItems } = useCart();
+  const { addToCart, totalItems, items } = useCart();
   const { user, logout } = useSupabaseAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
