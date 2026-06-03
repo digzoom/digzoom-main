@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCart } from '@/hooks/useCart';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import ChatBot from '@/components/ChatBot';
 import { products } from '@/data/products';
 import { marketingServices } from '@/data/marketingServices';
@@ -277,8 +278,10 @@ function ServiceCard({ service }: { service: { icon: React.ReactNode; title: str
 export default function Home() {
   const { lang, t, toggleLang } = useLanguage();
   const { addToCart, totalItems } = useCart();
+  const { user, logout } = useSupabaseAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -288,7 +291,20 @@ export default function Home() {
 
   const handleAddToCart = (product: typeof products[0]) => {
     addToCart(product as any);
-    toast.success(`تمت إضافة "${product.title}" إلى السلة`);
+    toast.success(
+      <div className="flex flex-col gap-1">
+        <span className="font-medium">{lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Added to cart'}</span>
+        <span className="text-xs opacity-80">{product.title}</span>
+        <Link 
+          to="/cart" 
+          className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded mt-1 text-center transition-colors"
+          onClick={() => toast.dismiss()}
+        >
+          {lang === 'ar' ? 'عرض السلة →' : 'View Cart →'}
+        </Link>
+      </div>,
+      { duration: 3000 }
+    );
   };
 
   return (
@@ -331,11 +347,56 @@ export default function Home() {
                 )}
               </Link>
 
-              {/* Login */}
-              <Link to="/login" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                <LogIn className="w-4 h-4" />
-                <span>{lang === 'ar' ? 'دخول' : 'Login'}</span>
-              </Link>
+              {/* User or Login */}
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    {user.avatar ? (
+                      <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    <span className="text-sm font-medium hidden lg:inline">{user.name}</span>
+                  </button>
+                  
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl py-2 z-50">
+                      <Link to="/account" className="flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
+                        <Users className="w-4 h-4" />
+                        {lang === 'ar' ? 'حسابي' : 'My Account'}
+                      </Link>
+                      <Link to="/orders" className="flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
+                        <Package className="w-4 h-4" />
+                        {lang === 'ar' ? 'طلباتي' : 'My Orders'}
+                      </Link>
+                      {user.role === 'admin' && (
+                        <Link to="/admin" className="flex items-center gap-2 px-4 py-2.5 text-purple-400 hover:text-purple-300 hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
+                          <Zap className="w-4 h-4" />
+                          {lang === 'ar' ? 'لوحة التحكم' : 'Admin'}
+                        </Link>
+                      )}
+                      <div className="border-t border-white/10 my-1" />
+                      <button
+                        onClick={() => { logout(); setUserMenuOpen(false); }}
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-white/5 text-sm text-right"
+                      >
+                        <LogIn className="w-4 h-4" />
+                        {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link to="/login" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                  <LogIn className="w-4 h-4" />
+                  <span>{lang === 'ar' ? 'دخول' : 'Login'}</span>
+                </Link>
+              )}
 
               <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-300">
                 {mobileOpen ? <span className="text-xl">✕</span> : <span className="text-xl">☰</span>}

@@ -67,16 +67,43 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check saved session on mount
+  // Check saved session + OAuth callback on mount
   useEffect(() => {
-    const token = localStorage.getItem('sb_access_token');
-    const refresh = localStorage.getItem('sb_refresh_token');
-    console.log('[SupabaseAuthProvider mount] sb_access_token exists?', !!token, 'length:', token?.length || 0, 'sb_refresh_token exists?', !!refresh);
-    if (token) {
-      loadUser(token).finally(() => setLoading(false));
-    } else {
+    const init = async () => {
+      // 1. Check for OAuth callback code in URL (Google, magic link, etc.)
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+      
+      if (code) {
+        console.log('[Auth mount] Found ?code= in URL, exchanging for session...');
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error('[Auth mount] exchangeCodeForSession failed:', error.message);
+        } else if (data.session) {
+          console.log('[Auth mount] Session obtained from code, access_token length:', data.session.access_token.length);
+          localStorage.setItem('sb_access_token', data.session.access_token);
+          localStorage.setItem('sb_refresh_token', data.session.refresh_token);
+          // Clean URL
+          url.searchParams.delete('code');
+          url.searchParams.delete('type');
+          if (!url.hash || url.hash === '') url.hash = '#/';
+          window.history.replaceState({}, '', url.toString());
+          await loadUser(data.session.access_token);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // 2. Fallback: check localStorage token
+      const token = localStorage.getItem('sb_access_token');
+      console.log('[Auth mount] sb_access_token exists?', !!token, 'length:', token?.length || 0);
+      if (token) {
+        await loadUser(token);
+      }
       setLoading(false);
-    }
+    };
+    
+    init();
   }, []);
 
   const loadUser = async (token: string): Promise<boolean> => {
