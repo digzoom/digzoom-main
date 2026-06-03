@@ -204,25 +204,30 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     return {};
   }, []);
 
-  // Google OAuth
+  // Google OAuth — uses native Supabase client with raw logging
   const signInWithGoogle = useCallback(async () => {
     const redirectTo = `${window.location.origin}/#/`;
-    const { ok, data } = await authApi('authorize', {
+    console.log('[Google OAuth] Calling supabase.auth.signInWithOAuth({ provider: "google", redirectTo:', redirectTo, '})');
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      redirect_to: redirectTo,
+      options: { redirectTo },
     });
-    if (ok && data?.url) {
+    
+    console.log('[Google OAuth] Raw response data:', JSON.stringify(data, null, 2));
+    console.log('[Google OAuth] Raw response error:', JSON.stringify(error, null, 2));
+    
+    if (error) {
+      console.error('[Google OAuth] Supabase returned error:', error);
+      throw new Error(error.message || JSON.stringify(error));
+    }
+    
+    if (data?.url) {
+      console.log('[Google OAuth] Redirecting to:', data.url);
       window.location.href = data.url;
     } else {
-      // Extract error from all possible Supabase response fields
-      const errMsg =
-        data?.error_description ||
-        data?.error ||
-        data?.msg ||
-        data?.message ||
-        (typeof data === 'string' ? data : null) ||
-        'Google login is not configured in Supabase. Please add Client ID and Client Secret.';
-      throw new Error(errMsg);
+      console.error('[Google OAuth] No URL in response. Full data:', data);
+      throw new Error('No redirect URL returned. Check console for details.');
     }
   }, []);
 
