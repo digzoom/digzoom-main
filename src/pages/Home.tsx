@@ -425,73 +425,84 @@ export default function Home() {
           <div className="absolute w-[500px] h-[500px] bottom-0 left-1/3 bg-cyan-600/4 rounded-full blur-[100px]" />
           {/* Grid pattern */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:60px_60px]" />
+          {/* Tiger watermark — very subtle, 5% opacity */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
+            <img src="/images/hero-tiger.jpg" alt="" className="w-[600px] h-[600px] object-contain" aria-hidden="true" />
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
-          {/* Center Tiger Logo */}
-          <div className="mb-6 flex justify-center">
-            <div className="relative group">
-              <img
-                src="/images/hero-tiger.jpg"
-                alt="DigZoom Tiger"
-                className="w-40 h-52 sm:w-48 sm:h-60 md:w-56 md:h-72 object-cover rounded-3xl drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] transition-all duration-500 group-hover:drop-shadow-[0_0_80px_rgba(139,92,246,0.6)] group-hover:scale-105"
-              />
-              <div className="absolute -inset-6 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-orange-600/20 rounded-full blur-3xl -z-10 animate-pulse" />
-            </div>
-          </div>
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-6">
-            <Flame className="w-4 h-4 text-orange-400" />
-            <span className="text-gray-300 text-sm">{t.hero.badge || '+50 منتج رقمي مختار'}</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.15] tracking-tight">
-            {t.hero.title1} {t.hero.titleHighlight}
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
-              {t.hero.title2}
-            </span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t.hero.subtitle}
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12">
-            <Link
-              to="/shop"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:-translate-y-0.5 font-bold"
-            >
-              <Package className="w-5 h-5" />
-              {t.hero.btnShop}
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <Link
-              to="/marketing"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/15 text-white hover:bg-white/5 px-8 py-4 text-base rounded-xl transition-all font-semibold bg-white/[0.02]"
-            >
-              <TrendingUp className="w-5 h-5 text-emerald-400" />
-              {lang === 'ar' ? 'خدمات التسويق الرقمي' : 'Digital Marketing Services'}
-            </Link>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-gray-400 text-sm">
-            {[
-              { icon: <Headphones className="w-4 h-4 text-blue-400" />, text: t.hero.feature3 },
-              { icon: <ShieldCheck className="w-4 h-4 text-emerald-400" />, text: lang === 'ar' ? 'منتجات رقمية أصلية' : 'Original Digital Products' },
-              { icon: <Zap className="w-4 h-4 text-orange-400" />, text: t.hero.feature1 },
-              { icon: <Heart className="w-4 h-4 text-pink-400" />, text: lang === 'ar' ? 'ضمان رضا العملاء' : 'Satisfaction Guarantee' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                {item.icon}
-                <span>{item.text}</span>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text */}
+            <div className="text-center lg:text-start">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-6">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
+                <span className="text-gray-300 text-sm">{lang === 'ar' ? 'منصة النمو الرقمي المتكاملة' : 'Digital Growth Platform'}</span>
               </div>
-            ))}
+
+              {/* Headline */}
+              <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-black text-white mb-5 leading-[1.1] tracking-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
+                  DigZoom | ديج زوم
+                </span>
+                <br />
+                {lang === 'ar' ? 'منصة النمو الرقمي المتكاملة' : 'Digital Growth Platform'}
+              </h1>
+
+              {/* Subheadline */}
+              <p className="text-base sm:text-lg text-gray-400 max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+                {lang === 'ar'
+                  ? 'نساعد الشركات والأفراد على النمو من خلال المنتجات الرقمية والخدمات التسويقية والحلول التقنية الحديثة.'
+                  : 'We help businesses and individuals grow through digital products, marketing services, and modern technical solutions.'}
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3 sm:gap-4 mb-10">
+                <Link
+                  to="/contact"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:-translate-y-0.5 font-bold"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  {lang === 'ar' ? 'احجز استشارة مجانية' : 'Book a Free Consultation'}
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+                <Link
+                  to="/marketing"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/15 text-white hover:bg-white/5 px-8 py-4 text-base rounded-xl transition-all font-semibold bg-white/[0.02]"
+                >
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                  {lang === 'ar' ? 'استكشف الخدمات' : 'Explore Services'}
+                </Link>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-gray-400 text-sm">
+                {[
+                  { icon: <ShieldCheck className="w-4 h-4 text-emerald-400" />, text: lang === 'ar' ? 'شركة أمريكية مسجلة' : 'US Registered Company' },
+                  { icon: <Zap className="w-4 h-4 text-orange-400" />, text: lang === 'ar' ? 'تسليم رقمي فوري' : 'Instant Digital Delivery' },
+                  { icon: <Headphones className="w-4 h-4 text-blue-400" />, text: lang === 'ar' ? 'دعم احترافي' : 'Professional Support' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    {item.icon}
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Dashboard Mockup */}
+            <div className="relative hidden lg:flex items-center justify-center">
+              <div className="relative">
+                <img
+                  src="/images/dashboard-mockup.png"
+                  alt={lang === 'ar' ? 'لوحة تحكم نمو DigZoom' : 'DigZoom Growth Dashboard'}
+                  className="w-full max-w-lg object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.3)]"
+                />
+                {/* Glow behind dashboard */}
+                <div className="absolute -inset-10 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-cyan-600/10 rounded-3xl blur-3xl -z-10" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -508,38 +519,38 @@ export default function Home() {
       <section className="py-10 border-y border-white/5 bg-gradient-to-b from-[#0a0a0f] to-[#0d0d18]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/10 text-blue-400 mb-3">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'استراتيجيات نمو مدروسة' : 'Data-Driven Growth Strategies'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Megaphone className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'حملات إعلانية مُحسّنة' : 'Optimized Ad Campaigns'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/10 text-emerald-400 mb-3">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تحسين محركات البحث' : 'SEO & Search Optimization'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 border border-orange-500/10 text-orange-400 mb-3">
+              <ShoppingCart className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تطوير متاجر إلكترونية' : 'eCommerce Development'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/10 text-pink-400 mb-3">
+              <Palette className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'صناعة محتوى احترافية' : 'Professional Content Creation'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/10 text-cyan-400 mb-3">
               <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تجربة شراء رقمية سلسة' : 'Seamless Digital Shopping'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Box className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'منتجات مختارة بعناية' : 'Carefully Selected Products'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Download className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تسليم رقمي منظم' : 'Organized Digital Delivery'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Headphones className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'دعم سريع عند الحاجة' : 'Fast Support When Needed'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Users className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'مناسب للأفراد وأصحاب المشاريع' : 'For Individuals & Business Owners'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Package className="w-6 h-6" />
             </div>
             <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'باقات قابلة للتطوير' : 'Scalable Plans'}</div>
           </div>
