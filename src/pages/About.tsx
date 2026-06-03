@@ -23,9 +23,9 @@ export default function About() {
         {/* Hero */}
         <div className="text-center mb-20">
           <img
-            src="/images/about-tiger.jpg"
+            src="/images/hero-tiger-new.jpg"
             alt="DigZoom Brand"
-            className="w-full max-w-md mx-auto rounded-2xl mb-8 shadow-2xl shadow-blue-500/10 border border-white/[0.06]"
+            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.35)]"
           />
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">{t.about.title}</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">{t.about.heroText}</p>
@@ -70,29 +70,24 @@ export default function About() {
               ? 'النمر الرقمي — رمز القوة والتقنية في عالم المنتجات الرقمية'
               : 'The Digital Tiger — a symbol of power and technology in the digital products world'}
           </p>
-          <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden border-2 border-purple-500/20 shadow-2xl shadow-purple-500/10">
+          <div className="max-w-lg mx-auto">
             <img
-              src="/images/digzoom-brand.jpg"
-              alt="digzoom brand identity - Digital Tiger"
-              className="w-full h-auto"
+              src="/images/hero-tiger-new.jpg"
+              alt="digzoom brand identity"
+              className="w-full h-auto object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.35)]"
             />
           </div>
         </div>
 
         {/* Mission & Vision */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">{t.about.mission}</h2>
-              <p className="text-gray-400 leading-relaxed">{t.about.missionText}</p>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">{t.about.vision}</h2>
-              <p className="text-gray-400 leading-relaxed">{t.about.visionText}</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+          <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04]">
+            <h2 className="text-2xl font-bold text-white mb-4">{t.about.mission}</h2>
+            <p className="text-gray-400 leading-relaxed">{t.about.missionText}</p>
           </div>
-          <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
-            <img src="/images/brand-mockup.jpg" alt="digzoom brand" className="w-full h-full object-cover" />
+          <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04]">
+            <h2 className="text-2xl font-bold text-white mb-4">{t.about.vision}</h2>
+            <p className="text-gray-400 leading-relaxed">{t.about.visionText}</p>
           </div>
         </div>
 
