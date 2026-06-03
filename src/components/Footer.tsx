@@ -43,8 +43,8 @@ export default function Footer() {
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">
               {lang === 'ar'
-                ? 'ديجي زوم — سوق رقمي لمنتجات التصميم والأعمال الإبداعية والقوالب والكتب الإلكترونية والملفات الرقمية.'
-                : 'DigZoom — a digital marketplace for design assets, business resources, templates, ebooks, and digital downloads.'}
+                ? 'DigZoom منصة متخصصة في المنتجات الرقمية وخدمات التسويق الرقمي تساعد الأفراد والشركات على تحقيق نمو رقمي مستدام من خلال حلول رقمية وتسويقية متكاملة.'
+                : 'DigZoom is a platform specialized in digital products and digital marketing services, helping individuals and businesses achieve sustainable digital growth through integrated digital and marketing solutions.'}
             </p>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-gray-400 text-sm"><Mail className="w-4 h-4 text-blue-400" /><span>info@digzoom.com</span></div>

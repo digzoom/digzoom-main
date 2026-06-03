@@ -23,12 +23,16 @@ export default function About() {
         {/* Hero */}
         <div className="text-center mb-20">
           <img
-            src="/images/about-tiger.jpg"
-            alt="DigZoom Brand"
-            className="w-full max-w-md mx-auto rounded-2xl mb-8 shadow-2xl shadow-blue-500/10 border border-white/[0.06]"
+            src="/images/hero-tiger-new.jpg"
+            alt="DigZoom"
+            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.35)]"
           />
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">{t.about.title}</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">{t.about.heroText}</p>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            {lang === 'ar'
+              ? 'ديج زوم (DigZoom) منصة نمو رقمي متكاملة تجمع بين المنتجات الرقمية والخدمات التسويقية الاحترافية تحت سقف واحد. نساعد الأفراد والشركات على بناء حضور رقمي أقوى وتحقيق نمو مستدام من خلال المنتجات الرقمية، إدارة التسويق الرقمي، الحملات الإعلانية، تحسين محركات البحث (SEO)، تطوير المتاجر الإلكترونية، وصناعة المحتوى.'
+              : 'DigZoom is a Digital Growth Platform that combines digital products and professional marketing services under one roof. We help individuals and businesses build a stronger digital presence and achieve sustainable growth through digital products, digital marketing management, advertising campaigns, SEO, e-commerce development, and content creation.'}
+          </p>
           <div className="mt-6 inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full px-4 py-2 text-sm">
             <Mail className="w-4 h-4" /> info@digzoom.com
           </div>
@@ -37,12 +41,12 @@ export default function About() {
         {/* What We Offer — Stripe Compliance Section */}
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            {t.lang === 'ar' ? 'ماذا نقدم' : 'What We Offer'}
+            {lang === 'ar' ? 'ماذا نقدم' : 'What We Offer'}
           </h2>
           <p className="text-gray-400 text-center max-w-xl mx-auto mb-10">
-            {t.lang === 'ar'
-              ? 'نحن سوق رقمي متخصص في المنتجات والملفات الرقمية القابلة للتحميل'
-              : 'We are a digital marketplace specializing in downloadable digital products and files'}
+            {lang === 'ar'
+              ? 'منصة نمو رقمي متكاملة — نجمع بين المنتجات الرقمية والخدمات التسويقية الاحترافية'
+              : 'A Digital Growth Platform — combining digital products with professional marketing services'}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -80,19 +84,22 @@ export default function About() {
         </div>
 
         {/* Mission & Vision */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">{t.about.mission}</h2>
-              <p className="text-gray-400 leading-relaxed">{t.about.missionText}</p>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-4">{t.about.vision}</h2>
-              <p className="text-gray-400 leading-relaxed">{t.about.visionText}</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+          <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04]">
+            <h2 className="text-2xl font-bold text-white mb-4">{lang === 'ar' ? 'رسالتنا' : 'Our Mission'}</h2>
+            <p className="text-gray-400 leading-relaxed">
+              {lang === 'ar'
+                ? 'تمكين الأفراد والشركات من النمو رقمياً عبر حلول رقمية وتسويقية حديثة تجمع بين الابتكار والنتائج العملية.'
+                : 'Empowering individuals and businesses to grow digitally through modern digital and marketing solutions that combine innovation with practical results.'}
+            </p>
           </div>
-          <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
-            <img src="/images/brand-mockup.jpg" alt="digzoom brand" className="w-full h-full object-cover" />
+          <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04]">
+            <h2 className="text-2xl font-bold text-white mb-4">{lang === 'ar' ? 'رؤيتنا' : 'Our Vision'}</h2>
+            <p className="text-gray-400 leading-relaxed">
+              {lang === 'ar'
+                ? 'أن تصبح DigZoom الوجهة العربية الرائدة للحلول الرقمية المتكاملة والشريك الموثوق للنمو الرقمي في المنطقة.'
+                : 'To make DigZoom the leading Arabic destination for integrated digital solutions and the trusted partner for digital growth in the region.'}
+            </p>
           </div>
         </div>
 

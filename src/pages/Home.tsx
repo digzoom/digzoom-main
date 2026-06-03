@@ -430,34 +430,33 @@ export default function Home() {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
           {/* Center Tiger Logo */}
           <div className="mb-6 flex justify-center">
-            <div className="relative group">
-              <img
-                src="/images/hero-tiger.jpg"
-                alt="DigZoom Tiger"
-                className="w-40 h-52 sm:w-48 sm:h-60 md:w-56 md:h-72 object-cover rounded-3xl drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] transition-all duration-500 group-hover:drop-shadow-[0_0_80px_rgba(139,92,246,0.6)] group-hover:scale-105"
-              />
-              <div className="absolute -inset-6 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-orange-600/20 rounded-full blur-3xl -z-10 animate-pulse" />
-            </div>
+            <img
+              src="/images/hero-tiger-new.jpg"
+              alt="DigZoom"
+              className="w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] transition-all duration-500 hover:scale-105"
+            />
           </div>
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-6">
             <Flame className="w-4 h-4 text-orange-400" />
-            <span className="text-gray-300 text-sm">{t.hero.badge || '+50 منتج رقمي مختار'}</span>
+            <span className="text-gray-300 text-sm">{t.hero.badge || 'منصة النمو الرقمي المتكاملة'}</span>
           </div>
 
           {/* Headline */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.15] tracking-tight">
-            {t.hero.title1} {t.hero.titleHighlight}
+            {lang === 'ar' ? 'منصة النمو الرقمي' : 'Digital Growth'}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
-              {t.hero.title2}
+              {lang === 'ar' ? 'المتكاملة للأفراد والشركات' : 'Platform for Individuals & Businesses'}
             </span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t.hero.subtitle}
+            {lang === 'ar'
+              ? 'اكتشف حلولنا ومنتجاتنا الرقمية — من المنتجات الرقمية إلى خدمات التسويق المتكاملة'
+              : 'Discover our digital solutions and products — from digital products to integrated marketing services'}
           </p>
 
           {/* CTA Buttons */}
@@ -509,39 +508,95 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="text-center p-4 md:p-5">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Package className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'منتجات رقمية متنوعة' : 'Diverse Digital Products'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'خدمات تسويق رقمي' : 'Digital Marketing Services'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تجربة شراء رقمية سلسة' : 'Seamless Digital Shopping'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Box className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'منتجات مختارة بعناية' : 'Carefully Selected Products'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Download className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تسليم رقمي منظم' : 'Organized Digital Delivery'}</div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'حلول نمو للشركات' : 'Business Growth Solutions'}</div>
           </div>
           <div className="text-center p-4 md:p-5">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
               <Headphones className="w-6 h-6" />
             </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'دعم سريع عند الحاجة' : 'Fast Support When Needed'}</div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'دعم متواصل' : 'Continuous Support'}</div>
           </div>
           <div className="text-center p-4 md:p-5">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
               <Users className="w-6 h-6" />
             </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'مناسب للأفراد وأصحاب المشاريع' : 'For Individuals & Business Owners'}</div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'للأفراد والشركات' : 'For Individuals & Businesses'}</div>
           </div>
           <div className="text-center p-4 md:p-5">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Package className="w-6 h-6" />
+              <Zap className="w-6 h-6" />
             </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'باقات قابلة للتطوير' : 'Scalable Plans'}</div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تسليم فوري' : 'Instant Delivery'}</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ ECOSYSTEM SECTION ═══════════ */}
+      <section className="py-16 md:py-20 bg-[#0a0a0f]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
+              <Zap className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-300 text-xs font-bold">{lang === 'ar' ? 'منظومة متكاملة' : 'Integrated Ecosystem'}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
+              {lang === 'ar' ? 'منظومة' : 'The'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">DigZoom</span> {lang === 'ar' ? 'للنمو الرقمي' : 'Digital Growth Ecosystem'}
+            </h2>
+            <p className="text-gray-400 text-base max-w-2xl mx-auto leading-relaxed">
+              {lang === 'ar'
+                ? 'نوفر لك الأدوات الرقمية والمنتجات الجاهزة التي تساعدك على الانطلاق، ونقدم في الوقت نفسه الخدمات التسويقية والاستراتيجيات اللازمة للوصول إلى جمهورك المستهدف وتحقيق نمو رقمي مستدام.'
+                : 'We provide you with the digital tools and ready-made products to get started, while also offering marketing services and strategies to reach your target audience and achieve sustainable digital growth.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04] text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/10 text-blue-400 mb-5">
+                <Package className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'المنتجات الرقمية' : 'Digital Products'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {lang === 'ar'
+                  ? 'قوالب، كتب، أدوات، دورات تدريبية — كل ما تحتاجه لتبدأ مشروعك الرقمي'
+                  : 'Templates, ebooks, tools, courses — everything you need to start your digital project'}
+              </p>
+            </div>
+            <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04] text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/10 text-purple-400 mb-5">
+                <TrendingUp className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'التسويق الرقمي' : 'Digital Marketing'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {lang === 'ar'
+                  ? 'إدارة حملات، SEO، إعلانات، تحليلات — استراتيجيات مدروسة لنمو حقيقي'
+                  : 'Campaign management, SEO, ads, analytics — strategies for real growth'}
+              </p>
+            </div>
+            <div className="bg-[#151520] rounded-2xl p-8 border border-white/[0.04] text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/10 text-orange-400 mb-5">
+                <Zap className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'التنفيذ والنمو' : 'Execution & Growth'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {lang === 'ar'
+                  ? 'هدفنا أن نجمع بين المنتج الرقمي، والتسويق، والتنفيذ داخل منظومة واحدة متكاملة'
+                  : 'Our goal is to bring together digital products, marketing, and execution in one integrated ecosystem'}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -556,7 +611,7 @@ export default function Home() {
                 <span className="text-orange-300 text-xs font-bold">{t.featured.badge || (lang === 'ar' ? 'الأكثر مبيعاً' : 'Best Sellers')}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                {lang === 'ar' ? 'منتجاتنا' : 'Our'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500">{t.featured.title}</span>
+                {lang === 'ar' ? 'استكشف حلولنا و' : 'Explore Our '}<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500">{lang === 'ar' ? 'منتجاتنا الرقمية' : 'Digital Products'}</span>
               </h2>
               <p className="text-gray-400 text-sm mt-2 max-w-lg">
                 {t.featured.subtitle}
