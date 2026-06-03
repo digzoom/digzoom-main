@@ -70,12 +70,21 @@ export default function About() {
               ? 'النمر الرقمي — رمز القوة والتقنية في عالم المنتجات الرقمية'
               : 'The Digital Tiger — a symbol of power and technology in the digital products world'}
           </p>
-          <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden border-2 border-purple-500/20 shadow-2xl shadow-purple-500/10">
-            <img
-              src="/images/digzoom-brand.jpg"
-              alt="digzoom brand identity - Digital Tiger"
-              className="w-full h-auto"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="rounded-3xl overflow-hidden border-2 border-purple-500/20 shadow-2xl shadow-purple-500/10">
+              <img
+                src="/images/digzoom-logo-front.jpg"
+                alt="digzoom logo - front view"
+                className="w-full h-auto"
+              />
+            </div>
+            <div className="rounded-3xl overflow-hidden border-2 border-purple-500/20 shadow-2xl shadow-purple-500/10">
+              <img
+                src="/images/digzoom-logo-side.jpg"
+                alt="digzoom logo - side view"
+                className="w-full h-auto"
+              />
+            </div>
           </div>
         </div>
 
