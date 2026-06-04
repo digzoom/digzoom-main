@@ -250,6 +250,7 @@ function CouponsTab() {
 
   const utils = trpc.useUtils();
   const { data: coupons, isLoading } = trpc.listCoupons.useQuery({ limit: 100 });
+  const { data: meData } = trpc.me.useQuery();
   const createMutation = trpc.createCoupon.useMutation({
     onSuccess: (data) => {
       setDebug((prev: any) => ({ ...prev, apiStatus: 'SUCCESS', apiResponse: data }));
@@ -320,6 +321,16 @@ function CouponsTab() {
             <button onClick={save} disabled={createMutation.isPending} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-xl text-sm font-bold"><Save className="w-4 h-4 inline mr-1" />{t.admin.save}</button>
             <button onClick={() => { setShowForm(false); resetForm(); }} className="bg-white/5 hover:bg-white/10 text-gray-400 px-6 py-2 rounded-xl text-sm">{t.admin.cancel}</button>
           </div>
+          {/* DEBUG: Backend's view of current user — always visible */}
+          <div className="mt-3 p-3 bg-purple-900/30 border border-purple-500/30 rounded-xl text-xs font-mono space-y-1">
+            <div className="text-purple-400 font-bold mb-2">BACKEND AUTH CONTEXT</div>
+            <div className="text-gray-300"><span className="text-purple-500">hasUser:</span> {JSON.stringify(meData?.hasUser)}</div>
+            <div className="text-gray-300"><span className="text-purple-500">userId:</span> {JSON.stringify(meData?.userId)}</div>
+            <div className="text-gray-300"><span className="text-purple-500">email:</span> {JSON.stringify(meData?.email)}</div>
+            <div className="text-gray-300"><span className="text-purple-500">role:</span> <span className={meData?.role === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meData?.role)}</span></div>
+            <div className="text-gray-300"><span className="text-purple-500">isAdmin:</span> <span className={meData?.isAdmin ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meData?.isAdmin)}</span></div>
+          </div>
+
           {/* DEBUG PANEL — visible on page */}
           {debug && (
             <div className="mt-3 p-3 bg-yellow-900/30 border border-yellow-500/30 rounded-xl text-xs font-mono space-y-1">

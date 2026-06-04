@@ -36,6 +36,18 @@ export const adminRouter = createRouter({
   // Health check — no auth
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),
 
+  // Debug: return current user context (any logged-in user)
+  me: publicQuery.query(({ ctx }) => {
+    const user = (ctx as any)?.user;
+    return {
+      hasUser: !!user,
+      userId: user?.id || null,
+      email: user?.email || null,
+      role: user?.role || null,
+      isAdmin: user?.role === 'admin',
+    };
+  }),
+
   /* ─── Create Order (public — guest checkout, no auth required) ─── */
   createOrder: publicQuery
     .input(
