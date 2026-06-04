@@ -32,19 +32,19 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-auto overflow-hidden rounded-xl ring-1 ring-white/10">
+              <div className="h-12 w-12 overflow-hidden rounded-xl ring-1 ring-white/10">
                 <img
-                  src="/images/logo-main.jpg"
+                  src="/images/digzoom-logo-side-new.jpg"
                   alt="DigZoom"
-                  className="h-full w-auto object-contain"
+                  className="h-full w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               </div>
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">
               {lang === 'ar'
-                ? 'ديجي زوم — سوق رقمي لمنتجات التصميم والأعمال الإبداعية والقوالب والكتب الإلكترونية والملفات الرقمية.'
-                : 'DigZoom — a digital marketplace for design assets, business resources, templates, ebooks, and digital downloads.'}
+                ? 'ديج زوم (DigZoom) منصة نمو رقمي متكاملة تجمع بين المنتجات الرقمية والخدمات التسويقية الاحترافية.'
+                : 'DigZoom is an integrated Digital Growth Platform combining digital products and professional marketing services.'}
             </p>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-gray-400 text-sm"><Mail className="w-4 h-4 text-blue-400" /><span>info@digzoom.com</span></div>

@@ -56,7 +56,7 @@ export default function AcceptableUsePolicy() {
           </h1>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             {isAr
-              ? 'تعرف على ما هو مسموح وما هو ممنوع في منصة ديجي زوم'
+              ? 'تعرف على ما هو مسموح وما هو ممنوع في منصة ديج زوم (DigZoom)'
               : 'Learn what is permitted and prohibited on the DigZoom platform'}
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function AcceptableUsePolicy() {
               <h3 className="text-white font-bold text-lg mb-2">{isAr ? 'مقدمة' : 'Introduction'}</h3>
               <p className="text-gray-400 leading-relaxed">
                 {isAr
-                  ? 'تهدف ديجي زوم إلى توفير سوق رقمي آمن وموثوق لمنتجات الأعمال والتصميمات والملفات الرقمية الأصلية. يجب على جميع المستخدمين والبائعين الالتزام بهذه السياسة لضمان تجربة آمنة للجميع.'
+                  ? 'تهدف ديج زوم (DigZoom) إلى توفير منصة نمو رقمي آمنة وموثوقة للمنتجات الرقمية والخدمات التسويقية. يجب على جميع المستخدمين والعملاء الالتزام بهذه السياسة لضمان تجربة آمنة للجميع.'
                   : 'DigZoom aims to provide a safe and trusted digital marketplace for business products, designs, and original digital files. All users and sellers must comply with this policy to ensure a safe experience for everyone.'}
               </p>
             </div>
@@ -116,7 +116,7 @@ export default function AcceptableUsePolicy() {
               <h3 className="text-amber-400 font-bold text-lg mb-2">{isAr ? 'الإنفاذ والعقوبات' : 'Enforcement & Penalties'}</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
                 {isAr
-                  ? 'في حال اكتشاف أي منتج أو خدمة مخالفة لهذه السياسة، تحتفظ ديجي زوم بالحق في: إزالة المنتج فوراً — تعليق حساب البائع — إلغاء جميع المدفوعات المرتبطة — الإبلاغ عن السلطات المختصة عند الضرورة — حظر المستخدم بشكل دائم من المنصة. إذا كنت غير متأكد مما إذا كان منتجك مسموحاً به، يرجى التواصل معنا على info@digzoom.com قبل الإدراج.'
+                  ? 'في حال اكتشاف أي منتج أو خدمة مخالفة لهذه السياسة، تحتفظ ديج زوم (DigZoom) بالحق في: إزالة المحتوى فوراً — تعليق حساب المستخدم — إلغاء جميع المدفوعات المرتبطة — الإبلاغ عن السلطات المختصة عند الضرورة — حظر المستخدم بشكل دائم من المنصة. إذا كنت غير متأكد مما إذا كان المحتوى مسموحاً به، يرجى التواصل معنا على info@digzoom.com قبل الإدراج.'
                   : 'If any product or service violating this policy is discovered, DigZoom reserves the right to: Remove the product immediately — Suspend the seller account — Cancel all related payments — Report to relevant authorities when necessary — Permanently ban the user from the platform. If you are unsure whether your product is allowed, please contact us at info@digzoom.com before listing.'}
               </p>
             </div>

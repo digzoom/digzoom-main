@@ -23,7 +23,9 @@ import Refund from './pages/Refund';
 import DeliveryPolicy from './pages/DeliveryPolicy';
 import AcceptableUsePolicy from './pages/AcceptableUsePolicy';
 import CompanyInformation from './pages/CompanyInformation';
+import MarketingServices from './pages/MarketingServices';
 import TrustSecurity from './pages/TrustSecurity';
+import Navbar from './components/Navbar';
 
 export default function App() {
   return (
@@ -32,6 +34,7 @@ export default function App() {
         <AuthProvider>
           <SupabaseAuthProvider>
             <ScrollToTop />
+            <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -53,6 +56,7 @@ export default function App() {
               <Route path="/acceptable-use" element={<AcceptableUsePolicy />} />
               <Route path="/company" element={<CompanyInformation />} />
               <Route path="/trust-security" element={<TrustSecurity />} />
+              <Route path="/marketing" element={<MarketingServices />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

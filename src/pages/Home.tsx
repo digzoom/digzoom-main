@@ -2,15 +2,13 @@ import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCart } from '@/hooks/useCart';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import ChatBot from '@/components/ChatBot';
 import { products } from '@/data/products';
-import { marketingServices } from '@/data/marketingServices';
 import {
   ArrowLeft, ArrowRight, Sparkles, Download, ShieldCheck, Zap,
-  ShoppingCart, Star, TrendingUp, Users, Box, Headphones,
+  Star, TrendingUp, Users, Box, Headphones, ShoppingCart,
   Award, Clock, HeadphonesIcon, Lock, RefreshCw, ChevronLeft,
-  LogIn, UserPlus, CheckCircle, Play, Package, BarChart3,
+  CheckCircle, Play, Package, BarChart3,
   Globe, Palette, Lightbulb, Camera, Megaphone, Check,
   Flame, Eye, Heart, Smartphone, Tablet, MousePointerClick,
   BookOpen, Layout, Type, Video
@@ -205,20 +203,13 @@ function StatCounter({ end, suffix, label, icon }: { end: number; suffix: string
 }
 
 /* ── Product Card ── */
-function ProductCard({ product, onAdd, cartQty = 0 }: { product: typeof products[0]; onAdd: (p: typeof products[0]) => void; cartQty?: number }) {
+function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (p: typeof products[0]) => void }) {
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
-  const [flash, setFlash] = useState(false);
-
-  const handleAdd = () => {
-    onAdd(product);
-    setFlash(true);
-    setTimeout(() => setFlash(false), 600);
-  };
 
   return (
-    <div className={`group bg-[#13131f] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-purple-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/5 flex flex-col ${flash ? 'ring-2 ring-emerald-500/50' : ''}`}>
+    <div className="group bg-[#13131f] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-purple-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/5 flex flex-col">
       <Link to={`/product/${product.id}`} className="block relative">
         <div className="aspect-[4/3] overflow-hidden bg-[#1a1a2e]">
           <img
@@ -237,12 +228,6 @@ function ProductCard({ product, onAdd, cartQty = 0 }: { product: typeof products
           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
           {product.rating}
         </div>
-        {cartQty > 0 && (
-          <div className="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-sm text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 animate-pulse">
-            <ShoppingCart className="w-3 h-3" />
-            {cartQty > 1 ? `في السلة: ${cartQty}` : 'في السلة'}
-          </div>
-        )}
       </Link>
 
       <div className="p-4 flex flex-col flex-1">
@@ -261,8 +246,8 @@ function ProductCard({ product, onAdd, cartQty = 0 }: { product: typeof products
             )}
           </div>
           <button
-            onClick={handleAdd}
-            className={`p-2.5 rounded-xl transition-all active:scale-95 shadow-lg ${cartQty > 0 ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-purple-500/20'} text-white`}
+            onClick={() => onAdd(product)}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-purple-500/20"
             aria-label="Add to cart"
           >
             <ShoppingCart className="w-4 h-4" />
@@ -290,17 +275,7 @@ function ServiceCard({ service }: { service: { icon: React.ReactNode; title: str
 /* ── Main Component ── */
 export default function Home() {
   const { lang, t, toggleLang } = useLanguage();
-  const { addToCart, totalItems, items } = useCart();
-  const { user, logout } = useSupabaseAuth();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  const { addToCart, totalItems } = useCart();
 
   const handleAddToCart = (product: typeof products[0]) => {
     addToCart(product as any);
@@ -322,122 +297,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* ═══════════ NAVBAR ═══════════ */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/5' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2.5">
-              <img src="/images/tiger-main.jpg" alt="DigZoom" className="w-9 h-9 rounded-lg object-cover" />
-              <span className="text-2xl font-black tracking-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">dig</span>
-                <span className="text-white">zoom</span>
-              </span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              {[t.navbar.home, t.navbar.shop, 'خدمات التسويق', t.navbar.about].map((item, i) => (
-                <Link key={i} to={['/', '/shop', '/marketing', '/about'][i]} className="text-gray-300 hover:text-white text-sm font-medium transition-colors">
-                  {item}
-                </Link>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Language Toggle */}
-              <button onClick={toggleLang}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">{lang === 'ar' ? 'EN' : 'عربي'}</span>
-              </button>
-
-              {/* Cart with count badge */}
-              <Link to="/cart" className="relative p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
-                <ShoppingCart className="w-5 h-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
-
-              {/* User or Login */}
-              {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                  >
-                    {user.avatar ? (
-                      <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
-                    ) : (
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
-                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
-                    )}
-                    <span className="text-sm font-medium hidden lg:inline">{user.name}</span>
-                  </button>
-                  
-                  {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-52 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl py-2 z-50">
-                      {/* User header */}
-                      <div className="px-4 py-2 border-b border-white/10 mb-1">
-                        <p className="text-white text-sm font-medium truncate">{user.name}</p>
-                        <p className="text-gray-500 text-xs truncate" dir="ltr">{user.email}</p>
-                      </div>
-                      <Link to="/account" className="flex items-center gap-2.5 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
-                        <Users className="w-4 h-4" />
-                        {lang === 'ar' ? 'حسابي' : 'My Account'}
-                      </Link>
-                      <Link to="/orders" className="flex items-center gap-2.5 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
-                        <Package className="w-4 h-4" />
-                        {lang === 'ar' ? 'طلباتي' : 'My Orders'}
-                      </Link>
-                      <Link to="/shop" className="flex items-center gap-2.5 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
-                        <ShoppingCart className="w-4 h-4" />
-                        {lang === 'ar' ? 'متابعة التسوق' : 'Continue Shopping'}
-                      </Link>
-                      {user.role === 'admin' && (
-                        <Link to="/admin" className="flex items-center gap-2.5 px-4 py-2.5 text-purple-400 hover:text-purple-300 hover:bg-white/5 text-sm transition-colors" onClick={() => setUserMenuOpen(false)}>
-                          <Zap className="w-4 h-4" />
-                          {lang === 'ar' ? 'لوحة التحكم' : 'Admin Dashboard'}
-                        </Link>
-                      )}
-                      <div className="border-t border-white/10 my-1" />
-                      <button
-                        onClick={() => { logout(); setUserMenuOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-white/5 text-sm text-right transition-colors"
-                      >
-                        <LogIn className="w-4 h-4" />
-                        {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link to="/login" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                  <LogIn className="w-4 h-4" />
-                  <span>{lang === 'ar' ? 'دخول' : 'Login'}</span>
-                </Link>
-              )}
-
-              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-300">
-                {mobileOpen ? <span className="text-xl">✕</span> : <span className="text-xl">☰</span>}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {mobileOpen && (
-          <div className="md:hidden bg-[#0a0a0f]/95 backdrop-blur-md border-t border-white/5 px-4 py-4 space-y-1">
-            {['الرئيسية', 'المتجر', 'خدمات التسويق', 'من نحن'].map((item, i) => (
-              <Link key={i} to={['/', '/shop', '/marketing', '/about'][i]} className="block py-2.5 text-gray-300 hover:text-white font-medium" onClick={() => setMobileOpen(false)}>
-                {item}
-              </Link>
-            ))}
-          </div>
-        )}
-      </nav>
-
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background effects */}
@@ -447,70 +306,84 @@ export default function Home() {
           <div className="absolute w-[500px] h-[500px] bottom-0 left-1/3 bg-cyan-600/4 rounded-full blur-[100px]" />
           {/* Grid pattern */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:60px_60px]" />
+          {/* Tiger watermark — very subtle, 5% opacity */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none">
+            <img src="/images/hero-tiger.jpg" alt="" className="w-[600px] h-[600px] object-contain" aria-hidden="true" />
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
-          {/* Center Tiger Logo */}
-          <div className="mb-6 flex justify-center">
-            <img
-              src="/images/hero-tiger-new.jpg"
-              alt="DigZoom Tiger"
-              className="w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.4)] transition-all duration-500 hover:scale-105"
-            />
-          </div>
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-6">
-            <Flame className="w-4 h-4 text-orange-400" />
-            <span className="text-gray-300 text-sm">{t.hero.badge || '+50 منتج رقمي مختار'}</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.15] tracking-tight">
-            {t.hero.title1} {t.hero.titleHighlight}
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
-              {t.hero.title2}
-            </span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t.hero.subtitle}
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12">
-            <Link
-              to="/shop"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:-translate-y-0.5 font-bold"
-            >
-              <Package className="w-5 h-5" />
-              {t.hero.btnShop}
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <Link
-              to="/marketing"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/15 text-white hover:bg-white/5 px-8 py-4 text-base rounded-xl transition-all font-semibold bg-white/[0.02]"
-            >
-              <TrendingUp className="w-5 h-5 text-emerald-400" />
-              {lang === 'ar' ? 'خدمات التسويق الرقمي' : 'Digital Marketing Services'}
-            </Link>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-gray-400 text-sm">
-            {[
-              { icon: <Headphones className="w-4 h-4 text-blue-400" />, text: t.hero.feature3 },
-              { icon: <ShieldCheck className="w-4 h-4 text-emerald-400" />, text: lang === 'ar' ? 'منتجات رقمية أصلية' : 'Original Digital Products' },
-              { icon: <Zap className="w-4 h-4 text-orange-400" />, text: t.hero.feature1 },
-              { icon: <Heart className="w-4 h-4 text-pink-400" />, text: lang === 'ar' ? 'ضمان رضا العملاء' : 'Satisfaction Guarantee' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                {item.icon}
-                <span>{item.text}</span>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text */}
+            <div className="text-center lg:text-start">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-6">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
+                <span className="text-gray-300 text-sm">{lang === 'ar' ? 'منصة النمو الرقمي المتكاملة' : 'Digital Growth Platform'}</span>
               </div>
-            ))}
+
+              {/* Headline */}
+              <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-black text-white mb-5 leading-[1.1] tracking-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
+                  DigZoom | ديج زوم
+                </span>
+                <br />
+                {lang === 'ar' ? 'منصة النمو الرقمي المتكاملة' : 'Digital Growth Platform'}
+              </h1>
+
+              {/* Subheadline */}
+              <p className="text-base sm:text-lg text-gray-400 max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+                {lang === 'ar'
+                  ? 'نساعد الشركات والأفراد على النمو من خلال المنتجات الرقمية والخدمات التسويقية والحلول التقنية الحديثة.'
+                  : 'We help businesses and individuals grow through digital products, marketing services, and modern technical solutions.'}
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-3 sm:gap-4 mb-10">
+                <Link
+                  to="/contact"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:-translate-y-0.5 font-bold"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  {lang === 'ar' ? 'احجز استشارة مجانية' : 'Book a Free Consultation'}
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+                <Link
+                  to="/marketing"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/15 text-white hover:bg-white/5 px-8 py-4 text-base rounded-xl transition-all font-semibold bg-white/[0.02]"
+                >
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                  {lang === 'ar' ? 'استكشف الخدمات' : 'Explore Services'}
+                </Link>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-gray-400 text-sm">
+                {[
+                  { icon: <ShieldCheck className="w-4 h-4 text-emerald-400" />, text: lang === 'ar' ? 'شركة أمريكية مسجلة' : 'US Registered Company' },
+                  { icon: <Zap className="w-4 h-4 text-orange-400" />, text: lang === 'ar' ? 'تسليم رقمي فوري' : 'Instant Digital Delivery' },
+                  { icon: <Headphones className="w-4 h-4 text-blue-400" />, text: lang === 'ar' ? 'دعم احترافي' : 'Professional Support' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    {item.icon}
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Dashboard Mockup */}
+            <div className="relative hidden lg:flex items-center justify-center">
+              <div className="relative">
+                <img
+                  src="/images/dashboard-mockup.png"
+                  alt={lang === 'ar' ? 'لوحة تحكم نمو DigZoom' : 'DigZoom Growth Dashboard'}
+                  className="w-full max-w-lg object-contain drop-shadow-[0_0_60px_rgba(59,130,246,0.3)]"
+                />
+                {/* Glow behind dashboard */}
+                <div className="absolute -inset-10 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-cyan-600/10 rounded-3xl blur-3xl -z-10" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -527,40 +400,115 @@ export default function Home() {
       <section className="py-10 border-y border-white/5 bg-gradient-to-b from-[#0a0a0f] to-[#0d0d18]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/10 text-blue-400 mb-3">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'استراتيجيات نمو مدروسة' : 'Data-Driven Growth Strategies'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
+              <Megaphone className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'حملات إعلانية مُحسّنة' : 'Optimized Ad Campaigns'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/10 text-emerald-400 mb-3">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تحسين محركات البحث' : 'SEO & Search Optimization'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 border border-orange-500/10 text-orange-400 mb-3">
+              <ShoppingCart className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تطوير متاجر إلكترونية' : 'eCommerce Development'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/10 text-pink-400 mb-3">
+              <Palette className="w-6 h-6" />
+            </div>
+            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'صناعة محتوى احترافية' : 'Professional Content Creation'}</div>
+          </div>
+          <div className="text-center p-4 md:p-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/10 text-cyan-400 mb-3">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تجربة شراء رقمية سلسة' : 'Seamless Digital Shopping'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Box className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'منتجات مختارة بعناية' : 'Carefully Selected Products'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Download className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'تسليم رقمي منظم' : 'Organized Digital Delivery'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Headphones className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'دعم سريع عند الحاجة' : 'Fast Support When Needed'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Users className="w-6 h-6" />
-            </div>
-            <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'مناسب للأفراد وأصحاب المشاريع' : 'For Individuals & Business Owners'}</div>
-          </div>
-          <div className="text-center p-4 md:p-5">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/10 text-purple-400 mb-3">
-              <Package className="w-6 h-6" />
-            </div>
             <div className="text-white font-semibold text-sm md:text-base">{lang === 'ar' ? 'باقات قابلة للتطوير' : 'Scalable Plans'}</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ 3 PILLARS: Digital Growth Platform ═══════════ */}
+      <section className="py-14 md:py-20 bg-[#0a0a0f]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-4">
+              <Sparkles className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-300 text-xs font-bold">{lang === 'ar' ? 'منظومة DigZoom المتكاملة' : 'The DigZoom Ecosystem'}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400">
+                {lang === 'ar' ? 'ثلاثة أركان للنمو الرقمي' : 'Three Pillars of Digital Growth'}
+              </span>
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              {lang === 'ar'
+                ? 'DigZoom ليست متجراً فقط ولا وكالة تسويق فقط — نحن منصة نمو رقمي متكاملة'
+                : 'DigZoom is not just a store or a marketing agency — we are an integrated Digital Growth Platform'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Pillar 1: Digital Products */}
+            <div className="group bg-gradient-to-b from-blue-500/[0.04] to-transparent rounded-2xl p-8 border border-blue-500/10 hover:border-blue-500/20 transition-all text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/10 text-blue-400 mb-5 group-hover:scale-110 transition-transform">
+                <Package className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'المنتجات الرقمية' : 'Digital Products'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                {lang === 'ar'
+                  ? 'قوالب، كتب، أدوات، دورات — آلاف المنتجات الرقمية الجاهزة لشراء مرة واحدة واستخدام مدى الحياة.'
+                  : 'Templates, ebooks, tools, courses — thousands of ready-made digital products for one-time purchase and lifetime use.'}
+              </p>
+              <Link to="/shop" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+                {lang === 'ar' ? 'تصفح المنتجات' : 'Browse Products'}
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Pillar 2: Marketing Services */}
+            <div className="group bg-gradient-to-b from-purple-500/[0.04] to-transparent rounded-2xl p-8 border border-purple-500/10 hover:border-purple-500/20 transition-all text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/10 text-purple-400 mb-5 group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'الخدمات التسويقية' : 'Marketing Services'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                {lang === 'ar'
+                  ? 'إدارة حملات، SEO، إعلانات، تحليلات — استراتيجيات تسويقية احترافية مدفوعة الأجر.'
+                  : 'Campaign management, SEO, ads, analytics — professional paid marketing strategies.'}
+              </p>
+              <Link to="/marketing" className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors">
+                {lang === 'ar' ? 'استكشف الخدمات' : 'Explore Services'}
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Pillar 3: Growth Solutions */}
+            <div className="group bg-gradient-to-b from-emerald-500/[0.04] to-transparent rounded-2xl p-8 border border-emerald-500/10 hover:border-emerald-500/20 transition-all text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/10 text-emerald-400 mb-5 group-hover:scale-110 transition-transform">
+                <Zap className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{lang === 'ar' ? 'حلول النمو الرقمي' : 'Growth Solutions'}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed mb-5">
+                {lang === 'ar'
+                  ? 'تطوير متاجر، تحول رقمي، استشارات — حلول متكاملة لنمو أعمالك الرقمي.'
+                  : 'Store development, digital transformation, consulting — integrated solutions for your digital business growth.'}
+              </p>
+              <Link to="/contact" className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors">
+                {lang === 'ar' ? 'احجز استشارة' : 'Book a Consultation'}
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -589,7 +537,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {bestsellers.map((product) => (
-              <ProductCard key={product.id} product={product} onAdd={handleAddToCart} cartQty={items.find(i => i.id === product.id)?.quantity || 0} />
+              <ProductCard key={product.id} product={product} onAdd={handleAddToCart} />
             ))}
           </div>
         </div>
