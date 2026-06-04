@@ -130,20 +130,32 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      // 1. Fetch profile data
-      const profileRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/profiles?select=role,full_name,avatar_url,phone&id=eq.${authUser.id}&limit=1`,
-        { headers: apiHeaders, signal: AbortSignal.timeout(10000) }
-      );
-      const profiles = await profileRes.json().catch(() => []);
-      const profile = profiles?.[0] || {};
+      // Build headers with the USER'S token (not ANON_KEY) so RLS allows the query
+      const userHeaders = {
+        'apikey': ANON_KEY,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+
+      // 1. Fetch profile data (with user's token to pass RLS)
+      let profile: Record<string, any> = {};
+      try {
+        const profileRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/profiles?select=role,full_name,avatar_url,phone&id=eq.${authUser.id}&limit=1`,
+          { headers: userHeaders, signal: AbortSignal.timeout(10000) }
+        );
+        const profiles = await profileRes.json().catch(() => []);
+        profile = profiles?.[0] || {};
+      } catch (e) {
+        console.warn('[loadUser] profiles query failed:', e);
+      }
 
       // 2. Check user_roles for definitive role (overrides profiles.role)
       let resolvedRole: UserRole = profile.role || 'user';
       try {
         const rolesRes = await fetch(
           `${SUPABASE_URL}/rest/v1/user_roles?select=role,status&user_id=eq.${authUser.id}&limit=1`,
-          { headers: apiHeaders, signal: AbortSignal.timeout(10000) }
+          { headers: userHeaders, signal: AbortSignal.timeout(10000) }
         );
         const userRoles = await rolesRes.json().catch(() => []);
         const ur = userRoles?.[0];

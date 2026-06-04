@@ -28,12 +28,34 @@ import TrustSecurity from './pages/TrustSecurity';
 import Navbar from './components/Navbar';
 import AdminGuard from './components/AdminGuard';
 
+/* Placeholder pages for user dropdown links */
+function ProfilePage() {
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center pt-16">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-white mb-4">الملف الشخصي</h1>
+        <p className="text-gray-400">قريباً...</p>
+      </div>
+    </div>
+  );
+}
+function OrdersPage() {
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center pt-16">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-white mb-4">طلباتي</h1>
+        <p className="text-gray-400">قريباً...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <LanguageProvider>
       <CartProvider>
-        <AuthProvider>
-          <SupabaseAuthProvider>
+        <SupabaseAuthProvider>
+          <AuthProvider>
             <ScrollToTop />
             <Navbar />
             <Routes>
@@ -58,11 +80,13 @@ export default function App() {
               <Route path="/company" element={<CompanyInformation />} />
               <Route path="/trust-security" element={<TrustSecurity />} />
               <Route path="/marketing" element={<MarketingServices />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/orders" element={<OrdersPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
-          </SupabaseAuthProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </SupabaseAuthProvider>
       </CartProvider>
     </LanguageProvider>
   );
