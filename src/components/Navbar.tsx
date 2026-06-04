@@ -11,10 +11,7 @@ const getNavLinks = (lang: string) => {
     { name: isAr ? 'الرئيسية' : 'Home', path: '/' },
     { name: isAr ? 'المتجر' : 'Shop', path: '/shop' },
     { name: isAr ? 'خدمات النمو الرقمي' : 'Growth Services', path: '/marketing' },
-    { name: isAr ? 'دراسات الحالة' : 'Case Studies', path: '/case-studies' },
-    { name: isAr ? 'الأسعار' : 'Pricing', path: '/pricing' },
     { name: isAr ? 'من نحن' : 'About', path: '/about' },
-    { name: isAr ? 'الأسئلة الشائعة' : 'FAQ', path: '/faq' },
     { name: isAr ? 'اتصل بنا' : 'Contact', path: '/contact' },
   ];
 };

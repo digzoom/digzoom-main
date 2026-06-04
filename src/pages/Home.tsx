@@ -2,15 +2,13 @@ import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCart } from '@/hooks/useCart';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import ChatBot from '@/components/ChatBot';
 import { products } from '@/data/products';
-import { marketingServices } from '@/data/marketingServices';
 import {
   ArrowLeft, ArrowRight, Sparkles, Download, ShieldCheck, Zap,
-  ShoppingCart, Star, TrendingUp, Users, Box, Headphones,
+  Star, TrendingUp, Users, Box, Headphones, ShoppingCart,
   Award, Clock, HeadphonesIcon, Lock, RefreshCw, ChevronLeft,
-  LogIn, UserPlus, CheckCircle, Play, Package, BarChart3,
+  CheckCircle, Play, Package, BarChart3,
   Globe, Palette, Lightbulb, Camera, Megaphone, Check,
   Flame, Eye, Heart, Smartphone, Tablet, MousePointerClick,
   BookOpen, Layout, Type, Video
@@ -278,16 +276,6 @@ function ServiceCard({ service }: { service: { icon: React.ReactNode; title: str
 export default function Home() {
   const { lang, t, toggleLang } = useLanguage();
   const { addToCart, totalItems } = useCart();
-  const { user, logout } = useSupabaseAuth();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const handleAddToCart = (product: typeof products[0]) => {
     addToCart(product as any);
@@ -309,128 +297,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* ═══════════ NAVBAR ═══════════ */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/5' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2.5">
-              <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="w-9 h-9 rounded-lg object-cover" />
-              <span className="text-2xl font-black tracking-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">dig</span>
-                <span className="text-white">zoom</span>
-              </span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-6">
-              {[
-                { name: 'الرئيسية', path: '/' },
-                { name: 'المتجر', path: '/shop' },
-                { name: 'خدمات النمو الرقمي', path: '/marketing' },
-                { name: 'من نحن', path: '/about' },
-              ].map((item, i) => (
-                <Link key={i} to={item.path} className="text-gray-300 hover:text-white text-sm font-medium transition-colors">
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Language Toggle — AR | EN */}
-              <button onClick={toggleLang}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5">
-                <span className={lang === 'ar' ? 'text-gray-500' : 'text-white'}>EN</span>
-                <span className="text-gray-600">|</span>
-                <span className={lang === 'ar' ? 'text-white' : 'text-gray-500'}>AR</span>
-              </button>
-
-              {/* Cart with count badge */}
-              <Link to="/cart" className="relative p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
-                <ShoppingCart className="w-5 h-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
-
-              {/* User or Login */}
-              {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                  >
-                    {user.avatar ? (
-                      <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
-                    ) : (
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
-                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
-                    )}
-                    <span className="text-sm font-medium hidden lg:inline">{user.name}</span>
-                  </button>
-                  
-                  {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl py-2 z-50">
-                      <Link to="/account" className="flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
-                        <Users className="w-4 h-4" />
-                        {lang === 'ar' ? 'حسابي' : 'My Account'}
-                      </Link>
-                      <Link to="/orders" className="flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
-                        <Package className="w-4 h-4" />
-                        {lang === 'ar' ? 'طلباتي' : 'My Orders'}
-                      </Link>
-                      {user.role === 'admin' && (
-                        <Link to="/admin" className="flex items-center gap-2 px-4 py-2.5 text-purple-400 hover:text-purple-300 hover:bg-white/5 text-sm" onClick={() => setUserMenuOpen(false)}>
-                          <Zap className="w-4 h-4" />
-                          {lang === 'ar' ? 'لوحة التحكم' : 'Admin'}
-                        </Link>
-                      )}
-                      <div className="border-t border-white/10 my-1" />
-                      <button
-                        onClick={() => { logout(); setUserMenuOpen(false); }}
-                        className="w-full flex items-center gap-2 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-white/5 text-sm text-right"
-                      >
-                        <LogIn className="w-4 h-4" />
-                        {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link to="/login" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
-                  <LogIn className="w-4 h-4" />
-                  <span>{lang === 'ar' ? 'دخول' : 'Login'}</span>
-                </Link>
-              )}
-
-              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-300">
-                {mobileOpen ? <span className="text-xl">✕</span> : <span className="text-xl">☰</span>}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {mobileOpen && (
-          <div className="md:hidden bg-[#0a0a0f]/95 backdrop-blur-md border-t border-white/5 px-4 py-4 space-y-1">
-            {[
-              { name: 'الرئيسية', path: '/' },
-              { name: 'المتجر', path: '/shop' },
-              { name: 'خدمات النمو الرقمي', path: '/marketing' },
-              { name: 'دراسات الحالة', path: '/case-studies' },
-              { name: 'الأسعار', path: '/pricing' },
-              { name: 'من نحن', path: '/about' },
-              { name: 'الأسئلة الشائعة', path: '/faq' },
-              { name: 'اتصل بنا', path: '/contact' },
-            ].map((item, i) => (
-              <Link key={i} to={item.path} className="block py-2.5 text-gray-300 hover:text-white font-medium" onClick={() => setMobileOpen(false)}>
-                {item.name}
-              </Link>
-            ))}
-          </div>
-        )}
-      </nav>
-
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background effects */}
