@@ -50,25 +50,32 @@ export async function verifySupabaseToken(
     const authUser = await res.json();
     if (!authUser.id) return undefined;
 
-    // Step 2: Read role from profiles table
-    // CRITICAL: Use SERVICE_ROLE_KEY as apikey to bypass RLS.
-    // SERVICE_ROLE_KEY has format "sb_secret_*" which is NOT a valid JWT.
-    // It must be sent as apikey (not as Bearer token).
-    const profileRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`,
-      {
-        headers: {
-          apikey: SERVICE_ROLE_KEY || ANON_KEY,
-        },
-        signal: AbortSignal.timeout(5000),
-      }
-    );
-    const profiles = await profileRes.json().catch(() => []);
-    const role = Array.isArray(profiles) && profiles.length > 0
-      ? profiles[0].role
-      : "user";
+    // Step 2: Read role from user_roles first (overrides profiles.role)
+    // Use SERVICE_ROLE_KEY as apikey to bypass RLS.
+    const serviceHeaders = { apikey: SERVICE_ROLE_KEY || ANON_KEY };
 
-    return { id: authUser.id, role, email: authUser.email };
+    // Check user_roles for definitive role
+    const rolesRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_roles?select=role,is_active&user_id=eq.${authUser.id}&limit=1`,
+      { headers: serviceHeaders, signal: AbortSignal.timeout(5000) }
+    );
+    const userRoles = await rolesRes.json().catch(() => []);
+    const ur = Array.isArray(userRoles) ? userRoles[0] : null;
+
+    let resolvedRole: string;
+    if (ur?.is_active === true && ur?.role) {
+      resolvedRole = ur.role;
+    } else {
+      // Fallback: read from profiles
+      const profileRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/profiles?select=role&id=eq.${authUser.id}&limit=1`,
+        { headers: serviceHeaders, signal: AbortSignal.timeout(5000) }
+      );
+      const profiles = await profileRes.json().catch(() => []);
+      resolvedRole = (Array.isArray(profiles) && profiles[0]?.role) || "user";
+    }
+
+    return { id: authUser.id, role: resolvedRole, email: authUser.email };
   } catch {
     return undefined;
   }
