@@ -26,6 +26,7 @@ import CompanyInformation from './pages/CompanyInformation';
 import MarketingServices from './pages/MarketingServices';
 import TrustSecurity from './pages/TrustSecurity';
 import Navbar from './components/Navbar';
+import AdminGuard from './components/AdminGuard';
 
 export default function App() {
   return (
@@ -48,7 +49,7 @@ export default function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/payment" element={<Payment />} />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/refund" element={<Refund />} />

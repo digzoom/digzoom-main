@@ -30,6 +30,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
   register: (email: string, password: string, name: string) => Promise<{ error?: string }>;
   resetPassword: (email: string) => Promise<{ error?: string; success?: boolean }>;
@@ -129,21 +130,38 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      // Fetch profile with role
+      // 1. Fetch profile data
       const profileRes = await fetch(
         `${SUPABASE_URL}/rest/v1/profiles?select=role,full_name,avatar_url,phone&id=eq.${authUser.id}&limit=1`,
         { headers: apiHeaders, signal: AbortSignal.timeout(10000) }
       );
       const profiles = await profileRes.json().catch(() => []);
       const profile = profiles?.[0] || {};
-      console.log('[loadUser] profile role:', profile.role, 'name:', profile.full_name);
+
+      // 2. Check user_roles for definitive role (overrides profiles.role)
+      let resolvedRole: UserRole = profile.role || 'user';
+      try {
+        const rolesRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/user_roles?select=role,status&user_id=eq.${authUser.id}&limit=1`,
+          { headers: apiHeaders, signal: AbortSignal.timeout(10000) }
+        );
+        const userRoles = await rolesRes.json().catch(() => []);
+        const ur = userRoles?.[0];
+        if (ur && ur.status === 'active' && ur.role) {
+          resolvedRole = ur.role;
+        }
+      } catch {
+        // Fallback to profiles.role — user_roles table may not exist or be unreachable
+      }
+
+      console.log('[loadUser] profile role:', profile.role, 'resolved role:', resolvedRole, 'name:', profile.full_name);
 
       setUser({
         id: authUser.id,
         email: authUser.email || '',
         name: profile.full_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || '',
         avatar: profile.avatar_url || authUser.user_metadata?.avatar_url || '',
-        role: profile.role || 'user',
+        role: resolvedRole,
         phone: profile.phone || '',
       });
       return true;
@@ -265,6 +283,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       user,
       loading,
+      isLoading: loading,
       login,
       register,
       resetPassword,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { ShoppingCart, Menu, X, LogIn, LogOut, ShieldCheck } from 'lucide-react';
+import { ShoppingCart, Menu, X, LogIn, LogOut, ShieldCheck, User, ChevronDown, Globe } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -19,6 +19,7 @@ const getNavLinks = (lang: string) => {
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { totalItems } = useCart();
   const { lang, t, toggleLang } = useLanguage();
   const { user, isAdmin, logout } = useSupabaseAuth();
@@ -26,6 +27,9 @@ export default function Navbar() {
   const isAr = lang === 'ar';
 
   const navLinks = getNavLinks(lang);
+
+  // Close user dropdown on route change
+  useEffect(() => setUserMenuOpen(false), [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -99,10 +103,40 @@ export default function Navbar() {
 
             {/* Auth */}
             {user ? (
-              <button onClick={logout}
-                className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm">
-                <LogOut className="w-4 h-4" />
-              </button>
+              <div className="hidden md:relative">
+                <button onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover ring-1 ring-white/10" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
+                      {(user.name || user.email || '?')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span className="max-w-[100px] truncate hidden sm:block">{user.name || user.email}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute top-full mt-1 right-0 min-w-[180px] bg-[#131722] border border-white/10 rounded-xl shadow-2xl shadow-black/50 py-1.5 z-50">
+                    <div className="px-3 py-2 border-b border-white/5">
+                      <div className="text-white text-sm font-medium truncate">{user.name || user.email}</div>
+                      <div className="text-gray-500 text-xs truncate">{user.email}</div>
+                    </div>
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-blue-400 hover:bg-blue-500/10 transition-all">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>{lang === 'ar' ? 'لوحة التحكم' : 'Admin'}</span>
+                      </Link>
+                    )}
+                    <button onClick={() => { setUserMenuOpen(false); logout(); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                      <LogOut className="w-4 h-4" />
+                      <span>{lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link to="/login"
                 className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all text-sm font-bold shadow-lg shadow-blue-500/20">
@@ -138,6 +172,19 @@ export default function Navbar() {
             </button>
             {user ? (
               <>
+                <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-3">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover ring-1 ring-white/10" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
+                      {(user.name || user.email || '?')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white text-sm font-medium truncate">{user.name || user.email}</div>
+                    <div className="text-gray-500 text-xs truncate">{user.email}</div>
+                  </div>
+                </div>
                 {isAdmin && (
                   <Link to="/admin" className="block px-4 py-3 rounded-xl text-sm font-medium text-blue-400 hover:bg-blue-500/10 transition-all flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4" /> {lang === 'ar' ? 'لوحة التحكم' : 'Admin'}
