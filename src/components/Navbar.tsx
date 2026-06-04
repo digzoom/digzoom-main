@@ -65,8 +65,8 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group shrink-0">
+          {/* Logo — Tiger icon + DigZoom text */}
+          <Link to="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="h-10 w-10 flex-shrink-0 rounded-lg overflow-hidden ring-1 ring-white/10 group-hover:ring-blue-500/50 transition-all">
               <img
                 src="/images/digzoom-logo-side-new.jpg"
@@ -75,6 +75,10 @@ export default function Navbar() {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             </div>
+            <span className="text-xl font-bold tracking-tight">
+              <span className="text-white">Dig</span>
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoom</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}
