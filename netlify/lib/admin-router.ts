@@ -405,12 +405,12 @@ export const adminRouter = createRouter({
 
       const orders = Array.isArray(data) ? data.map((o: any) => ({
         id: o.id,
-        order_number: o.order_number,
+        order_number: o.id,           // orders table uses "id" as the order number
         customer_name: o.customer_name,
         customer_email: o.customer_email,
         total: o.total_amount,
         status: o.status,
-        payment_status: o.payment_status,
+        payment_status: o.payment_status || 'pending',
         created_at: o.created_at,
         items: [] as any[],
       })) : [];

@@ -855,14 +855,15 @@ function OrdersTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-white/5 text-gray-400 text-xs">
-                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.order}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.payment}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
+                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.orderNo}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.email}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
                 {(Array.isArray(orders) ? orders : []).map((o: any) => (
                   <>
                     <tr key={o.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
-                      <td className="px-4 py-3"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center"><Receipt className="w-4 h-4 text-white" /></div><div><div className="text-white font-medium text-sm">{o.order_number}</div><div className="text-gray-500 text-xs">{o.customer_email}</div></div></div></td>
+                      <td className="px-4 py-3"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center"><Receipt className="w-4 h-4 text-white" /></div><div><div className="text-white font-mono font-medium text-sm">{o.order_number || o.id}</div></div></div></td>
                       <td className="px-4 py-3"><span className="text-white text-sm">{o.customer_name}</span></td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{o.customer_email}</td>
                       <td className="px-4 py-3 text-center text-emerald-400 font-bold">{o.total} {t.admin.currency}</td>
                       <td className="px-4 py-3 text-center"><select value={o.status} onChange={(e) => { e.stopPropagation(); updateStatusMutation.mutate({ id: o.id, status: e.target.value as any }); }} className={`text-xs px-3 py-1 rounded-full font-bold bg-transparent ${statusColors[o.status] || ''}`}>{['pending', 'processing', 'completed', 'cancelled', 'refunded'].map((s) => <option key={s} value={s}>{statusLabels[s]}</option>)}</select></td>
                       <td className="px-4 py-3 text-center"><span className={`text-xs px-3 py-1 rounded-full font-bold ${o.payment_status === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'}`}>{o.payment_status}</span></td>
