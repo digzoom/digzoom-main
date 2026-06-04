@@ -156,55 +156,48 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
     const init = async () => {
       setLoading(true);
+      console.log('[AUTH] === init ===');
 
-      // 1. Handle OAuth callback
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
+      // Supabase client auto-handles ?code= PKCE callback (detectSessionInUrl=true)
+      // Just call getSession() which picks up the session after PKCE exchange
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-      if (code) {
-        console.log('[AUTH] OAuth callback detected');
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-        if (error) {
-          console.error('[AUTH] exchangeCodeForSession:', error.message);
-        } else if (data.session) {
-          localStorage.setItem('sb_access_token', data.session.access_token);
-          localStorage.setItem('sb_refresh_token', data.session.refresh_token);
-          url.searchParams.delete('code');
-          url.searchParams.delete('type');
-          window.history.replaceState({}, '', url.toString());
-          if (mounted) {
-            await loadUser(data.session.access_token);
-            setLoading(false);
-          }
-          return;
-        }
+      if (error) {
+        console.error('[AUTH] getSession error:', error.message);
       }
 
-      // 2. Restore from stored token
-      const token = localStorage.getItem('sb_access_token');
-      if (token) {
-        console.log('[AUTH] Restoring from stored token');
-        if (mounted) {
-          await loadUser(token);
-          setLoading(false);
-        }
+      if (session?.access_token) {
+        console.log('[AUTH] Session found! token length:', session.access_token.length);
+        console.log('[AUTH] Refresh token exists:', !!session.refresh_token);
+        localStorage.setItem('sb_access_token', session.access_token);
+        localStorage.setItem('sb_refresh_token', session.refresh_token);
+        if (mounted) await loadUser(session.access_token);
       } else {
-        console.log('[AUTH] No token');
-        setUser(null);
-        setLoading(false);
+        // Fallback: try stored token
+        const token = localStorage.getItem('sb_access_token');
+        if (token) {
+          console.log('[AUTH] No session, trying stored token');
+          if (mounted) await loadUser(token);
+        } else {
+          console.log('[AUTH] No session, no token');
+          if (mounted) setUser(null);
+        }
       }
+
+      if (mounted) setLoading(false);
     };
 
     init();
 
-    // 3. Listen for auth changes
+    // Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AUTH] onAuthStateChange:', event);
+      console.log('[AUTH] onAuthStateChange:', event, 'hasSession:', !!session);
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
         localStorage.setItem('sb_access_token', session.access_token);
         if (mounted) await loadUser(session.access_token);
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem('sb_access_token');
+        localStorage.removeItem('sb_refresh_token');
         if (mounted) setUser(null);
       }
       if (mounted) setLoading(false);
