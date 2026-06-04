@@ -251,6 +251,7 @@ function CouponsTab() {
   const utils = trpc.useUtils();
   const { data: coupons, isLoading } = trpc.listCoupons.useQuery({ limit: 100 });
   const { data: meData } = trpc.me.useQuery();
+  const { data: meDebugData } = trpc.meDebug.useQuery();
   const createMutation = trpc.createCoupon.useMutation({
     onSuccess: (data) => {
       setDebug((prev: any) => ({ ...prev, apiStatus: 'SUCCESS', apiResponse: data }));
@@ -329,6 +330,19 @@ function CouponsTab() {
             <div className="text-gray-300"><span className="text-purple-500">email:</span> {JSON.stringify(meData?.email)}</div>
             <div className="text-gray-300"><span className="text-purple-500">role:</span> <span className={meData?.role === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meData?.role)}</span></div>
             <div className="text-gray-300"><span className="text-purple-500">isAdmin:</span> <span className={meData?.isAdmin ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meData?.isAdmin)}</span></div>
+          </div>
+
+          {/* DEBUG: Raw user_roles query — always visible */}
+          <div className="mt-3 p-3 bg-blue-900/30 border border-blue-500/30 rounded-xl text-xs font-mono space-y-1">
+            <div className="text-blue-400 font-bold mb-2">RAW USER ROLES QUERY</div>
+            <div className="text-gray-300"><span className="text-blue-500">hasUser:</span> {JSON.stringify(meDebugData?.hasUser)}</div>
+            <div className="text-gray-300"><span className="text-blue-500">userId:</span> {JSON.stringify(meDebugData?.userId)}</div>
+            <div className="text-gray-300"><span className="text-blue-500">email:</span> {JSON.stringify(meDebugData?.email)}</div>
+            <div className="text-gray-300"><span className="text-blue-500">userRolesError:</span> {JSON.stringify(meDebugData?.userRolesError)}</div>
+            <div className="text-gray-300"><span className="text-blue-500">rawUserRoles:</span> <span className={meDebugData?.rawUserRoles?.role === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meDebugData?.rawUserRoles)}</span></div>
+            <div className="text-gray-300"><span className="text-blue-500">profilesError:</span> {JSON.stringify(meDebugData?.profilesError)}</div>
+            <div className="text-gray-300"><span className="text-blue-500">rawProfiles:</span> {JSON.stringify(meDebugData?.rawProfiles)}</div>
+            <div className="text-gray-300"><span className="text-blue-500">computedRole:</span> <span className={meDebugData?.computedRole === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meDebugData?.computedRole)}</span></div>
           </div>
 
           {/* DEBUG PANEL — visible on page */}
