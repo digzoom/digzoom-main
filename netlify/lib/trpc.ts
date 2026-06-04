@@ -40,14 +40,17 @@ export async function verifySupabaseToken(
   token: string
 ): Promise<TrpcContext["user"]> {
   try {
+    console.log("[verifySupabaseToken] starting, token length:", token.length);
     // Step 1: Verify the user's access token with Supabase Auth
     const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { apikey: ANON_KEY, Authorization: `Bearer ${token}` },
       signal: AbortSignal.timeout(10000),
     });
+    console.log("[verifySupabaseToken] /auth/v1/user status:", res.status);
     if (!res.ok) return undefined;
 
     const authUser = await res.json();
+    console.log("[verifySupabaseToken] authUser id:", authUser.id);
     if (!authUser.id) return undefined;
 
     // Step 2: Read role from user_roles first (overrides profiles.role)
@@ -55,15 +58,17 @@ export async function verifySupabaseToken(
     const serviceHeaders = { apikey: SERVICE_ROLE_KEY || ANON_KEY };
 
     // Check user_roles for definitive role
-    const rolesRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/user_roles?select=role,is_active&user_id=eq.${authUser.id}&limit=1`,
-      { headers: serviceHeaders, signal: AbortSignal.timeout(5000) }
-    );
+    const rolesUrl = `${SUPABASE_URL}/rest/v1/user_roles?select=role,is_active&user_id=eq.${authUser.id}&limit=1`;
+    console.log("[verifySupabaseToken] fetching user_roles:", rolesUrl);
+    const rolesRes = await fetch(rolesUrl, { headers: serviceHeaders, signal: AbortSignal.timeout(5000) });
+    console.log("[verifySupabaseToken] user_roles status:", rolesRes.status);
     const userRoles = await rolesRes.json().catch(() => []);
+    console.log("[verifySupabaseToken] user_roles data:", JSON.stringify(userRoles));
     const ur = Array.isArray(userRoles) ? userRoles[0] : null;
 
     let resolvedRole: string;
     if (ur?.is_active === true && ur?.role) {
+      console.log("[verifySupabaseToken] using user_roles.role:", ur.role);
       resolvedRole = ur.role;
     } else {
       // Fallback: read from profiles
@@ -75,6 +80,7 @@ export async function verifySupabaseToken(
       resolvedRole = (Array.isArray(profiles) && profiles[0]?.role) || "user";
     }
 
+    console.log("[verifySupabaseToken] FINAL role:", resolvedRole);
     return { id: authUser.id, role: resolvedRole, email: authUser.email };
   } catch {
     return undefined;
