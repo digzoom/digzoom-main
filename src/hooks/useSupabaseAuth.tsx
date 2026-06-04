@@ -1,21 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
-
-// ——— Recovery code exchange — uses Supabase client (PKCE flow) ———
-async function exchangeRecoveryCode(code: string): Promise<{ error?: string }> {
-  try {
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error || !data.session) {
-      return { error: error?.message || 'Invalid or expired recovery code' };
-    }
-    // Save tokens same as login flow
-    localStorage.setItem('sb_access_token', data.session.access_token);
-    localStorage.setItem('sb_refresh_token', data.session.refresh_token);
-    return {};
-  } catch {
-    return { error: 'Failed to process recovery link' };
-  }
-}
 import type { UserRole } from '@/types/database';
 
 interface User {
@@ -30,6 +14,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
   register: (email: string, password: string, name: string) => Promise<{ error?: string }>;
   resetPassword: (email: string) => Promise<{ error?: string; success?: boolean }>;
@@ -46,138 +31,232 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-const apiHeaders = {
-  'apikey': ANON_KEY,
-  'Authorization': `Bearer ${ANON_KEY}`,
-  'Content-Type': 'application/json',
-};
+// Build headers with USER'S token so RLS allows the query
+function makeUserHeaders(token: string) {
+  return {
+    'apikey': ANON_KEY,
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+}
 
-async function authApi(endpoint: string, body: Record<string, unknown>) {
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
-    method: 'POST',
-    headers: apiHeaders,
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(15000),
+// Generic REST fetch helper
+async function restQuery(token: string, table: string, select: string, eq?: { col: string; val: string }) {
+  let url = `${SUPABASE_URL}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
+  if (eq) url += `&${eq.col}=eq.${encodeURIComponent(eq.val)}`;
+  url += '&limit=1';
+
+  const res = await fetch(url, {
+    headers: makeUserHeaders(token),
+    signal: AbortSignal.timeout(10000),
   });
-  const data = await res.json().catch(() => ({}));
-  return { ok: res.ok, data };
+  return res;
+}
+
+// Fetch profile + role using USER token (passes RLS)
+async function loadProfile(token: string, userId: string, email: string, metadata: any): Promise<User> {
+  console.log('[AUTH] loadProfile for userId:', userId);
+
+  // 1. Query profiles
+  const profileRes = await restQuery(token, 'profiles', 'full_name,avatar_url,role,phone', { col: 'id', val: userId });
+  console.log('[AUTH] profiles response status:', profileRes.status);
+  const profiles = await profileRes.json().catch(() => []);
+  const profile = Array.isArray(profiles) ? profiles[0] : profiles;
+  console.log('[AUTH] profiles data:', JSON.stringify(profile || {}));
+
+  // 2. Query user_roles
+  const rolesRes = await restQuery(token, 'user_roles', 'role,is_active', { col: 'user_id', val: userId });
+  console.log('[AUTH] user_roles response status:', rolesRes.status);
+  const userRoles = await rolesRes.json().catch(() => []);
+  const ur = Array.isArray(userRoles) ? userRoles[0] : userRoles;
+  console.log('[AUTH] user_roles data:', JSON.stringify(ur || {}));
+
+  // 3. Resolve role
+  let resolvedRole: UserRole = 'user';
+  if (ur?.is_active === true && ur?.role) {
+    resolvedRole = ur.role;
+    console.log('[AUTH] role from user_roles:', resolvedRole);
+  } else if (profile?.role) {
+    resolvedRole = profile.role;
+    console.log('[AUTH] role from profiles:', resolvedRole);
+  } else {
+    console.log('[AUTH] no role found, defaulting to user');
+  }
+
+  // 4. Resolve name
+  const name = profile?.full_name || metadata?.full_name || metadata?.name || email?.split('@')[0] || '';
+
+  // 5. Resolve avatar
+  const avatar = profile?.avatar_url || metadata?.avatar_url || metadata?.picture || '';
+
+  console.log('[AUTH] FINAL name:', name, 'role:', resolvedRole, 'hasAvatar:', !!avatar);
+
+  return {
+    id: userId,
+    email: email || '',
+    name,
+    avatar,
+    role: resolvedRole,
+    phone: profile?.phone || '',
+  };
+}
+
+// Recovery code exchange (uses Supabase client for PKCE)
+async function exchangeRecoveryCodeFn(code: string): Promise<{ error?: string }> {
+  try {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error || !data.session) return { error: error?.message || 'Invalid recovery code' };
+    localStorage.setItem('sb_access_token', data.session.access_token);
+    localStorage.setItem('sb_refresh_token', data.session.refresh_token);
+    return {};
+  } catch {
+    return { error: 'Failed to process recovery link' };
+  }
 }
 
 export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check saved session + OAuth callback on mount
-  useEffect(() => {
-    const init = async () => {
-      // 1. Check for OAuth callback code in URL (Google, magic link, etc.)
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
-      
-      if (code) {
-        console.log('[Auth mount] Found ?code= in URL, exchanging for session...');
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-        if (error) {
-          console.error('[Auth mount] exchangeCodeForSession failed:', error.message);
-        } else if (data.session) {
-          console.log('[Auth mount] Session obtained from code, access_token length:', data.session.access_token.length);
-          localStorage.setItem('sb_access_token', data.session.access_token);
-          localStorage.setItem('sb_refresh_token', data.session.refresh_token);
-          // Clean URL
-          url.searchParams.delete('code');
-          url.searchParams.delete('type');
-          if (!url.hash || url.hash === '') url.hash = '#/';
-          window.history.replaceState({}, '', url.toString());
-          await loadUser(data.session.access_token);
-          setLoading(false);
-          return;
-        }
-      }
-      
-      // 2. Fallback: check localStorage token
-      const token = localStorage.getItem('sb_access_token');
-      console.log('[Auth mount] sb_access_token exists?', !!token, 'length:', token?.length || 0);
-      if (token) {
-        await loadUser(token);
-      }
-      setLoading(false);
-    };
-    
-    init();
-  }, []);
-
-  const loadUser = async (token: string): Promise<boolean> => {
-    console.log('[loadUser] token length:', token.length);
+  // Core: load user from token
+  const loadUser = useCallback(async (token: string) => {
+    console.log('[AUTH] loadUser token length:', token?.length);
     try {
+      // Get auth user info
       const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-        headers: {
-          'apikey': ANON_KEY,
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: makeUserHeaders(token),
         signal: AbortSignal.timeout(10000),
       });
-      console.log('[loadUser] /auth/v1/user res.ok?', res.ok, 'status:', res.status);
+      console.log('[AUTH] /auth/v1/user status:', res.status);
+
       if (!res.ok) {
-        console.warn('[loadUser] /auth/v1/user FAILED - removing token');
+        console.error('[AUTH] /auth/v1/user FAILED');
         localStorage.removeItem('sb_access_token');
         setUser(null);
-        return false;
+        return;
       }
+
       const authUser = await res.json();
-      if (!authUser.id) {
-        setUser(null);
-        return false;
+      console.log('[AUTH] authUser id:', authUser.id);
+      console.log('[AUTH] expected admin: 866de745-c743-4611-b6b1-839470b3cf4a');
+      console.log('[AUTH] IDs match:', authUser.id === '866de745-c743-4611-b6b1-839470b3cf4a');
+
+      // Load profile + role with user token (passes RLS)
+      const userData = await loadProfile(token, authUser.id, authUser.email, authUser.user_metadata);
+      setUser(userData);
+    } catch (e) {
+      console.error('[AUTH] loadUser exception:', e);
+      setUser(null);
+    }
+  }, []);
+
+  // Mount: handle OAuth callback + restore session
+  useEffect(() => {
+    let mounted = true;
+
+    const init = async () => {
+      setLoading(true);
+      console.log('[AUTH] === init ===');
+
+      // 1. Check for PKCE OAuth callback (?code= in search params)
+      // We use detectSessionInUrl=false so we handle this manually.
+      // redirectTo in signInWithOAuth is window.location.origin (no hash),
+      // so ?code= appears in window.location.search, NOT in the hash fragment.
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+
+      if (code) {
+        console.log('[AUTH] PKCE callback detected, code:', code.substring(0, 8) + '...');
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (error) {
+          console.error('[AUTH] exchangeCodeForSession FAILED:', error.message);
+        } else if (data.session) {
+          console.log('[AUTH] PKCE SUCCESS! token length:', data.session.access_token.length);
+          localStorage.setItem('sb_access_token', data.session.access_token);
+          localStorage.setItem('sb_refresh_token', data.session.refresh_token);
+
+          // Remove ?code= from URL and redirect to HashRouter root
+          url.searchParams.delete('code');
+          url.searchParams.delete('type');
+          window.location.href = url.toString() + '#/';
+          return; // Page will reload
+        }
       }
 
-      // Fetch profile with role
-      const profileRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/profiles?select=role,full_name,avatar_url,phone&id=eq.${authUser.id}&limit=1`,
-        { headers: apiHeaders, signal: AbortSignal.timeout(10000) }
-      );
-      const profiles = await profileRes.json().catch(() => []);
-      const profile = profiles?.[0] || {};
-      console.log('[loadUser] profile role:', profile.role, 'name:', profile.full_name);
+      // 2. No callback code — check for existing session via Supabase client
+      const { data: { session }, error } = await supabase.auth.getSession();
 
-      setUser({
-        id: authUser.id,
-        email: authUser.email || '',
-        name: profile.full_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || '',
-        avatar: profile.avatar_url || authUser.user_metadata?.avatar_url || '',
-        role: profile.role || 'user',
-        phone: profile.phone || '',
-      });
-      return true;
-    } catch {
-      setUser(null);
-      return false;
-    }
-  };
+      if (error) {
+        console.error('[AUTH] getSession error:', error.message);
+      }
+
+      if (session?.access_token) {
+        console.log('[AUTH] Session found! token length:', session.access_token.length);
+        localStorage.setItem('sb_access_token', session.access_token);
+        localStorage.setItem('sb_refresh_token', session.refresh_token);
+        if (mounted) await loadUser(session.access_token);
+      } else {
+        // Fallback: try stored token
+        const token = localStorage.getItem('sb_access_token');
+        if (token) {
+          console.log('[AUTH] No session, trying stored token');
+          if (mounted) await loadUser(token);
+        } else {
+          console.log('[AUTH] No session, no token');
+          if (mounted) setUser(null);
+        }
+      }
+
+      if (mounted) setLoading(false);
+    };
+
+    init();
+
+    // Listen for auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[AUTH] onAuthStateChange:', event, 'hasSession:', !!session);
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
+        localStorage.setItem('sb_access_token', session.access_token);
+        if (mounted) await loadUser(session.access_token);
+      } else if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('sb_access_token');
+        localStorage.removeItem('sb_refresh_token');
+        if (mounted) setUser(null);
+      }
+      if (mounted) setLoading(false);
+    });
+
+    return () => { mounted = false; listener?.subscription?.unsubscribe(); };
+  }, [loadUser]);
 
   // Email/Password Login
   const login = useCallback(async (email: string, password: string) => {
-    console.log('[login] attempting login for:', email);
-    const { ok, data } = await authApi('token?grant_type=password', { email, password });
-    console.log('[login] authApi ok?', ok, 'has access_token?', !!data?.access_token, 'token length:', data?.access_token?.length || 0);
-    if (!ok || !data.access_token) {
-      console.error('[login] FAILED:', data?.msg || data?.message || 'No access_token');
-      return { error: data.msg || data.message || 'Login failed' };
-    }
-    console.log('[login] SUCCESS - saving token to localStorage');
+    const { ok, data } = await (async () => {
+      const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        signal: AbortSignal.timeout(15000),
+      });
+      const d = await r.json().catch(() => ({}));
+      return { ok: r.ok, data: d };
+    })();
+
+    if (!ok || !data.access_token) return { error: data?.msg || data?.message || 'Login failed' };
+
     localStorage.setItem('sb_access_token', data.access_token);
-    localStorage.setItem('sb_refresh_token', data.refresh_token || '');
-    console.log('[login] localStorage sb_access_token set?', !!localStorage.getItem('sb_access_token'));
     await loadUser(data.access_token);
     return {};
-  }, []);
+  }, [loadUser]);
 
   // Register
   const register = useCallback(async (email: string, password: string, name: string) => {
-    const { ok, data } = await authApi('signup', {
-      email,
-      password,
-      data: { full_name: name },
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { full_name: name } },
     });
-    if (!ok) return { error: data.msg || data.message || 'Registration failed' };
+    if (error) return { error: error.message };
     return {};
   }, []);
 
@@ -188,74 +267,42 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       try {
         await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
           method: 'POST',
-          headers: {
-            'apikey': ANON_KEY,
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: makeUserHeaders(token),
           signal: AbortSignal.timeout(10000),
         });
       } catch { /* ignore */ }
     }
+    await supabase.auth.signOut();
     localStorage.removeItem('sb_access_token');
     localStorage.removeItem('sb_refresh_token');
     setUser(null);
   }, []);
 
-  // Password Reset — send recovery email
+  // Password Reset
   const resetPassword = useCallback(async (email: string) => {
-    const { ok, data } = await authApi('recover', {
-      email,
-    });
-    if (!ok) return { error: data.msg || data.message || 'Failed to send reset email' };
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) return { error: error.message };
     return { success: true };
   }, []);
 
-  // Password Reset — update password (requires valid session/token)
   const updatePassword = useCallback(async (newPassword: string) => {
-    const token = localStorage.getItem('sb_access_token');
-    if (!token) return { error: 'No active session. Please use the recovery link again.' };
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      method: 'PUT',
-      headers: {
-        'apikey': ANON_KEY,
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ password: newPassword }),
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      return { error: data.msg || data.message || 'Failed to update password' };
-    }
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { error: error.message };
     return {};
   }, []);
 
-  // Google OAuth — uses native Supabase client with raw logging
+  // Google OAuth — PKCE
+  // redirectTo WITHOUT hash: Supabase backend appends ?code= to origin.
+  // After callback we manually redirect to /#/ for HashRouter.
   const signInWithGoogle = useCallback(async () => {
-    const redirectTo = `${window.location.origin}/#/`;
-    console.log('[Google OAuth] Calling supabase.auth.signInWithOAuth({ provider: "google", redirectTo:', redirectTo, '})');
-    
+    const redirectTo = window.location.origin; // e.g. https://digzoom.com
+    console.log('[AUTH] signInWithOAuth redirectTo:', redirectTo);
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },
     });
-    
-    console.log('[Google OAuth] Raw response data:', JSON.stringify(data, null, 2));
-    console.log('[Google OAuth] Raw response error:', JSON.stringify(error, null, 2));
-    
-    if (error) {
-      console.error('[Google OAuth] Supabase returned error:', error);
-      throw new Error(error.message || JSON.stringify(error));
-    }
-    
-    if (data?.url) {
-      console.log('[Google OAuth] Redirecting to:', data.url);
-      window.location.href = data.url;
-    } else {
-      console.error('[Google OAuth] No URL in response. Full data:', data);
-      throw new Error('No redirect URL returned. Check console for details.');
-    }
+    if (error) throw new Error(error.message);
+    if (data?.url) window.location.href = data.url;
   }, []);
 
   const isAdmin = user?.role === 'admin';
@@ -263,17 +310,10 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user,
-      loading,
-      login,
-      register,
-      resetPassword,
-      updatePassword,
-      exchangeRecoveryCode,
-      logout,
-      signInWithGoogle,
-      isAdmin,
-      isSupport,
+      user, loading, isLoading: loading,
+      login, register, resetPassword, updatePassword,
+      exchangeRecoveryCode: exchangeRecoveryCodeFn,
+      logout, signInWithGoogle, isAdmin, isSupport,
     }}>
       {children}
     </AuthContext.Provider>

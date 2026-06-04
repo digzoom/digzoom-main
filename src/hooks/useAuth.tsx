@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { useSupabaseAuth } from './useSupabaseAuth';
 
 interface User {
   id: string;
@@ -20,104 +21,62 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Demo accounts for testing
-const DEMO_USERS: Record<string, { password: string; user: User }> = {
-  'admin@digzoom.com': {
-    password: 'admin123',
-    user: {
-      id: '1',
-      name: 'Admin',
-      email: 'admin@digzoom.com',
-      role: 'admin',
-    },
-  },
-  'user@digzoom.com': {
-    password: 'user123',
-    user: {
-      id: '2',
-      name: 'Demo User',
-      email: 'user@digzoom.com',
-      role: 'user',
-    },
-  },
-};
-
-const STORAGE_KEY = 'digzoom-user';
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const supabaseAuth = useSupabaseAuth();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.id && parsed.email) {
-          setUser(parsed);
-        }
+  // Map supabase user to our User interface
+  const user: User | null = supabaseAuth.user
+    ? {
+        id: supabaseAuth.user.id,
+        name: supabaseAuth.user.name,
+        email: supabaseAuth.user.email,
+        role: supabaseAuth.user.role as 'user' | 'admin',
+        avatar: supabaseAuth.user.avatar,
       }
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
-    }
-    setIsLoading(false);
-  }, []);
+    : null;
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    const found = DEMO_USERS[email.toLowerCase()];
-    if (found && found.password === password) {
-      setUser(found.user);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(found.user));
-      return true;
-    }
-    return false;
-  }, []);
+  // Sync loading state from supabase auth
+  useEffect(() => {
+    setIsLoading(supabaseAuth.loading);
+  }, [supabaseAuth.loading]);
 
-  const register = useCallback(async (name: string, email: string, password: string): Promise<boolean> => {
-    const key = email.toLowerCase();
-    if (DEMO_USERS[key]) return false;
+  const login = useCallback(
+    async (email: string, password: string): Promise<boolean> => {
+      const result = await supabaseAuth.login(email, password);
+      return !result.error;
+    },
+    [supabaseAuth]
+  );
 
-    const newUser: User = {
-      id: Date.now().toString(),
-      name,
-      email: key,
-      role: 'user',
-    };
-
-    DEMO_USERS[key] = { password, user: newUser };
-    setUser(newUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-    return true;
-  }, []);
+  const register = useCallback(
+    async (name: string, email: string, password: string): Promise<boolean> => {
+      const result = await supabaseAuth.register(email, password, name);
+      return !result.error;
+    },
+    [supabaseAuth]
+  );
 
   const logout = useCallback(() => {
-    setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
-  }, []);
+    supabaseAuth.logout();
+  }, [supabaseAuth]);
 
   const signInWithGoogle = useCallback(async () => {
-    // Demo Google login - creates a demo user
-    const googleUser: User = {
-      id: `google_${Date.now()}`,
-      name: 'Google User',
-      email: `user${Date.now()}@gmail.com`,
-      role: 'user',
-    };
-    setUser(googleUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(googleUser));
-  }, []);
+    await supabaseAuth.signInWithGoogle();
+  }, [supabaseAuth]);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      login,
-      register,
-      logout,
-      signInWithGoogle,
-      isAdmin: user?.role === 'admin',
-      isLoading,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        signInWithGoogle,
+        isAdmin: supabaseAuth.isAdmin,
+        isLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
