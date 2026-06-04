@@ -158,8 +158,33 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       console.log('[AUTH] === init ===');
 
-      // Supabase client auto-handles ?code= PKCE callback (detectSessionInUrl=true)
-      // Just call getSession() which picks up the session after PKCE exchange
+      // 1. Check for PKCE OAuth callback (?code= in search params)
+      // We use detectSessionInUrl=false so we handle this manually.
+      // redirectTo in signInWithOAuth is window.location.origin (no hash),
+      // so ?code= appears in window.location.search, NOT in the hash fragment.
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+
+      if (code) {
+        console.log('[AUTH] PKCE callback detected, code:', code.substring(0, 8) + '...');
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (error) {
+          console.error('[AUTH] exchangeCodeForSession FAILED:', error.message);
+        } else if (data.session) {
+          console.log('[AUTH] PKCE SUCCESS! token length:', data.session.access_token.length);
+          localStorage.setItem('sb_access_token', data.session.access_token);
+          localStorage.setItem('sb_refresh_token', data.session.refresh_token);
+
+          // Remove ?code= from URL and redirect to HashRouter root
+          url.searchParams.delete('code');
+          url.searchParams.delete('type');
+          window.location.href = url.toString() + '#/';
+          return; // Page will reload
+        }
+      }
+
+      // 2. No callback code — check for existing session via Supabase client
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
@@ -168,7 +193,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
       if (session?.access_token) {
         console.log('[AUTH] Session found! token length:', session.access_token.length);
-        console.log('[AUTH] Refresh token exists:', !!session.refresh_token);
         localStorage.setItem('sb_access_token', session.access_token);
         localStorage.setItem('sb_refresh_token', session.refresh_token);
         if (mounted) await loadUser(session.access_token);
@@ -267,9 +291,12 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     return {};
   }, []);
 
-  // Google OAuth
+  // Google OAuth — PKCE
+  // redirectTo WITHOUT hash: Supabase backend appends ?code= to origin.
+  // After callback we manually redirect to /#/ for HashRouter.
   const signInWithGoogle = useCallback(async () => {
-    const redirectTo = `${window.location.origin}/#/`;
+    const redirectTo = window.location.origin; // e.g. https://digzoom.com
+    console.log('[AUTH] signInWithOAuth redirectTo:', redirectTo);
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },
