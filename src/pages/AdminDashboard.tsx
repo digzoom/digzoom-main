@@ -256,14 +256,27 @@ function CouponsTab() {
   const resetForm = () => setForm({ code: '', discount_percent: '', max_uses: '', valid_until: '', min_order_amount: '' });
 
   const save = () => {
-    if (!form.code || !form.discount_percent) { setToast('Code and discount required'); return; }
-    createMutation.mutate({
-      code: form.code,
-      discount_percent: Number(form.discount_percent),
+    console.log('[COUPON] save called');
+    console.log('[COUPON] form.code:', JSON.stringify(form.code));
+    console.log('[COUPON] form.discount_percent:', JSON.stringify(form.discount_percent));
+    console.log('[COUPON] form.max_uses:', JSON.stringify(form.max_uses));
+    console.log('[COUPON] form.min_order_amount:', JSON.stringify(form.min_order_amount));
+
+    const code = form.code?.trim();
+    const discount = Number(form.discount_percent);
+
+    if (!code) { setToast('Code required'); return; }
+    if (!form.discount_percent || isNaN(discount) || discount < 1 || discount > 100) { setToast('Discount must be 1-100'); return; }
+
+    const payload = {
+      code,
+      discount_percent: discount,
       max_uses: form.max_uses ? Number(form.max_uses) : undefined,
       valid_until: form.valid_until || undefined,
       min_order_amount: form.min_order_amount ? Number(form.min_order_amount) : undefined,
-    });
+    };
+    console.log('[COUPON] payload:', JSON.stringify(payload));
+    createMutation.mutate(payload);
   };
 
   return (
