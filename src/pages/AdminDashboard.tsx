@@ -246,24 +246,43 @@ function CouponsTab() {
   const [editCoupon, setEditCoupon] = useState<any>(null);
   const [toast, setToast] = useState('');
   const [form, setForm] = useState({ code: '', discount_percent: '', max_uses: '', valid_until: '', min_order_amount: '' });
+  const [debug, setDebug] = useState<any>(null);
 
   const utils = trpc.useUtils();
   const { data: coupons, isLoading } = trpc.listCoupons.useQuery({ limit: 100 });
-  const createMutation = trpc.createCoupon.useMutation({ onSuccess: () => { setToast(t.admin.couponCreated); setShowForm(false); resetForm(); utils.listCoupons.invalidate(); }, onError: (e) => setToast(e.message) });
+  const createMutation = trpc.createCoupon.useMutation({
+    onSuccess: (data) => {
+      setDebug((prev: any) => ({ ...prev, apiStatus: 'SUCCESS', apiResponse: data }));
+      setToast(t.admin.couponCreated); setShowForm(false); resetForm(); utils.listCoupons.invalidate();
+    },
+    onError: (e) => {
+      setDebug((prev: any) => ({ ...prev, apiStatus: 'ERROR', apiError: e.message }));
+      setToast(e.message);
+    },
+  });
   const toggleMutation = trpc.toggleCoupon.useMutation({ onSuccess: () => { utils.listCoupons.invalidate(); }, onError: (e: any) => setToast(e.message) });
   const deleteMutation = trpc.deleteCoupon.useMutation({ onSuccess: () => { setToast(t.admin.couponDeleted); utils.listCoupons.invalidate(); }, onError: (e: any) => setToast(e.message) });
 
   const resetForm = () => setForm({ code: '', discount_percent: '', max_uses: '', valid_until: '', min_order_amount: '' });
 
   const save = () => {
-    console.log('[COUPON] save called');
-    console.log('[COUPON] form.code:', JSON.stringify(form.code));
-    console.log('[COUPON] form.discount_percent:', JSON.stringify(form.discount_percent));
-    console.log('[COUPON] form.max_uses:', JSON.stringify(form.max_uses));
-    console.log('[COUPON] form.min_order_amount:', JSON.stringify(form.min_order_amount));
-
     const code = form.code?.trim();
     const discount = Number(form.discount_percent);
+
+    setDebug({
+      formCode: form.code,
+      formDiscount: form.discount_percent,
+      formMaxUses: form.max_uses,
+      formMinOrder: form.min_order_amount,
+      codeTrimmed: code,
+      discountParsed: discount,
+      isCodeValid: !!code,
+      isDiscountValid: !!form.discount_percent && !isNaN(discount) && discount >= 1 && discount <= 100,
+      apiStatus: 'SENDING...',
+      payload: null,
+      apiResponse: null,
+      apiError: null,
+    });
 
     if (!code) { setToast('Code required'); return; }
     if (!form.discount_percent || isNaN(discount) || discount < 1 || discount > 100) { setToast('Discount must be 1-100'); return; }
@@ -275,7 +294,7 @@ function CouponsTab() {
       valid_until: form.valid_until || undefined,
       min_order_amount: form.min_order_amount ? Number(form.min_order_amount) : undefined,
     };
-    console.log('[COUPON] payload:', JSON.stringify(payload));
+    setDebug((prev: any) => ({ ...prev, payload }));
     createMutation.mutate(payload);
   };
 
@@ -301,6 +320,24 @@ function CouponsTab() {
             <button onClick={save} disabled={createMutation.isPending} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-xl text-sm font-bold"><Save className="w-4 h-4 inline mr-1" />{t.admin.save}</button>
             <button onClick={() => { setShowForm(false); resetForm(); }} className="bg-white/5 hover:bg-white/10 text-gray-400 px-6 py-2 rounded-xl text-sm">{t.admin.cancel}</button>
           </div>
+          {/* DEBUG PANEL — visible on page */}
+          {debug && (
+            <div className="mt-3 p-3 bg-yellow-900/30 border border-yellow-500/30 rounded-xl text-xs font-mono space-y-1">
+              <div className="text-yellow-400 font-bold mb-2">DEBUG OUTPUT</div>
+              <div className="text-gray-300"><span className="text-yellow-500">form.code:</span> {JSON.stringify(debug.formCode)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">form.discount_percent:</span> {JSON.stringify(debug.formDiscount)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">form.max_uses:</span> {JSON.stringify(debug.formMaxUses)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">form.min_order_amount:</span> {JSON.stringify(debug.formMinOrder)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">codeTrimmed:</span> {JSON.stringify(debug.codeTrimmed)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">discountParsed:</span> {JSON.stringify(debug.discountParsed)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">isCodeValid:</span> {JSON.stringify(debug.isCodeValid)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">isDiscountValid:</span> {JSON.stringify(debug.isDiscountValid)}</div>
+              <div className="text-gray-300"><span className="text-yellow-500">apiStatus:</span> <span className={debug.apiStatus === 'SUCCESS' ? 'text-emerald-400' : debug.apiStatus === 'ERROR' ? 'text-red-400' : 'text-blue-400'}>{debug.apiStatus}</span></div>
+              {debug.payload && <div className="text-gray-300"><span className="text-yellow-500">payload:</span> {JSON.stringify(debug.payload)}</div>}
+              {debug.apiResponse && <div className="text-emerald-400"><span className="text-yellow-500">apiResponse:</span> {JSON.stringify(debug.apiResponse)}</div>}
+              {debug.apiError && <div className="text-red-400"><span className="text-yellow-500">apiError:</span> {JSON.stringify(debug.apiError)}</div>}
+            </div>
+          )}
         </div>
       )}
 
