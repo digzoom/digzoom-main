@@ -286,35 +286,21 @@ export default function MarketingServices() {
         </div>
       </section>
 
-      {/* ═══════════ FORM ═══════════ */}
-      <section className={`py-14 transition-all duration-500 ${formOpen ? 'max-h-[1200px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-        <div className="max-w-lg mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white text-center mb-8">{t.formTitle}</h2>
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            {[
-              { label: isAr ? 'الاسم' : 'Name', type: 'text', icon: <User className="w-4 h-4" /> },
-              { label: isAr ? 'رقم الجوال' : 'Phone', type: 'tel', icon: <Phone className="w-4 h-4" /> },
-              { label: isAr ? 'النشاط' : 'Business Type', type: 'text', icon: <Briefcase className="w-4 h-4" /> },
-              { label: isAr ? 'الميزانية التقريبية' : 'Approximate Budget', type: 'text', icon: <Wallet className="w-4 h-4" /> },
-            ].map((field, i) => (
-              <div key={i} className="relative">
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">{field.icon}</div>
-                <input type={field.type} placeholder={field.label} className="w-full bg-[#151520] border border-white/[0.06] rounded-xl py-3 pr-10 pl-4 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/30" />
-              </div>
-            ))}
-            <div className="relative">
-              <div className="absolute right-3 top-3 text-gray-500"><MessageCircle className="w-4 h-4" /></div>
-              <textarea placeholder={isAr ? 'الخدمة المطلوبة' : 'Service Required'} rows={3} className="w-full bg-[#151520] border border-white/[0.06] rounded-xl py-3 pr-10 pl-4 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500/30 resize-none" />
-            </div>
-            <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-3 text-center">
-              <p className="text-blue-300/70 text-xs">
-                {isAr ? 'هذا النموذج للمعاينة حالياً، وسيتم تفعيل استقبال الطلبات قريباً' : 'This form is for preview only. Order submission will be activated soon.'}
-              </p>
-            </div>
-            <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:shadow-lg transition-all opacity-60 cursor-not-allowed" disabled>
-              {t.formSubmit}
-            </button>
-          </form>
+      {/* ═══════════ CTA SECTION ═══════════ */}
+      <section className="py-16">
+        <div className="max-w-lg mx-auto px-4 text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">{isAr ? 'ابدأ نموك الرقمي اليوم' : 'Start Your Digital Growth Today'}</h2>
+          <p className="text-gray-400 mb-8">
+            {isAr ? 'تواصل معنا مباشرة عبر واتساب أو اطلب استشارة مجانية' : 'Contact us directly via WhatsApp or request a free consultation'}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="https://wa.me/966500000000" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-bold transition-all">
+              <MessageCircle className="w-5 h-5" /> {isAr ? 'تحدث معنا عبر واتساب' : 'Chat on WhatsApp'}
+            </a>
+            <Link to="/contact" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold transition-all">
+              <Phone className="w-5 h-5" /> {isAr ? 'اطلب استشارة مجانية' : 'Request Free Consultation'}
+            </Link>
+          </div>
         </div>
       </section>
 
