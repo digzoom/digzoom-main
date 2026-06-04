@@ -28,13 +28,84 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ——— Recovery code exchange — uses Supabase client (PKCE flow) ———
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Build headers with USER'S token so RLS allows the query
+function makeUserHeaders(token: string) {
+  return {
+    'apikey': ANON_KEY,
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+}
+
+// Generic REST fetch helper
+async function restQuery(token: string, table: string, select: string, eq?: { col: string; val: string }) {
+  let url = `${SUPABASE_URL}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
+  if (eq) url += `&${eq.col}=eq.${encodeURIComponent(eq.val)}`;
+  url += '&limit=1';
+
+  const res = await fetch(url, {
+    headers: makeUserHeaders(token),
+    signal: AbortSignal.timeout(10000),
+  });
+  return res;
+}
+
+// Fetch profile + role using USER token (passes RLS)
+async function loadProfile(token: string, userId: string, email: string, metadata: any): Promise<User> {
+  console.log('[AUTH] loadProfile for userId:', userId);
+
+  // 1. Query profiles
+  const profileRes = await restQuery(token, 'profiles', 'full_name,avatar_url,role,phone', { col: 'id', val: userId });
+  console.log('[AUTH] profiles response status:', profileRes.status);
+  const profiles = await profileRes.json().catch(() => []);
+  const profile = Array.isArray(profiles) ? profiles[0] : profiles;
+  console.log('[AUTH] profiles data:', JSON.stringify(profile || {}));
+
+  // 2. Query user_roles
+  const rolesRes = await restQuery(token, 'user_roles', 'role,is_active', { col: 'user_id', val: userId });
+  console.log('[AUTH] user_roles response status:', rolesRes.status);
+  const userRoles = await rolesRes.json().catch(() => []);
+  const ur = Array.isArray(userRoles) ? userRoles[0] : userRoles;
+  console.log('[AUTH] user_roles data:', JSON.stringify(ur || {}));
+
+  // 3. Resolve role
+  let resolvedRole: UserRole = 'user';
+  if (ur?.is_active === true && ur?.role) {
+    resolvedRole = ur.role;
+    console.log('[AUTH] role from user_roles:', resolvedRole);
+  } else if (profile?.role) {
+    resolvedRole = profile.role;
+    console.log('[AUTH] role from profiles:', resolvedRole);
+  } else {
+    console.log('[AUTH] no role found, defaulting to user');
+  }
+
+  // 4. Resolve name
+  const name = profile?.full_name || metadata?.full_name || metadata?.name || email?.split('@')[0] || '';
+
+  // 5. Resolve avatar
+  const avatar = profile?.avatar_url || metadata?.avatar_url || metadata?.picture || '';
+
+  console.log('[AUTH] FINAL name:', name, 'role:', resolvedRole, 'hasAvatar:', !!avatar);
+
+  return {
+    id: userId,
+    email: email || '',
+    name,
+    avatar,
+    role: resolvedRole,
+    phone: profile?.phone || '',
+  };
+}
+
+// Recovery code exchange (uses Supabase client for PKCE)
 async function exchangeRecoveryCodeFn(code: string): Promise<{ error?: string }> {
   try {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error || !data.session) {
-      return { error: error?.message || 'Invalid or expired recovery code' };
-    }
+    if (error || !data.session) return { error: error?.message || 'Invalid recovery code' };
     localStorage.setItem('sb_access_token', data.session.access_token);
     localStorage.setItem('sb_refresh_token', data.session.refresh_token);
     return {};
@@ -43,189 +114,82 @@ async function exchangeRecoveryCodeFn(code: string): Promise<{ error?: string }>
   }
 }
 
-// ——— Fetch user profile + role from Supabase ———
-async function fetchUserProfile(userId: string): Promise<{
-  name: string;
-  avatar?: string;
-  role: UserRole;
-  phone?: string;
-}> {
-  try {
-    console.log('[ADMIN] Querying profiles for id:', userId);
-    // Fetch profile
-    const { data: profile, error: profileErr } = await supabase
-      .from('profiles')
-      .select('full_name, avatar_url, role, phone')
-      .eq('id', userId)
-      .single();
-
-    if (profileErr) {
-      console.error('[ADMIN] profiles ERROR:', profileErr.message);
-    } else {
-      console.log('[ADMIN] profiles found:', JSON.stringify(profile));
-    }
-
-    // Fetch user_roles (overrides profile role if active)
-    let resolvedRole: UserRole = profile?.role || 'user';
-    console.log('[ADMIN] Querying user_roles for user_id:', userId);
-    try {
-      const { data: userRole, error: roleErr } = await supabase
-        .from('user_roles')
-        .select('role, is_active')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (roleErr) {
-        console.error('[ADMIN] user_roles ERROR:', roleErr.message);
-      } else {
-        console.log('[ADMIN] user_roles row:', JSON.stringify(userRole));
-        console.log('[ADMIN] is_active:', userRole?.is_active);
-        console.log('[ADMIN] role from user_roles:', userRole?.role);
-      }
-
-      if (roleErr) {
-        console.warn('[fetchUserProfile] user_roles error:', roleErr.message);
-      } else if (userRole?.is_active === true && userRole?.role) {
-        resolvedRole = userRole.role;
-      }
-    } catch (e) {
-      console.warn('[fetchUserProfile] user_roles exception:', e);
-    }
-
-    console.log('[ADMIN] FINAL resolvedRole:', resolvedRole);
-
-    return {
-      name: profile?.full_name || '',
-      avatar: profile?.avatar_url || undefined,
-      role: resolvedRole,
-      phone: profile?.phone || undefined,
-    };
-  } catch (e) {
-    console.warn('[fetchUserProfile] exception:', e);
-    return { name: '', role: 'user' };
-  }
-}
-
 export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Build User object from Supabase auth user + profile
-  const buildUser = useCallback(async (authUser: any): Promise<User | null> => {
-    if (!authUser?.id) {
-      console.error('[AUTH] buildUser: NO authUser.id');
-      return null;
-    }
-
-    console.log('[AUTH] user id:', authUser.id);
-    console.log('[AUTH] email:', authUser.email);
-    console.log('[AUTH] metadata:', JSON.stringify(authUser.user_metadata || {}));
-    console.log('[AUTH] avatar_url from metadata:', authUser.user_metadata?.avatar_url);
-
-    const profile = await fetchUserProfile(authUser.id);
-
-    console.log('[ADMIN] resolved role:', profile.role);
-    console.log('[ADMIN] is admin:', profile.role === 'admin');
-
-    // Get Google avatar from user_metadata if no profile avatar
-    const googleAvatar = authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture;
-    const googleName = authUser.user_metadata?.full_name || authUser.user_metadata?.name;
-
-    const name = profile.name || googleName || authUser.email?.split('@')[0] || '';
-    const avatar = profile.avatar || googleAvatar || '';
-
-    console.log('[AUTH] final name:', name);
-    console.log('[AUTH] final avatar:', avatar ? 'YES' : 'NO');
-
-    return {
-      id: authUser.id,
-      email: authUser.email || '',
-      name,
-      avatar,
-      role: profile.role,
-      phone: profile.phone,
-    };
-  }, []);
-
-  // Sync user from Supabase session
-  const syncUser = useCallback(async () => {
-    console.log('[AUTH] === syncUser called ===');
+  // Core: load user from token
+  const loadUser = useCallback(async (token: string) => {
+    console.log('[AUTH] loadUser token length:', token?.length);
     try {
-      const { data: { user: authUser }, error } = await supabase.auth.getUser();
+      // Get auth user info
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        headers: makeUserHeaders(token),
+        signal: AbortSignal.timeout(10000),
+      });
+      console.log('[AUTH] /auth/v1/user status:', res.status);
 
-      if (error) {
-        console.error('[AUTH] getUser ERROR:', error.message);
+      if (!res.ok) {
+        console.error('[AUTH] /auth/v1/user FAILED');
+        localStorage.removeItem('sb_access_token');
         setUser(null);
-        setLoading(false);
         return;
       }
 
-      if (!authUser) {
-        console.error('[AUTH] getUser returned NO USER');
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      console.log('[AUTH] === getUser SUCCESS ===');
-      console.log('[AUTH] user id:', authUser.id);
-      console.log('[AUTH] email:', authUser.email);
-      console.log('[AUTH] expected admin id: 866de745-c743-4611-b6b1-839470b3cf4a');
+      const authUser = await res.json();
+      console.log('[AUTH] authUser id:', authUser.id);
+      console.log('[AUTH] expected admin: 866de745-c743-4611-b6b1-839470b3cf4a');
       console.log('[AUTH] IDs match:', authUser.id === '866de745-c743-4611-b6b1-839470b3cf4a');
 
-      const builtUser = await buildUser(authUser);
-      setUser(builtUser);
+      // Load profile + role with user token (passes RLS)
+      const userData = await loadProfile(token, authUser.id, authUser.email, authUser.user_metadata);
+      setUser(userData);
     } catch (e) {
-      console.error('[AUTH] syncUser exception:', e);
+      console.error('[AUTH] loadUser exception:', e);
       setUser(null);
-    } finally {
-      setLoading(false);
     }
-  }, [buildUser]);
+  }, []);
 
-  // Listen for auth state changes + initial sync
+  // Mount: handle OAuth callback + restore session
   useEffect(() => {
     let mounted = true;
 
     const init = async () => {
       setLoading(true);
 
-      // 1. Handle OAuth callback code in URL (Google, etc.)
+      // 1. Handle OAuth callback
       const url = new URL(window.location.href);
       const code = url.searchParams.get('code');
 
       if (code) {
-        console.log('[Auth init] Found ?code= in URL, exchanging...');
+        console.log('[AUTH] OAuth callback detected');
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         if (error) {
-          console.error('[Auth init] exchangeCodeForSession failed:', error.message);
+          console.error('[AUTH] exchangeCodeForSession:', error.message);
         } else if (data.session) {
-          console.log('[Auth init] Session obtained, token length:', data.session.access_token.length);
           localStorage.setItem('sb_access_token', data.session.access_token);
           localStorage.setItem('sb_refresh_token', data.session.refresh_token);
-
-          // Clean URL
           url.searchParams.delete('code');
           url.searchParams.delete('type');
-          if (!url.hash || url.hash === '') url.hash = '#/';
           window.history.replaceState({}, '', url.toString());
-
           if (mounted) {
-            const builtUser = await buildUser(data.session.user);
-            setUser(builtUser);
+            await loadUser(data.session.access_token);
             setLoading(false);
           }
           return;
         }
       }
 
-      // 2. Fallback: check stored token
+      // 2. Restore from stored token
       const token = localStorage.getItem('sb_access_token');
       if (token) {
-        console.log('[Auth init] Found stored token, syncing...');
-        await syncUser();
+        console.log('[AUTH] Restoring from stored token');
+        if (mounted) {
+          await loadUser(token);
+          setLoading(false);
+        }
       } else {
-        console.log('[Auth init] No token found');
+        console.log('[AUTH] No token');
         setUser(null);
         setLoading(false);
       }
@@ -233,105 +197,92 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
     init();
 
-    // 3. Subscribe to auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Auth onAuthStateChange] event:', event, 'hasSession:', !!session);
-
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        if (session?.user && mounted) {
-          localStorage.setItem('sb_access_token', session.access_token);
-          localStorage.setItem('sb_refresh_token', session.refresh_token);
-          const builtUser = await buildUser(session.user);
-          setUser(builtUser);
-          setLoading(false);
-        }
+    // 3. Listen for auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[AUTH] onAuthStateChange:', event);
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
+        localStorage.setItem('sb_access_token', session.access_token);
+        if (mounted) await loadUser(session.access_token);
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem('sb_access_token');
-        localStorage.removeItem('sb_refresh_token');
-        setUser(null);
-        setLoading(false);
+        if (mounted) setUser(null);
       }
+      if (mounted) setLoading(false);
     });
 
-    return () => {
-      mounted = false;
-      authListener?.subscription?.unsubscribe();
-    };
-  }, [buildUser, syncUser]);
+    return () => { mounted = false; listener?.subscription?.unsubscribe(); };
+  }, [loadUser]);
 
   // Email/Password Login
   const login = useCallback(async (email: string, password: string) => {
-    console.log('[login] attempting for:', email);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { ok, data } = await (async () => {
+      const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        signal: AbortSignal.timeout(15000),
+      });
+      const d = await r.json().catch(() => ({}));
+      return { ok: r.ok, data: d };
+    })();
 
-    if (error || !data.session) {
-      console.error('[login] failed:', error?.message);
-      return { error: error?.message || 'Login failed' };
-    }
+    if (!ok || !data.access_token) return { error: data?.msg || data?.message || 'Login failed' };
 
-    console.log('[login] success, token length:', data.session.access_token.length);
-    localStorage.setItem('sb_access_token', data.session.access_token);
-    localStorage.setItem('sb_refresh_token', data.session.refresh_token);
-
-    const builtUser = await buildUser(data.session.user);
-    setUser(builtUser);
+    localStorage.setItem('sb_access_token', data.access_token);
+    await loadUser(data.access_token);
     return {};
-  }, [buildUser]);
+  }, [loadUser]);
 
   // Register
   const register = useCallback(async (email: string, password: string, name: string) => {
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email, password,
       options: { data: { full_name: name } },
     });
-    if (error) return { error: error.message || 'Registration failed' };
+    if (error) return { error: error.message };
     return {};
   }, []);
 
   // Logout
   const logout = useCallback(async () => {
+    const token = localStorage.getItem('sb_access_token');
+    if (token) {
+      try {
+        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+          method: 'POST',
+          headers: makeUserHeaders(token),
+          signal: AbortSignal.timeout(10000),
+        });
+      } catch { /* ignore */ }
+    }
     await supabase.auth.signOut();
     localStorage.removeItem('sb_access_token');
     localStorage.removeItem('sb_refresh_token');
     setUser(null);
   }, []);
 
-  // Password Reset — send recovery email
+  // Password Reset
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) return { error: error.message || 'Failed to send reset email' };
+    if (error) return { error: error.message };
     return { success: true };
   }, []);
 
-  // Password Reset — update password
   const updatePassword = useCallback(async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) return { error: error.message || 'Failed to update password' };
+    if (error) return { error: error.message };
     return {};
   }, []);
 
   // Google OAuth
   const signInWithGoogle = useCallback(async () => {
     const redirectTo = `${window.location.origin}/#/`;
-    console.log('[Google OAuth] redirectTo:', redirectTo);
-
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },
     });
-
-    if (error) {
-      console.error('[Google OAuth] error:', error);
-      throw new Error(error.message);
-    }
-
-    if (data?.url) {
-      console.log('[Google OAuth] redirecting to:', data.url);
-      window.location.href = data.url;
-    } else {
-      throw new Error('No redirect URL returned');
-    }
+    if (error) throw new Error(error.message);
+    if (data?.url) window.location.href = data.url;
   }, []);
 
   const isAdmin = user?.role === 'admin';
@@ -339,18 +290,10 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user,
-      loading,
-      isLoading: loading,
-      login,
-      register,
-      resetPassword,
-      updatePassword,
+      user, loading, isLoading: loading,
+      login, register, resetPassword, updatePassword,
       exchangeRecoveryCode: exchangeRecoveryCodeFn,
-      logout,
-      signInWithGoogle,
-      isAdmin,
-      isSupport,
+      logout, signInWithGoogle, isAdmin, isSupport,
     }}>
       {children}
     </AuthContext.Provider>
