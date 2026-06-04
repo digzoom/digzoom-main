@@ -51,6 +51,7 @@ async function fetchUserProfile(userId: string): Promise<{
   phone?: string;
 }> {
   try {
+    console.log('[ADMIN] Querying profiles for id:', userId);
     // Fetch profile
     const { data: profile, error: profileErr } = await supabase
       .from('profiles')
@@ -59,17 +60,28 @@ async function fetchUserProfile(userId: string): Promise<{
       .single();
 
     if (profileErr) {
-      console.warn('[fetchUserProfile] profiles error:', profileErr.message);
+      console.error('[ADMIN] profiles ERROR:', profileErr.message);
+    } else {
+      console.log('[ADMIN] profiles found:', JSON.stringify(profile));
     }
 
     // Fetch user_roles (overrides profile role if active)
     let resolvedRole: UserRole = profile?.role || 'user';
+    console.log('[ADMIN] Querying user_roles for user_id:', userId);
     try {
       const { data: userRole, error: roleErr } = await supabase
         .from('user_roles')
         .select('role, is_active')
         .eq('user_id', userId)
         .maybeSingle();
+
+      if (roleErr) {
+        console.error('[ADMIN] user_roles ERROR:', roleErr.message);
+      } else {
+        console.log('[ADMIN] user_roles row:', JSON.stringify(userRole));
+        console.log('[ADMIN] is_active:', userRole?.is_active);
+        console.log('[ADMIN] role from user_roles:', userRole?.role);
+      }
 
       if (roleErr) {
         console.warn('[fetchUserProfile] user_roles error:', roleErr.message);
@@ -79,6 +91,8 @@ async function fetchUserProfile(userId: string): Promise<{
     } catch (e) {
       console.warn('[fetchUserProfile] user_roles exception:', e);
     }
+
+    console.log('[ADMIN] FINAL resolvedRole:', resolvedRole);
 
     return {
       name: profile?.full_name || '',
@@ -98,9 +112,20 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Build User object from Supabase auth user + profile
   const buildUser = useCallback(async (authUser: any): Promise<User | null> => {
-    if (!authUser?.id) return null;
+    if (!authUser?.id) {
+      console.error('[AUTH] buildUser: NO authUser.id');
+      return null;
+    }
+
+    console.log('[AUTH] user id:', authUser.id);
+    console.log('[AUTH] email:', authUser.email);
+    console.log('[AUTH] metadata:', JSON.stringify(authUser.user_metadata || {}));
+    console.log('[AUTH] avatar_url from metadata:', authUser.user_metadata?.avatar_url);
 
     const profile = await fetchUserProfile(authUser.id);
+
+    console.log('[ADMIN] resolved role:', profile.role);
+    console.log('[ADMIN] is admin:', profile.role === 'admin');
 
     // Get Google avatar from user_metadata if no profile avatar
     const googleAvatar = authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture;
@@ -109,7 +134,8 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const name = profile.name || googleName || authUser.email?.split('@')[0] || '';
     const avatar = profile.avatar || googleAvatar || '';
 
-    console.log('[buildUser] id:', authUser.id, 'name:', name, 'role:', profile.role, 'hasAvatar:', !!avatar);
+    console.log('[AUTH] final name:', name);
+    console.log('[AUTH] final avatar:', avatar ? 'YES' : 'NO');
 
     return {
       id: authUser.id,
@@ -123,21 +149,34 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Sync user from Supabase session
   const syncUser = useCallback(async () => {
+    console.log('[AUTH] === syncUser called ===');
     try {
       const { data: { user: authUser }, error } = await supabase.auth.getUser();
 
-      if (error || !authUser) {
-        console.log('[syncUser] no auth user, clearing state');
+      if (error) {
+        console.error('[AUTH] getUser ERROR:', error.message);
         setUser(null);
         setLoading(false);
         return;
       }
 
-      console.log('[syncUser] authUser found:', authUser.id, 'email:', authUser.email);
+      if (!authUser) {
+        console.error('[AUTH] getUser returned NO USER');
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      console.log('[AUTH] === getUser SUCCESS ===');
+      console.log('[AUTH] user id:', authUser.id);
+      console.log('[AUTH] email:', authUser.email);
+      console.log('[AUTH] expected admin id: 866de745-c743-4611-b6b1-839470b3cf4a');
+      console.log('[AUTH] IDs match:', authUser.id === '866de745-c743-4611-b6b1-839470b3cf4a');
+
       const builtUser = await buildUser(authUser);
       setUser(builtUser);
     } catch (e) {
-      console.error('[syncUser] error:', e);
+      console.error('[AUTH] syncUser exception:', e);
       setUser(null);
     } finally {
       setLoading(false);
