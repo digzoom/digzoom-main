@@ -67,13 +67,13 @@ async function fetchUserProfile(userId: string): Promise<{
     try {
       const { data: userRole, error: roleErr } = await supabase
         .from('user_roles')
-        .select('role, status')
+        .select('role, is_active')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (roleErr) {
         console.warn('[fetchUserProfile] user_roles error:', roleErr.message);
-      } else if (userRole?.status === 'active' && userRole?.role) {
+      } else if (userRole?.is_active === true && userRole?.role) {
         resolvedRole = userRole.role;
       }
     } catch (e) {
@@ -274,7 +274,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Google OAuth
   const signInWithGoogle = useCallback(async () => {
-    const redirectTo = `${window.location.origin}/`;
+    const redirectTo = `${window.location.origin}/#/`;
     console.log('[Google OAuth] redirectTo:', redirectTo);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
