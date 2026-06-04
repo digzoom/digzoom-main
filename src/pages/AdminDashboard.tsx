@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNavigate } from 'react-router';
 import { trpc } from '@/providers/trpc';
 import {
@@ -893,6 +894,143 @@ function OrdersTab() {
    SETTINGS TAB (placeholder)
    ═══════════════════════════════════════════════════════════ */
 function SettingsTab() {
-  const { t } = useLanguage();
-  return <div className="space-y-4"><h2 className="text-xl font-bold text-white">{t.admin.settings}</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Settings className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">{t.admin.settingsSoon}</div></div></div>;
+  const { t, lang } = useLanguage();
+  const { settings, byGroup, update, isLoading, isUpdating } = useStoreSettings();
+  const [activeTab, setActiveTab] = useState<'general' | 'status' | 'currency'>('general');
+  const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  const [savedKey, setSavedKey] = useState<string | null>(null);
+
+  // Sync local values when settings load
+  useEffect(() => {
+    const map: Record<string, string> = {};
+    for (const s of settings) map[s.key] = s.value;
+    setLocalValues(map);
+  }, [settings]);
+
+  const groups: { key: 'general' | 'status' | 'currency'; label: string }[] = [
+    { key: 'general', label: lang === 'ar' ? 'عام' : 'General' },
+    { key: 'status', label: lang === 'ar' ? 'الحالة' : 'Status' },
+    { key: 'currency', label: lang === 'ar' ? 'العملة' : 'Currency' },
+  ];
+
+  const handleChange = (key: string, value: string) => {
+    setLocalValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = (key: string) => {
+    const value = localValues[key];
+    update(key, value);
+    setSavedKey(key);
+    setTimeout(() => setSavedKey(null), 1500);
+  };
+
+  const items = byGroup[activeTab] || [];
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-white">{t.admin.settings}</h2>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-[#131722] rounded-xl p-1 w-fit">
+        {groups.map((g) => (
+          <button
+            key={g.key}
+            onClick={() => setActiveTab(g.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === g.key
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Settings Form */}
+      {isLoading ? (
+        <div className="text-gray-500 text-center py-12 text-sm">{t.admin.loading}</div>
+      ) : items.length === 0 ? (
+        <div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center">
+          <Settings className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+          <div className="text-gray-400 text-sm">{t.admin.noData}</div>
+        </div>
+      ) : (
+        <div className="bg-[#131722] rounded-2xl border border-white/5 p-5 space-y-4">
+          {items.map((item) => (
+            <div key={item.key} className="flex flex-col sm:flex-row gap-3 sm:items-start">
+              <label className="text-gray-400 text-xs sm:w-40 shrink-0 pt-2.5">
+                {lang === 'ar' ? item.label_ar : item.label_en}
+              </label>
+              <div className="flex-1 flex gap-2">
+                {/* Text input */}
+                {item.input_type === 'text' && (
+                  <input
+                    type="text"
+                    value={localValues[item.key] ?? ''}
+                    onChange={(e) => handleChange(item.key, e.target.value)}
+                    className="flex-1 bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                )}
+
+                {/* Textarea */}
+                {item.input_type === 'textarea' && (
+                  <textarea
+                    value={localValues[item.key] ?? ''}
+                    onChange={(e) => handleChange(item.key, e.target.value)}
+                    rows={3}
+                    className="flex-1 bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none resize-none"
+                  />
+                )}
+
+                {/* Select */}
+                {item.input_type === 'select' && item.options && (
+                  <select
+                    value={localValues[item.key] ?? ''}
+                    onChange={(e) => handleChange(item.key, e.target.value)}
+                    className="flex-1 bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none"
+                  >
+                    {item.options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                )}
+
+                {/* Toggle */}
+                {item.input_type === 'toggle' && (
+                  <button
+                    onClick={() => handleChange(item.key, localValues[item.key] === 'true' ? 'false' : 'true')}
+                    className={`relative w-12 h-7 rounded-full transition-all ${
+                      localValues[item.key] === 'true' ? 'bg-blue-600' : 'bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 w-6 h-6 rounded-full bg-white transition-all ${
+                        localValues[item.key] === 'true' ? 'left-[22px]' : 'left-0.5'
+                      }`}
+                    />
+                  </button>
+                )}
+
+                {/* Save button */}
+                <button
+                  onClick={() => handleSave(item.key)}
+                  disabled={isUpdating}
+                  className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    savedKey === item.key
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white'
+                  }`}
+                >
+                  {savedKey === item.key
+                    ? (lang === 'ar' ? 'تم الحفظ!' : 'Saved!')
+                    : (lang === 'ar' ? 'حفظ' : 'Save')}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
