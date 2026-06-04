@@ -17,7 +17,7 @@ export const supabase = createClient<Database>(
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      flowType: 'pkce',
+      flowType: 'implicit',
     },
     realtime: {
       enabled: false,
