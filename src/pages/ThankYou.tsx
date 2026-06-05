@@ -13,10 +13,14 @@ export default function ThankYou() {
   const { lang } = useLanguage();
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [orderDate] = useState(new Date());
-  const [orderId] = useState(`DZ${Date.now().toString(36).toUpperCase()}`);
+  // Read REAL order ID from localStorage (set by Checkout after createOrder)
+  const [orderId] = useState(() => {
+    const saved = localStorage.getItem('lastOrderId');
+    return saved || '';
+  });
 
   useEffect(() => {
-    // Get order from localStorage
+    // Get order items from localStorage
     const saved = localStorage.getItem('lastOrder');
     if (saved) {
       try {
