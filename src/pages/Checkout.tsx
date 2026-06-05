@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
   CreditCard, ShieldCheck, Lock, ArrowLeft, ArrowRight,
@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
 
@@ -29,6 +30,7 @@ export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
+  const { user } = useSupabaseAuth();
   const isRTL = lang === 'ar';
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
@@ -39,6 +41,17 @@ export default function Checkout() {
     email: '',
     phone: '',
   });
+
+  // Auto-fill from logged-in user
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
 
   const createOrder = trpc.createOrder.useMutation({
     onError: (error) => {
@@ -69,7 +82,9 @@ export default function Checkout() {
   }
 
   const handleCheckout = async () => {
-    if (!form.email || !form.name) {
+    const finalName = form.name || user?.name || '';
+    const finalEmail = form.email || user?.email || '';
+    if (!finalEmail || !finalName) {
       toast.error(lang === 'ar' ? 'يرجى ملء الاسم والبريد الإلكتروني' : 'Please fill in name and email');
       return;
     }
@@ -78,8 +93,8 @@ export default function Checkout() {
 
     try {
       const result = await createOrder.mutateAsync({
-        customer_name: form.name,
-        customer_email: form.email,
+        customer_name: finalName,
+        customer_email: finalEmail,
         customer_phone: form.phone || undefined,
         items: items.map(item => ({
           product_id: item.id,
@@ -165,9 +180,19 @@ export default function Checkout() {
                     required
                     value={form.email}
                     onChange={e => setForm({ ...form, email: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/40 transition-colors placeholder:text-gray-700"
+                    readOnly={!!user?.email}
+                    className={`w-full rounded-xl px-4 py-3 text-white text-sm focus:outline-none transition-colors placeholder:text-gray-700 ${
+                      user?.email
+                        ? 'bg-white/[0.01] border border-white/[0.03] text-gray-400 cursor-not-allowed'
+                        : 'bg-white/[0.03] border border-white/[0.06] focus:border-blue-500/40'
+                    }`}
                     dir="ltr"
                   />
+                  {user?.email && (
+                    <span className="text-[10px] text-gray-600 mt-1 block">
+                      {lang === 'ar' ? 'يتم استخدام بريد حسابك' : 'Using your account email'}
+                    </span>
+                  )}
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-gray-500 text-xs md:text-sm mb-1.5 md:mb-2">{t.checkout.phone}</label>
