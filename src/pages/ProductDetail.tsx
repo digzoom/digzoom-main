@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/database';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productTitle, productDescription, productLongDescription } from '@/lib/i18n';
 import { toast } from 'sonner';
 
 /* ── Trust badges ── */
@@ -32,6 +33,11 @@ export default function ProductDetail() {
   const [showSticky, setShowSticky] = useState(false);
   const isRTL = lang === 'ar';
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
+
+  // Bilingual helpers
+  const pTitle = product ? productTitle(product, lang) : '';
+  const pDesc = product ? productDescription(product, lang) : '';
+  const pLongDesc = product ? productLongDescription(product, lang) : '';
 
   // Fetch product from Supabase
   useEffect(() => {
@@ -124,7 +130,7 @@ export default function ProductDetail() {
           <Arrow className="w-3 h-3 flex-shrink-0" />
           <Link to="/shop" className="hover:text-blue-400 transition-colors flex-shrink-0">{t.navbar.shop}</Link>
           <Arrow className="w-3 h-3 flex-shrink-0" />
-          <span className="text-gray-300 truncate">{product.title}</span>
+          <span className="text-gray-300 truncate">{pTitle}</span>
         </div>
 
         {/* Main Product Grid */}
@@ -134,7 +140,7 @@ export default function ProductDetail() {
             <div className="relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#151520] group">
               <img
                 src={product.image_url}
-                alt={product.title}
+                alt={pTitle}
                 className="w-full aspect-[4/3] sm:aspect-square object-cover"
                 loading="lazy"
               />
@@ -165,11 +171,11 @@ export default function ProductDetail() {
           {/* Info */}
           <div className="flex flex-col">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4 leading-snug">
-              {product.title}
+              {pTitle}
             </h1>
 
             <p className="text-gray-400 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">
-              {product.long_description}
+              {pLongDesc}
             </p>
 
             {/* Rating */}
@@ -297,13 +303,13 @@ export default function ProductDetail() {
                   <div className="aspect-[16/10] overflow-hidden">
                     <img
                       src={p.image_url}
-                      alt={p.title}
+                      alt={productTitle(p, lang)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-3 md:p-4">
                     <h3 className="text-white font-medium text-xs md:text-sm group-hover:text-blue-400 transition-colors line-clamp-1">
-                      {p.title}
+                      {productTitle(p, lang)}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-blue-400 font-bold text-sm md:text-base">{p.price} {t.featured.currency}</p>

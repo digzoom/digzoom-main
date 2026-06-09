@@ -3,6 +3,7 @@ import { Star, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productTitle, productDescription } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -15,7 +16,8 @@ export default function FeaturedProducts() {
 
   const handleAdd = (product: typeof displayFeatured[0]) => {
     addToCart(product);
-    const msg = isRTL ? `تمت إضافة "${product.title}" إلى السلة` : `Added "${product.title}" to cart`;
+    const title = productTitle(product, lang);
+    const msg = isRTL ? `تمت إضافة "${title}" إلى السلة` : `Added "${title}" to cart`;
     toast.success(msg);
   };
 
@@ -48,7 +50,7 @@ export default function FeaturedProducts() {
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
                     src={product.image}
-                    alt={product.title}
+                    alt={productTitle(product, lang)}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
@@ -62,7 +64,7 @@ export default function FeaturedProducts() {
               <div className="p-5">
                 <Link to={`/product/${product.id}`}>
                   <h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
-                    {product.title}
+                    {productTitle(product, lang)}
                   </h3>
                 </Link>
 

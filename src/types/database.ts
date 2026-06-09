@@ -68,8 +68,14 @@ export interface Database {
           id: number;
           slug: string;
           title: string;
+          title_en: string | null;
+          title_ar: string | null;
           description: string;
+          description_en: string | null;
+          description_ar: string | null;
           long_description: string | null;
+          long_description_en: string | null;
+          long_description_ar: string | null;
           price: number;
           original_price: number | null;
           category_id: number | null;

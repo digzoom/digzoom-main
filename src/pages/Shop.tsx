@@ -4,6 +4,7 @@ import { Star, ShoppingCart, Search, LayoutGrid, List, X, PackageOpen, Tag, Load
 import { useSupabaseProducts } from '@/hooks/useSupabaseProducts';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productTitle, productDescription } from '@/lib/i18n';
 import { toast } from 'sonner';
 import AnimatedBackground from '@/components/AnimatedBackground';
 
@@ -102,9 +103,13 @@ export default function Shop() {
     return res;
   }, [activeCat, sort, search, products, categories]);
 
+  const getTitle = (p: typeof products[0]) => productTitle(p, lang);
+  const getDesc = (p: typeof products[0]) => productDescription(p, lang);
+
   const handleAdd = (p: typeof products[0]) => {
+    const title = getTitle(p);
     addToCart(p as any);
-    toast.success(lang === 'ar' ? `تمت إضافة "${p.title}" إلى السلة` : `"${p.title}" added to cart`);
+    toast.success(lang === 'ar' ? `تمت إضافة "${title}" إلى السلة` : `"${title}" added to cart`);
   };
 
   const sortOptions = [
@@ -213,7 +218,7 @@ export default function Shop() {
               <div key={p.id} className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/5">
                 <Link to={`/product/${p.id}`} className="block relative">
                   <div className="aspect-[3/4] overflow-hidden">
-                    <img src={p.image_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={p.image_url} alt={getTitle(p)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   {p.original_price && (
                     <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -222,7 +227,7 @@ export default function Shop() {
                   )}
                 </Link>
                 <div className="p-5">
-                  <Link to={`/product/${p.id}`}><h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors text-sm leading-relaxed">{p.title}</h3></Link>
+                  <Link to={`/product/${p.id}`}><h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors text-sm leading-relaxed">{getTitle(p)}</h3></Link>
                   <div className="flex items-center gap-1.5 mb-3">
                     <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
                     <span className="text-gray-300 text-xs">{p.rating}</span>
@@ -250,7 +255,7 @@ export default function Shop() {
               <div key={p.id} className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all flex flex-col sm:flex-row">
                 <Link to={`/product/${p.id}`} className="sm:w-56 flex-shrink-0 relative">
                   <div className="aspect-[3/4] sm:aspect-auto sm:h-full overflow-hidden">
-                    <img src={p.image_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={p.image_url} alt={getTitle(p)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   {p.original_price && (
                     <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -260,8 +265,8 @@ export default function Shop() {
                 </Link>
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
-                    <Link to={`/product/${p.id}`}><h3 className="text-white font-semibold mb-2 text-lg group-hover:text-blue-400 transition-colors">{p.title}</h3></Link>
-                    <p className="text-gray-400 text-sm mb-3 line-clamp-2">{p.description}</p>
+                    <Link to={`/product/${p.id}`}><h3 className="text-white font-semibold mb-2 text-lg group-hover:text-blue-400 transition-colors">{getTitle(p)}</h3></Link>
+                    <p className="text-gray-400 text-sm mb-3 line-clamp-2">{getDesc(p)}</p>
                     <div className="flex items-center gap-1.5 mb-2">
                       <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                       <span className="text-gray-300 text-sm">{p.rating}</span>
