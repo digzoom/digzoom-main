@@ -265,7 +265,7 @@ export default function ProductDetail() {
               <button
                 onClick={() => {
                   addToCart(product);
-                  toast.success(lang === 'ar' ? `تمت إضافة "${product.title}" إلى السلة` : `"${product.title}" added to cart`);
+                  toast.success(lang === 'ar' ? `تمت إضافة "${pTitle}" إلى السلة` : `"${pTitle}" added to cart`);
                 }}
                 className="flex items-center justify-center gap-2 border border-white/10 text-white hover:bg-white/5 active:scale-[0.98] px-6 md:px-8 py-3.5 md:py-4 rounded-xl transition-all font-medium text-sm md:text-base"
               >
