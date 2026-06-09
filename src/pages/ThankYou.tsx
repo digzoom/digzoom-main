@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { CheckCircle, Download, Home, Package, Clock, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productTitle } from '@/lib/i18n';
 import type { Product } from '@/types';
 
 interface OrderItem {
@@ -103,12 +104,12 @@ export default function ThankYou() {
                     <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                       <img
                         src={item.product.image}
-                        alt={item.product.title}
+                        alt={productTitle(item.product, lang)}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-medium text-sm truncate">{item.product.title}</h3>
+                      <h3 className="text-white font-medium text-sm truncate">{productTitle(item.product, lang)}</h3>
                       <p className="text-gray-500 text-xs">{item.product.fileType} · {item.product.fileSize}</p>
                     </div>
                     <button
@@ -157,7 +158,7 @@ export default function ThankYou() {
               .map(item => (
                 <div key={item.product.id} className="flex items-center gap-3 text-gray-500 text-sm py-2">
                   <Package className="w-4 h-4" />
-                  <span>{item.product.title}</span>
+                  <span>{productTitle(item.product, lang)}</span>
                   <span className="text-xs bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded-full">
                     {lang === 'ar' ? 'قريباً' : 'Soon'}
                   </span>

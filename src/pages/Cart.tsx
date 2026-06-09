@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productTitle } from '@/lib/i18n';
 
 export default function Cart() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
@@ -79,14 +80,14 @@ export default function Cart() {
                 <Link to={`/product/${item.id}`} className="flex-shrink-0 self-start">
                   <img
                     src={item.image}
-                    alt={item.title}
+                    alt={productTitle(item, lang)}
                     className="w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover"
                   />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link to={`/product/${item.id}`}>
                     <h3 className="text-white font-semibold mb-1 text-xs md:text-sm line-clamp-2 hover:text-blue-400 transition-colors">
-                      {item.title}
+                      {productTitle(item, lang)}
                     </h3>
                   </Link>
                   <p className="text-gray-600 text-xs mb-2 md:mb-3">

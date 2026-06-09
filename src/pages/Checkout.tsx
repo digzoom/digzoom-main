@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
+import { productTitle } from '@/lib/i18n';
 import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
 
@@ -85,7 +86,7 @@ export default function Checkout() {
           product_id: item.id,
           quantity: item.quantity,
           price: item.price,
-          title: item.title,
+          title: productTitle(item, lang),
         })),
         subtotal: totalPrice,
         tax_amount: tax,
@@ -279,22 +280,25 @@ export default function Checkout() {
             <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-4 md:p-6 h-fit lg:sticky lg:top-24">
               <h3 className="text-white font-semibold mb-4 md:mb-6 text-sm md:text-base">{t.checkout.summary}</h3>
               <div className="space-y-3 md:space-y-4 mb-4 md:mb-6 max-h-40 md:max-h-60 overflow-y-auto custom-scrollbar">
-                {items.map(item => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-10 h-10 md:w-14 md:h-14 rounded-lg object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-xs md:text-sm line-clamp-1">{item.title}</p>
-                      <p className="text-gray-600 text-xs">x{item.quantity}</p>
+                {items.map(item => {
+                  const title = productTitle(item, lang);
+                  return (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <img
+                        src={item.image}
+                        alt={title}
+                        className="w-10 h-10 md:w-14 md:h-14 rounded-lg object-cover flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-xs md:text-sm line-clamp-1">{title}</p>
+                        <p className="text-gray-600 text-xs">x{item.quantity}</p>
+                      </div>
+                      <span className="text-gray-300 text-xs md:text-sm flex-shrink-0">
+                        {item.price * item.quantity} {t.cart.currency}
+                      </span>
                     </div>
-                    <span className="text-gray-300 text-xs md:text-sm flex-shrink-0">
-                      {item.price * item.quantity} {t.cart.currency}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div className="space-y-2 md:space-y-3 border-t border-white/[0.06] pt-3 md:pt-4">
                 <div className="flex justify-between text-gray-400 text-xs md:text-sm">
