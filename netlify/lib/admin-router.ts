@@ -48,38 +48,29 @@ export const adminRouter = createRouter({
     };
   }),
 
-  // Debug: query user_roles directly for current user (admin bypass)
-  meDebug: publicQuery.query(async ({ ctx }) => {
-    const user = (ctx as any)?.user;
-    if (!user?.id) {
-      return { hasUser: false, userId: null, rawUserRoles: null, rawProfiles: null };
-    }
-
-    // Query user_roles directly via admin client (bypasses RLS)
-    const { data: userRoles, error: rolesErr } = await admin()
-      .from('user_roles')
-      .select('role, is_active')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    // Query profiles directly via admin client (bypasses RLS)
-    const { data: profile, error: profileErr } = await admin()
-      .from('profiles')
-      .select('role, full_name, avatar_url')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    return {
-      hasUser: true,
-      userId: user.id,
-      email: user.email,
-      userRolesError: rolesErr?.message || null,
-      rawUserRoles: userRoles || null,
-      profilesError: profileErr?.message || null,
-      rawProfiles: profile || null,
-      computedRole: (userRoles?.is_active && userRoles?.role) || profile?.role || 'user',
-    };
+  /* ─── Store Settings ─── */
+  listSettings: publicQuery.query(async () => {
+    const { data, error } = await admin()
+      .from('store_settings')
+      .select('*')
+      .eq('is_active', true)
+      .order('group_name', { ascending: true })
+      .order('sort_order', { ascending: true });
+    if (error) throw new Error(error.message);
+    return data || [];
   }),
+
+  updateSetting: adminQuery
+    .input(z.object({ key: z.string(), value: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const user = (ctx as any)?.user;
+      const { error } = await admin()
+        .from('store_settings')
+        .update({ value: input.value, updated_at: new Date().toISOString(), updated_by: user?.id })
+        .eq('key', input.key);
+      if (error) throw new Error(error.message);
+      return { success: true };
+    }),
 
   /* ─── Create Order (public — guest checkout, no auth required) ─── */
   createOrder: publicQuery
@@ -405,12 +396,12 @@ export const adminRouter = createRouter({
 
       const orders = Array.isArray(data) ? data.map((o: any) => ({
         id: o.id,
-        order_number: o.order_number,
+        order_number: o.id,           // orders table uses "id" as the order number
         customer_name: o.customer_name,
         customer_email: o.customer_email,
         total: o.total_amount,
         status: o.status,
-        payment_status: o.payment_status,
+        payment_status: o.payment_status || 'pending',
         created_at: o.created_at,
         items: [] as any[],
       })) : [];

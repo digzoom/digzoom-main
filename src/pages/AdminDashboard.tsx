@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNavigate } from 'react-router';
 import { trpc } from '@/providers/trpc';
 import {
@@ -855,14 +856,15 @@ function OrdersTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-white/5 text-gray-400 text-xs">
-                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.order}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.payment}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
+                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.orderNo}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.email}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
                 {(Array.isArray(orders) ? orders : []).map((o: any) => (
                   <>
                     <tr key={o.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
-                      <td className="px-4 py-3"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center"><Receipt className="w-4 h-4 text-white" /></div><div><div className="text-white font-medium text-sm">{o.order_number}</div><div className="text-gray-500 text-xs">{o.customer_email}</div></div></div></td>
+                      <td className="px-4 py-3"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center"><Receipt className="w-4 h-4 text-white" /></div><div><div className="text-white font-mono font-medium text-sm">{o.order_number || o.id}</div></div></div></td>
                       <td className="px-4 py-3"><span className="text-white text-sm">{o.customer_name}</span></td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{o.customer_email}</td>
                       <td className="px-4 py-3 text-center text-emerald-400 font-bold">{o.total} {t.admin.currency}</td>
                       <td className="px-4 py-3 text-center"><select value={o.status} onChange={(e) => { e.stopPropagation(); updateStatusMutation.mutate({ id: o.id, status: e.target.value as any }); }} className={`text-xs px-3 py-1 rounded-full font-bold bg-transparent ${statusColors[o.status] || ''}`}>{['pending', 'processing', 'completed', 'cancelled', 'refunded'].map((s) => <option key={s} value={s}>{statusLabels[s]}</option>)}</select></td>
                       <td className="px-4 py-3 text-center"><span className={`text-xs px-3 py-1 rounded-full font-bold ${o.payment_status === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'}`}>{o.payment_status}</span></td>
@@ -893,6 +895,143 @@ function OrdersTab() {
    SETTINGS TAB (placeholder)
    ═══════════════════════════════════════════════════════════ */
 function SettingsTab() {
-  const { t } = useLanguage();
-  return <div className="space-y-4"><h2 className="text-xl font-bold text-white">{t.admin.settings}</h2><div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center"><Settings className="w-12 h-12 text-gray-600 mx-auto mb-4" /><div className="text-gray-400 text-sm">{t.admin.settingsSoon}</div></div></div>;
+  const { t, lang } = useLanguage();
+  const { settings, byGroup, update, isLoading, isUpdating } = useStoreSettings();
+  const [activeTab, setActiveTab] = useState<'general' | 'status' | 'currency'>('general');
+  const [localValues, setLocalValues] = useState<Record<string, string>>({});
+  const [savedKey, setSavedKey] = useState<string | null>(null);
+
+  // Sync local values when settings load
+  useEffect(() => {
+    const map: Record<string, string> = {};
+    for (const s of settings) map[s.key] = s.value;
+    setLocalValues(map);
+  }, [settings]);
+
+  const groups: { key: 'general' | 'status' | 'currency'; label: string }[] = [
+    { key: 'general', label: lang === 'ar' ? 'عام' : 'General' },
+    { key: 'status', label: lang === 'ar' ? 'الحالة' : 'Status' },
+    { key: 'currency', label: lang === 'ar' ? 'العملة' : 'Currency' },
+  ];
+
+  const handleChange = (key: string, value: string) => {
+    setLocalValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = (key: string) => {
+    const value = localValues[key];
+    update(key, value);
+    setSavedKey(key);
+    setTimeout(() => setSavedKey(null), 1500);
+  };
+
+  const items = byGroup[activeTab] || [];
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-white">{t.admin.settings}</h2>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-[#131722] rounded-xl p-1 w-fit">
+        {groups.map((g) => (
+          <button
+            key={g.key}
+            onClick={() => setActiveTab(g.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === g.key
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Settings Form */}
+      {isLoading ? (
+        <div className="text-gray-500 text-center py-12 text-sm">{t.admin.loading}</div>
+      ) : items.length === 0 ? (
+        <div className="bg-[#131722] rounded-2xl border border-white/5 p-12 text-center">
+          <Settings className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+          <div className="text-gray-400 text-sm">{t.admin.noData}</div>
+        </div>
+      ) : (
+        <div className="bg-[#131722] rounded-2xl border border-white/5 p-5 space-y-4">
+          {items.map((item) => (
+            <div key={item.key} className="flex flex-col sm:flex-row gap-3 sm:items-start">
+              <label className="text-gray-400 text-xs sm:w-40 shrink-0 pt-2.5">
+                {lang === 'ar' ? item.label_ar : item.label_en}
+              </label>
+              <div className="flex-1 flex gap-2">
+                {/* Text input */}
+                {item.input_type === 'text' && (
+                  <input
+                    type="text"
+                    value={localValues[item.key] ?? ''}
+                    onChange={(e) => handleChange(item.key, e.target.value)}
+                    className="flex-1 bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                )}
+
+                {/* Textarea */}
+                {item.input_type === 'textarea' && (
+                  <textarea
+                    value={localValues[item.key] ?? ''}
+                    onChange={(e) => handleChange(item.key, e.target.value)}
+                    rows={3}
+                    className="flex-1 bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none resize-none"
+                  />
+                )}
+
+                {/* Select */}
+                {item.input_type === 'select' && item.options && (
+                  <select
+                    value={localValues[item.key] ?? ''}
+                    onChange={(e) => handleChange(item.key, e.target.value)}
+                    className="flex-1 bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500 focus:outline-none"
+                  >
+                    {item.options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                )}
+
+                {/* Toggle */}
+                {item.input_type === 'toggle' && (
+                  <button
+                    onClick={() => handleChange(item.key, localValues[item.key] === 'true' ? 'false' : 'true')}
+                    className={`relative w-12 h-7 rounded-full transition-all ${
+                      localValues[item.key] === 'true' ? 'bg-blue-600' : 'bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 w-6 h-6 rounded-full bg-white transition-all ${
+                        localValues[item.key] === 'true' ? 'left-[22px]' : 'left-0.5'
+                      }`}
+                    />
+                  </button>
+                )}
+
+                {/* Save button */}
+                <button
+                  onClick={() => handleSave(item.key)}
+                  disabled={isUpdating}
+                  className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    savedKey === item.key
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white'
+                  }`}
+                >
+                  {savedKey === item.key
+                    ? (lang === 'ar' ? 'تم الحفظ!' : 'Saved!')
+                    : (lang === 'ar' ? 'حفظ' : 'Save')}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
