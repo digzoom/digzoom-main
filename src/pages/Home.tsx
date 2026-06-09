@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCart } from '@/hooks/useCart';
+import { productTitle, productDescription } from '@/lib/i18n';
 import ChatBot from '@/components/ChatBot';
 import { products } from '@/data/products';
 import {
@@ -209,8 +210,8 @@ function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
 
-  const title = lang === 'en' ? (product.title_en || product.title) : (product.title_ar || product.title);
-  const description = lang === 'en' ? (product.description_en || product.description) : (product.description_ar || product.description);
+  const title = productTitle(product, lang);
+  const description = productDescription(product, lang);
   const discountLabel = lang === 'en' ? 'Save' : 'خصم';
 
   return (
@@ -287,7 +288,7 @@ export default function Home() {
     toast.success(
       <div className="flex flex-col gap-1">
         <span className="font-medium">{lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Added to cart'}</span>
-        <span className="text-xs opacity-80">{product.title}</span>
+        <span className="text-xs opacity-80">{productTitle(product, lang)}</span>
         <Link 
           to="/cart" 
           className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded mt-1 text-center transition-colors"
