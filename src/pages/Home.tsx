@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useCart } from '@/hooks/useCart';
+import { productTitle, productDescription } from '@/lib/i18n';
 import ChatBot from '@/components/ChatBot';
 import { products } from '@/data/products';
 import {
@@ -204,9 +205,14 @@ function StatCounter({ end, suffix, label, icon }: { end: number; suffix: string
 
 /* ── Product Card ── */
 function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (p: typeof products[0]) => void }) {
+  const { lang } = useLanguage();
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
+
+  const title = productTitle(product, lang);
+  const description = productDescription(product, lang);
+  const discountLabel = lang === 'en' ? 'Save' : 'خصم';
 
   return (
     <div className="group bg-[#13131f] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-purple-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/5 flex flex-col">
@@ -214,14 +220,14 @@ function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (
         <div className="aspect-[4/3] overflow-hidden bg-[#1a1a2e]">
           <img
             src={product.image}
-            alt={product.title}
+            alt={title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
         </div>
         {discount > 0 && (
           <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full">
-            خصم {discount}%
+            {discountLabel} {discount}%
           </div>
         )}
         <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-[11px] font-medium px-2 py-1 rounded-full flex items-center gap-1">
@@ -233,10 +239,10 @@ function ProductCard({ product, onAdd }: { product: typeof products[0]; onAdd: (
       <div className="p-4 flex flex-col flex-1">
         <Link to={`/product/${product.id}`}>
           <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors leading-relaxed min-h-[2.5rem]">
-            {product.title}
+            {title}
           </h3>
         </Link>
-        <p className="text-gray-500 text-xs mb-3 line-clamp-1">{product.description}</p>
+        <p className="text-gray-500 text-xs mb-3 line-clamp-1">{description}</p>
 
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -282,7 +288,7 @@ export default function Home() {
     toast.success(
       <div className="flex flex-col gap-1">
         <span className="font-medium">{lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Added to cart'}</span>
-        <span className="text-xs opacity-80">{product.title}</span>
+        <span className="text-xs opacity-80">{productTitle(product, lang)}</span>
         <Link 
           to="/cart" 
           className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded mt-1 text-center transition-colors"
