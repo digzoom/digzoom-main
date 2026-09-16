@@ -1,341 +1,304 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useState } from "react";
+import { Link } from "react-router";
 import {
-  TrendingUp, Package, Zap, Check, CheckCircle,
-  Stethoscope, ShoppingBag, Building2, Rocket, GraduationCap,
-  BarChart3, Megaphone, Search, PenTool, Store, FileText,
-  MessageCircle, ArrowLeft, Sparkles, Phone, User, Briefcase,
-  Wallet, ChevronDown, ChevronUp, Users
-} from 'lucide-react';
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  Building2,
+  Check,
+  ChevronDown,
+  CircleCheckBig,
+  Lightbulb,
+  Megaphone,
+  PenTool,
+  Search,
+  ShoppingBag,
+  Sparkles,
+  Stethoscope,
+  Store,
+  Target,
+  Users,
+} from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
+
+type Service = {
+  icon: typeof Target;
+  title: string;
+  description: string;
+  deliverables: string[];
+  image: string;
+};
 
 export default function MarketingServices() {
   const { lang } = useLanguage();
-  const isAr = lang === 'ar';
-  const [formOpen, setFormOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const isAr = lang === "ar";
+  const Arrow = isAr ? ArrowLeft : ArrowRight;
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  const t = {
-    heroTitle: isAr ? 'نُدير نمو أعمالك رقمياً لتتفرغ لتطوير مشروعك' : 'We Manage Your Digital Growth So You Can Focus on Your Business',
-    heroSubtitle: isAr ? 'من إدارة التسويق الرقمي والحملات الإعلانية إلى تطوير المتاجر الإلكترونية وتحسين محركات البحث وصناعة المحتوى، نوفر لك منظومة متكاملة للنمو الرقمي.' : 'From digital marketing and advertising campaigns to e-commerce development, SEO, and content creation — we provide an integrated digital growth ecosystem.',
-    ctaConsult: isAr ? 'احجز استشارة مجانية' : 'Book Free Consultation',
-    ctaQuote: isAr ? 'اطلب عرض سعر' : 'Request a Quote',
-
-    pillar1Title: isAr ? 'المنتجات الرقمية' : 'Digital Products',
-    pillar1Desc: isAr ? 'قوالب، كتب، أدوات، دورات — آلاف المنتجات الجاهزة' : 'Templates, ebooks, tools, courses — thousands of ready-made products',
-    pillar2Title: isAr ? 'الخدمات التسويقية' : 'Marketing Services',
-    pillar2Desc: isAr ? 'إدارة حملات، SEO، إعلانات، تحليلات' : 'Campaign management, SEO, ads, analytics',
-    pillar3Title: isAr ? 'حلول النمو الرقمي' : 'Growth Solutions',
-    pillar3Desc: isAr ? 'تطوير متاجر، تحول رقمي، استشارات' : 'Store development, digital transformation, consulting',
-
-    sectorsTitle: isAr ? 'من نخدم؟' : 'Who We Serve?',
-    whyTitle: isAr ? 'لماذا DigZoom؟' : 'Why DigZoom?',
-    servicesTitle: isAr ? 'الخدمات التسويقية' : 'Marketing Services',
-    howTitle: isAr ? 'كيف نعمل؟' : 'How We Work?',
-    pricingTitle: isAr ? 'الباقات الشهرية' : 'Monthly Plans',
-    ecosystemTitle: isAr ? 'منظومة DigZoom' : 'The DigZoom Ecosystem',
-    processTitle: isAr ? 'ماذا يحدث بعد التواصل معنا؟' : 'What Happens After You Contact Us?',
-    faqTitle: isAr ? 'الأسئلة الشائعة' : 'Frequently Asked Questions',
-    formTitle: isAr ? 'نموذج طلب خطة نمو مجانية' : 'Request a Free Growth Plan',
-    formSubmit: isAr ? 'اطلب خطة نمو مجانية' : 'Request Free Growth Plan',
-  };
+  const services: Service[] = isAr
+    ? [
+        {
+          icon: Target,
+          title: "استراتيجية النمو الرقمي",
+          description: "نحوّل أهداف النشاط إلى أولويات وقنوات ومؤشرات أداء قابلة للقياس.",
+          deliverables: ["تشخيص الوضع الحالي", "خريطة فرص واضحة", "خطة تنفيذ مرحلية"],
+          image: "/images/services/strategy-session.jpg",
+        },
+        {
+          icon: Megaphone,
+          title: "الحملات الإعلانية",
+          description: "تخطيط وتشغيل وتحسين الحملات بحسب الهدف والميزانية الفعلية.",
+          deliverables: ["هيكلة الحملات", "اختبار الرسائل", "تقارير أداء مفهومة"],
+          image: "/images/services/analytics-dashboard.jpg",
+        },
+        {
+          icon: Users,
+          title: "إدارة الحضور الاجتماعي",
+          description: "تقويم محتوى واتجاه بصري ونشر منظم يخدم هوية النشاط.",
+          deliverables: ["خطة محتوى", "تصاميم ونسخ", "متابعة الأداء"],
+          image: "/images/services/growth-team.jpg",
+        },
+        {
+          icon: PenTool,
+          title: "المحتوى الإبداعي",
+          description: "محتوى مكتوب وبصري يشرح القيمة ويهيئ العميل لاتخاذ القرار.",
+          deliverables: ["رسائل تسويقية", "تصميمات رقمية", "محتوى الحملات"],
+          image: "/images/services/content-production.jpg",
+        },
+        {
+          icon: Store,
+          title: "تطوير المتاجر الإلكترونية",
+          description: "تحسين الواجهة ورحلة الشراء وصفحات المنتجات لرفع الوضوح والثقة.",
+          deliverables: ["مراجعة تجربة المستخدم", "تحسين الصفحات", "تهيئة القياس"],
+          image: "/images/services/ecommerce-workspace.jpg",
+        },
+        {
+          icon: Search,
+          title: "الظهور والتحليلات",
+          description: "تهيئة أساسية للبحث وقياس السلوك حتى تكون القرارات مبنية على بيانات.",
+          deliverables: ["مراجعة الظهور", "إعداد القياس", "لوحة مؤشرات"],
+          image: "/images/services/creative-work.jpg",
+        },
+      ]
+    : [
+        {
+          icon: Target,
+          title: "Digital growth strategy",
+          description: "We translate business goals into measurable priorities, channels, and KPIs.",
+          deliverables: ["Current-state audit", "Opportunity map", "Phased action plan"],
+          image: "/images/services/strategy-session.jpg",
+        },
+        {
+          icon: Megaphone,
+          title: "Paid campaigns",
+          description: "Campaign planning, operation, and optimization around real goals and budgets.",
+          deliverables: ["Campaign structure", "Message testing", "Clear reporting"],
+          image: "/images/services/analytics-dashboard.jpg",
+        },
+        {
+          icon: Users,
+          title: "Social presence",
+          description: "A focused content calendar, visual direction, and consistent publishing.",
+          deliverables: ["Content plan", "Design and copy", "Performance tracking"],
+          image: "/images/services/growth-team.jpg",
+        },
+        {
+          icon: PenTool,
+          title: "Creative content",
+          description: "Written and visual content that explains value and supports decisions.",
+          deliverables: ["Marketing messages", "Digital creative", "Campaign content"],
+          image: "/images/services/content-production.jpg",
+        },
+        {
+          icon: Store,
+          title: "E-commerce development",
+          description: "Sharper storefronts, buying journeys, and product pages that build confidence.",
+          deliverables: ["UX review", "Page improvements", "Analytics setup"],
+          image: "/images/services/ecommerce-workspace.jpg",
+        },
+        {
+          icon: Search,
+          title: "Search and analytics",
+          description: "Search foundations and behavior tracking for evidence-based decisions.",
+          deliverables: ["Visibility review", "Measurement setup", "KPI dashboard"],
+          image: "/images/services/creative-work.jpg",
+        },
+      ];
 
   const sectors = [
-    { icon: <Stethoscope className="w-7 h-7" />, title: isAr ? 'القطاع الطبي' : 'Healthcare', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
-    { icon: <ShoppingBag className="w-7 h-7" />, title: isAr ? 'المتاجر الإلكترونية' : 'E-commerce', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
-    { icon: <Building2 className="w-7 h-7" />, title: isAr ? 'الشركات والمؤسسات' : 'Corporations', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
-    { icon: <Rocket className="w-7 h-7" />, title: isAr ? 'المشاريع الناشئة' : 'Startups', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
-    { icon: <GraduationCap className="w-7 h-7" />, title: isAr ? 'الخبراء وصناع المحتوى' : 'Experts & Creators', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+    { icon: ShoppingBag, ar: "المتاجر الإلكترونية", en: "E-commerce" },
+    { icon: Building2, ar: "الشركات", en: "Companies" },
+    { icon: Stethoscope, ar: "القطاع الطبي", en: "Healthcare" },
+    { icon: Sparkles, ar: "العلامات الناشئة", en: "Emerging brands" },
   ];
-
-  const whyItems = [
-    isAr ? 'منتجات رقمية وخدمات تسويقية في منصة واحدة' : 'Digital products & marketing in one platform',
-    isAr ? 'استراتيجيات مبنية على البيانات' : 'Data-driven strategies',
-    isAr ? 'حلول قابلة للتوسع' : 'Scalable solutions',
-    isAr ? 'شريك نمو طويل المدى' : 'Long-term growth partner',
-  ];
-
-  const services = [
-    { icon: <Users className="w-6 h-6" />, title: isAr ? 'إدارة حسابات التواصل الاجتماعي' : 'Social Media Management', desc: isAr ? 'إدارة محترفة لجميع المنصات' : 'Professional management for all platforms' },
-    { icon: <Megaphone className="w-6 h-6" />, title: isAr ? 'إدارة الحملات الإعلانية' : 'Ad Campaign Management', desc: isAr ? 'Google Ads, Meta, TikTok, Snapchat' : 'Google Ads, Meta, TikTok, Snapchat' },
-    { icon: <Search className="w-6 h-6" />, title: isAr ? 'تحسين محركات البحث SEO' : 'Search Engine Optimization', desc: isAr ? 'تحسين الظهور في نتائج البحث' : 'Improve search visibility' },
-    { icon: <PenTool className="w-6 h-6" />, title: isAr ? 'صناعة المحتوى الإبداعي' : 'Creative Content Creation', desc: isAr ? 'تصميم، فيديو، كتابة، وإنتاج' : 'Design, video, writing, production' },
-    { icon: <Store className="w-6 h-6" />, title: isAr ? 'تطوير وتحسين المتاجر الإلكترونية' : 'eCommerce Development', desc: isAr ? 'Shopify, WooCommerce, Custom' : 'Shopify, WooCommerce, Custom' },
-    { icon: <BarChart3 className="w-6 h-6" />, title: isAr ? 'التحليلات والتقارير' : 'Analytics & Reporting', desc: isAr ? 'تقارير أداء دورية وتحليلات' : 'Periodic performance reports' },
-  ];
-
-  const howSteps = [
-    { num: '01', title: isAr ? 'تحليل النشاط والمنافسين' : 'Analyze Business & Competitors', desc: isAr ? 'دراسة شاملة لسوقك ومنافسيك' : 'Comprehensive study of your market & competitors' },
-    { num: '02', title: isAr ? 'بناء استراتيجية النمو' : 'Build Growth Strategy', desc: isAr ? 'خطة عمل مخصصة لأهدافك' : 'Custom action plan for your goals' },
-    { num: '03', title: isAr ? 'التنفيذ والتشغيل' : 'Execution & Launch', desc: isAr ? 'تنفيذ الاستراتيجية بكفاءة' : 'Execute the strategy efficiently' },
-    { num: '04', title: isAr ? 'المتابعة والتحسين المستمر' : 'Monitor & Optimize', desc: isAr ? 'تقييم الأداء وتحسين النتائج' : 'Evaluate performance & improve results' },
-  ];
-
-  const plans = [
-    {
-      name: isAr ? 'باقة الانطلاق' : 'Starter Plan',
-      price: '2,999',
-      period: isAr ? 'ريال / شهر' : 'SAR / month',
-      features: [isAr ? 'إدارة منصتين' : '2 Platform Management', isAr ? 'محتوى شهري' : 'Monthly Content', isAr ? 'تقارير أداء' : 'Performance Reports'],
-      highlight: false,
-    },
-    {
-      name: isAr ? 'باقة النمو' : 'Growth Plan',
-      price: '5,999',
-      period: isAr ? 'ريال / شهر' : 'SAR / month',
-      features: [isAr ? 'إدارة 4 منصات' : '4 Platform Management', isAr ? 'حملات إعلانية' : 'Ad Campaigns', isAr ? 'SEO أساسي' : 'Basic SEO', isAr ? 'تقارير احترافية' : 'Professional Reports'],
-      highlight: true,
-      badge: isAr ? 'الأكثر طلباً' : 'Most Popular',
-    },
-    {
-      name: isAr ? 'باقة الشريك الرقمي' : 'Digital Partner',
-      price: '9,999',
-      period: isAr ? 'ريال / شهر' : 'SAR / month',
-      features: [isAr ? 'إدارة كاملة' : 'Full Management', isAr ? 'محتوى متقدم' : 'Advanced Content', isAr ? 'إعلانات' : 'Ads', isAr ? 'SEO' : 'SEO', isAr ? 'مدير حساب مخصص' : 'Dedicated Account Manager', isAr ? 'لوحة متابعة' : 'Dashboard'],
-      highlight: false,
-    },
-  ];
-
-  const processSteps = [
-    { num: '1', title: isAr ? 'حجز الاستشارة' : 'Book Consultation' },
-    { num: '2', title: isAr ? 'دراسة النشاط' : 'Study Your Business' },
-    { num: '3', title: isAr ? 'إعداد الخطة' : 'Prepare the Plan' },
-    { num: '4', title: isAr ? 'بدء التنفيذ والمتابعة' : 'Execute & Monitor' },
-  ];
-
-  const faqs = [
-    { q: isAr ? 'هل العقود شهرية؟' : 'Are contracts monthly?', a: isAr ? 'نعم، جميع باقاتنا شهرية بدون التزام طويل المدى. يمكنك الإلغاء في أي وقت.' : 'Yes, all our plans are monthly with no long-term commitment. You can cancel anytime.' },
-    { q: isAr ? 'هل يمكن تخصيص الباقات؟' : 'Can plans be customized?', a: isAr ? 'بالتأكيد! نصمم حلولاً مخصصة تناسب احتياجات عملك و ميزانيتك.' : 'Absolutely! We design custom solutions tailored to your business needs and budget.' },
-    { q: isAr ? 'هل تشمل الباقات إدارة الإعلانات؟' : 'Do plans include ad management?', a: isAr ? 'باقة النمو والشريك الرقمي تشمل إدارة الإعلانات. باقة الانطلاق تركز على المحتوى والتنظيم.' : 'Growth and Digital Partner plans include ad management. Starter focuses on content & management.' },
-    { q: isAr ? 'متى تظهر نتائج SEO؟' : 'When do SEO results show?', a: isAr ? 'عادة بين 3 إلى 6 أشهر حسب المنافسة والنشاط. نقدم تقارير شهرية توضح التقدم.' : 'Typically 3 to 6 months depending on competition. We provide monthly progress reports.' },
-    { q: isAr ? 'كيف أتابع الأداء والتقارير؟' : 'How do I track performance?', a: isAr ? 'نوفر تقارير أداء دورية ولوحة متابعة لباقة الشريك الرقمي.' : 'We provide periodic performance reports and a dashboard for Digital Partner plan.' },
-  ];
+  const steps = isAr
+    ? [
+        ["01", "نستمع ونشخّص", "نفهم النشاط والجمهور والهدف والموارد المتاحة."],
+        ["02", "نحدد الأولويات", "نختار الأعمال الأعلى أثراً ونوضح نطاق التنفيذ."],
+        ["03", "ننطلق ونقيس", "ننّفذ، نراقب المؤشرات، ونشاركك ما تحقق بوضوح."],
+      ]
+    : [
+        ["01", "Listen and diagnose", "We understand the business, audience, goals, and resources."],
+        ["02", "Set priorities", "We choose the highest-impact work and define the scope."],
+        ["03", "Launch and measure", "We execute, track the right signals, and report clearly."],
+      ];
+  const faqs = isAr
+    ? [
+        ["هل توجد باقات ثابتة؟", "نحدد النطاق والسعر بعد التشخيص لأن احتياج كل نشاط مختلف. ستحصل على عرض واضح قبل بدء أي عمل."],
+        ["هل ميزانية الإعلانات ضمن أتعاب الإدارة؟", "تُفصل ميزانية المنصات الإعلانية عن أتعاب الإدارة، ويُوضح الاثنان في العرض."],
+        ["هل يمكن البدء بخدمة واحدة؟", "نعم. يمكن البدء بمشروع محدد ثم التوسع بناءً على النتائج والأولوية."],
+        ["كيف تتم متابعة العمل؟", "نحدد مؤشرات الأداء وآلية التواصل والتقارير ضمن نطاق المشروع المتفق عليه."],
+      ]
+    : [
+        ["Do you offer fixed packages?", "Scope and price follow diagnosis because each business is different. You receive a clear proposal before work starts."],
+        ["Is ad spend included?", "Platform spend is separate from management fees, and both are stated in the proposal."],
+        ["Can we start with one service?", "Yes. We can start with a focused project, then expand based on priority and results."],
+        ["How is work tracked?", "KPIs, communication, and reporting are defined in the agreed project scope."],
+      ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pt-20 pb-16">
-
-      {/* ═══════════ HERO ═══════════ */}
-      <section className="relative overflow-hidden py-16 md:py-24">
-        <div className="absolute inset-0">
-          <div className="absolute w-[600px] h-[600px] top-0 right-0 bg-blue-600/5 rounded-full blur-[120px]" />
-          <div className="absolute w-[500px] h-[500px] bottom-0 left-0 bg-purple-600/5 rounded-full blur-[100px]" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-6">
-            <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-purple-300 text-sm">{isAr ? 'خدمات النمو الرقمي' : 'Digital Growth Services'}</span>
+    <main className="min-h-screen bg-[#f7f8fb] text-[#10131a] overflow-hidden">
+      <section className="relative bg-[#080b12] text-white pt-32 pb-20 md:pt-40 md:pb-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(31,120,255,.22),transparent_34%),radial-gradient(circle_at_80%_70%,rgba(107,72,255,.17),transparent_36%)]" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[1.02fr_.98fr] gap-14 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300 mb-7">
+              <Sparkles className="w-4 h-4" />
+              {isAr ? "خدمات النمو الرقمي" : "Digital growth services"}
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-6">
+              {isAr ? "نحوّل التسويق من أعمال متفرقة" : "Turn scattered marketing"}
+              <span className="block bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent mt-2">
+                {isAr ? "إلى خطة نمو واضحة." : "into a clear growth plan."}
+              </span>
+            </h1>
+            <p className="max-w-xl text-lg leading-8 text-gray-300 mb-9">
+              {isAr
+                ? "استراتيجية، حملات، محتوى، متاجر وتحليلات تعمل معاً بحسب احتياج مشروعك—بنطاق واضح ومؤشرات يمكن متابعتها."
+                : "Strategy, campaigns, content, commerce, and analytics working together around your business—with a clear scope and measurable signals."}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-4 font-bold shadow-lg shadow-blue-900/30 hover:bg-blue-500 transition">
+                {isAr ? "اطلب جلسة تشخيص" : "Request a discovery call"}
+                <Arrow className="w-5 h-5" />
+              </Link>
+              <a href="#services" className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[.04] px-7 py-4 font-semibold hover:bg-white/[.08] transition">
+                {isAr ? "استكشف الخدمات" : "Explore services"}
+              </a>
+            </div>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
-            {t.heroTitle}
-          </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t.heroSubtitle}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link to="/contact" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:shadow-xl transition-all">
-              <Phone className="w-5 h-5" /> {t.ctaConsult} <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <button onClick={() => setFormOpen(!formOpen)} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/15 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/5 transition-all">
-              <Briefcase className="w-5 h-5 text-emerald-400" /> {t.ctaQuote}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ 3 PILLARS ═══════════ */}
-      <section className="py-14 border-y border-white/[0.04]">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { icon: <Package className="w-8 h-8" />, title: t.pillar1Title, desc: t.pillar1Desc, color: 'from-blue-500/10 to-blue-600/5 border-blue-500/10 text-blue-400' },
-              { icon: <TrendingUp className="w-8 h-8" />, title: t.pillar2Title, desc: t.pillar2Desc, color: 'from-purple-500/10 to-purple-600/5 border-purple-500/10 text-purple-400' },
-              { icon: <Zap className="w-8 h-8" />, title: t.pillar3Title, desc: t.pillar3Desc, color: 'from-emerald-500/10 to-emerald-600/5 border-emerald-500/10 text-emerald-400' },
-            ].map((p, i) => (
-              <div key={i} className={`bg-gradient-to-b ${p.color} rounded-2xl p-6 border text-center`}>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.03] mb-4">{p.icon}</div>
-                <h3 className="text-white font-bold mb-2">{p.title}</h3>
-                <p className="text-gray-400 text-sm">{p.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ WHO WE SERVE ═══════════ */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">{t.sectorsTitle}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {sectors.map((s, i) => (
-              <div key={i} className={`${s.color} rounded-2xl p-5 border text-center`}>
-                <div className="inline-flex items-center justify-center mb-3">{s.icon}</div>
-                <div className="text-white font-semibold text-sm">{s.title}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ WHY DIGZOOM ═══════════ */}
-      <section className="py-14 bg-gradient-to-b from-[#0a0a0f] to-[#0d0d18]">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">{t.whyTitle}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {whyItems.map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-[#151520] rounded-xl p-4 border border-white/[0.04]">
-                <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                <span className="text-gray-300 text-sm">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ SERVICES ═══════════ */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">{t.servicesTitle}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.map((s, i) => (
-              <div key={i} className="bg-[#151520] rounded-2xl p-6 border border-white/[0.04] hover:border-white/[0.08] transition-all group">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 text-purple-400 mb-4">{s.icon}</div>
-                <h3 className="text-white font-semibold mb-2">{s.title}</h3>
-                <p className="text-gray-400 text-sm">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ HOW WE WORK ═══════════ */}
-      <section className="py-14 border-y border-white/[0.04]">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">{t.howTitle}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {howSteps.map((step, i) => (
-              <div key={i} className="relative text-center">
-                <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-3">{step.num}</div>
-                <h3 className="text-white font-semibold mb-2">{step.title}</h3>
-                <p className="text-gray-400 text-sm">{step.desc}</p>
-                {i < 3 && <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20" />}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ PRICING ═══════════ */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">{t.pricingTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan, i) => (
-              <div key={i} className={`relative rounded-2xl p-8 border ${plan.highlight ? 'border-purple-500/30 bg-gradient-to-b from-purple-500/[0.05] to-transparent' : 'border-white/[0.04] bg-[#151520]'} text-center`}>
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full">{plan.badge}</div>
-                )}
-                <h3 className="text-xl font-bold text-white mb-4">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-black text-white">{plan.price}</span>
-                  <span className="text-gray-400 text-sm block">{plan.period}</span>
+          <div className="relative">
+            <div className="absolute -inset-7 rounded-full bg-blue-500/15 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[.04] p-3 shadow-2xl">
+              <img src="/images/services/growth-team.jpg" alt={isAr ? "فريق عمل يناقش خطة نمو رقمية" : "Team discussing a digital growth plan"} className="aspect-[4/3] w-full rounded-[1.4rem] object-cover" />
+              <div className="absolute inset-x-7 bottom-7 rounded-2xl border border-white/10 bg-black/75 p-5 backdrop-blur-xl">
+                <div className="flex items-center gap-3 text-sm font-semibold">
+                  <CircleCheckBig className="w-5 h-5 text-emerald-400 shrink-0" />
+                  {isAr ? "صورة واقعية، خدمة واضحة، وقرار مبني على احتياجك" : "Real people, clear scope, decisions based on your needs"}
                 </div>
-                <ul className="space-y-3 mb-8 text-right">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2 text-gray-300 text-sm">
-                      <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-gray-200 bg-white py-9">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-3 md:gap-5">
+          <span className="w-full md:w-auto text-center text-sm font-bold text-gray-500">{isAr ? "نخدم" : "Built for"}</span>
+          {sectors.map(({ icon: Icon, ar, en }) => (
+            <div key={en} className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700">
+              <Icon className="w-4 h-4 text-blue-600" /> {isAr ? ar : en}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div className="max-w-3xl mb-12">
+          <p className="text-blue-600 text-sm font-black tracking-widest mb-3">DIGZOOM GROWTH</p>
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-5">{isAr ? "ما الذي يمكننا تنفيذه؟" : "What can we execute?"}</h2>
+          <p className="text-gray-600 text-lg leading-8">{isAr ? "نبدأ بما يحتاجه مشروعك فعلاً، لا بقائمة خدمات جاهزة. اختر المجال وسنحدد النطاق والنتيجة المتوقعة قبل التنفيذ." : "We start with what your business actually needs—not a preset bundle. Choose an area and we will define scope and expected outcomes before execution."}</p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map(({ icon: Icon, title, description, deliverables, image }) => (
+            <article key={title} className="group overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                <img src={image} alt={title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <div className="absolute bottom-4 start-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-lg"><Icon className="w-5 h-5" /></div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-black mb-3">{title}</h3>
+                <p className="text-gray-600 leading-7 mb-5">{description}</p>
+                <ul className="space-y-2">
+                  {deliverables.map(item => <li key={item} className="flex items-center gap-2 text-sm text-gray-700"><Check className="w-4 h-4 text-emerald-600 shrink-0" />{item}</li>)}
                 </ul>
-                <button onClick={() => setFormOpen(true)} className={`w-full py-3 rounded-xl font-bold transition-all ${plan.highlight ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'border border-white/15 text-white hover:bg-white/5'}`}>
-                  {isAr ? 'اختر الباقة' : 'Select Plan'}
-                </button>
               </div>
-            ))}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-[#0b0e15] text-white py-20 md:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-14 items-center">
+          <img src="/images/services/strategy-session.jpg" alt={isAr ? "جلسة تخطيط استراتيجية" : "Strategy planning session"} loading="lazy" className="w-full aspect-[4/3] object-cover rounded-[2rem]" />
+          <div>
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400 mb-6"><Lightbulb className="w-6 h-6" /></div>
+            <h2 className="text-3xl md:text-4xl font-black mb-5">{isAr ? "من التشخيص إلى التنفيذ" : "From diagnosis to delivery"}</h2>
+            <p className="text-gray-400 leading-8 mb-9">{isAr ? "ثلاث مراحل بسيطة تقلل التخمين، وتربط كل عمل بهدف ومقياس واضح." : "Three simple stages reduce guesswork and connect every activity to a clear goal and measure."}</p>
+            <div className="space-y-7">
+              {steps.map(([num, title, description]) => (
+                <div key={num} className="grid grid-cols-[3rem_1fr] gap-4">
+                  <span className="text-blue-400 font-black text-xl">{num}</span>
+                  <div><h3 className="font-bold text-lg mb-1">{title}</h3><p className="text-sm leading-6 text-gray-400">{description}</p></div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════ ECOSYSTEM ═══════════ */}
-      <section className="py-14 bg-gradient-to-b from-[#0d0d18] to-[#0a0a0f]">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">{t.ecosystemTitle}</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-            {isAr ? 'تجمع منظومتنا بين المنتجات الرقمية والخدمات التسويقية وحلول النمو الرقمي في منصة واحدة متكاملة.' : 'Our ecosystem combines digital products, marketing services, and growth solutions in one integrated platform.'}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {['📦 ' + (isAr ? 'المنتجات الرقمية' : 'Digital Products'), '📈 ' + (isAr ? 'الخدمات التسويقية' : 'Marketing Services'), '🚀 ' + (isAr ? 'حلول النمو' : 'Growth Solutions')].map((item, i) => (
-              <div key={i} className="bg-[#151520] rounded-xl px-6 py-3 border border-white/[0.04] text-white font-medium">{item}</div>
-            ))}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div className="grid lg:grid-cols-[.85fr_1.15fr] gap-12">
+          <div>
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-700 mb-6"><BarChart3 className="w-6 h-6" /></div>
+            <h2 className="text-3xl md:text-4xl font-black mb-5">{isAr ? "السعر بعد التشخيص، وليس قبله" : "Pricing follows diagnosis"}</h2>
+            <p className="text-gray-600 leading-8 mb-7">{isAr ? "لا نعرض باقات وهمية أو سعراً واحداً لاحتياجات مختلفة. بعد فهم المشروع، نرسل نطاقاً يتضمن الأعمال والمخرجات والمدة والتكلفة." : "We do not force different needs into a generic package. After discovery, we send a scope covering work, deliverables, timeline, and cost."}</p>
+            <Link to="/contact" className="inline-flex items-center gap-2 font-bold text-blue-700">{isAr ? "اطلب عرضاً واضحاً" : "Request a clear proposal"}<Arrow className="w-4 h-4" /></Link>
+          </div>
+          <div className="rounded-3xl border border-gray-200 bg-white p-7 md:p-9 shadow-sm">
+            <h3 className="text-xl font-black mb-6">{isAr ? "يتضمن العرض قبل الموافقة" : "Your proposal includes"}</h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {(isAr ? ["الهدف والنطاق", "المخرجات المتفق عليها", "المدة ومراحل التسليم", "التكلفة وطريقة الدفع", "المسؤوليات المطلوبة", "آلية القياس والتقارير"] : ["Goal and scope", "Agreed deliverables", "Timeline and milestones", "Cost and payment terms", "Required responsibilities", "Measurement and reporting"]).map(item => (
+                <div key={item} className="flex items-center gap-3 rounded-2xl bg-gray-50 p-4 text-sm font-semibold"><CircleCheckBig className="w-5 h-5 text-emerald-600 shrink-0" />{item}</div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════ PROCESS ═══════════ */}
-      <section className="py-14 border-y border-white/[0.04]">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white text-center mb-10">{t.processTitle}</h2>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {processSteps.map((step, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">{step.num}</div>
-                <span className="text-gray-300 text-sm font-medium">{step.title}</span>
-                {i < 3 && <div className="hidden md:block w-8 h-0.5 bg-white/10" />}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ CTA SECTION ═══════════ */}
-      <section className="py-16">
-        <div className="max-w-lg mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">{isAr ? 'ابدأ نموك الرقمي اليوم' : 'Start Your Digital Growth Today'}</h2>
-          <p className="text-gray-400 mb-8">
-            {isAr ? 'تواصل معنا مباشرة عبر واتساب أو اطلب استشارة مجانية' : 'Contact us directly via WhatsApp or request a free consultation'}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="https://wa.me/966500000000" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-bold transition-all">
-              <MessageCircle className="w-5 h-5" /> {isAr ? 'تحدث معنا عبر واتساب' : 'Chat on WhatsApp'}
-            </a>
-            <Link to="/contact" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold transition-all">
-              <Phone className="w-5 h-5" /> {isAr ? 'اطلب استشارة مجانية' : 'Request Free Consultation'}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ FAQ ═══════════ */}
-      <section className="py-16">
-        <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white text-center mb-10">{t.faqTitle}</h2>
+      <section className="border-y border-gray-200 bg-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10"><h2 className="text-3xl md:text-4xl font-black mb-3">{isAr ? "أسئلة قبل البدء" : "Before we begin"}</h2><p className="text-gray-600">{isAr ? "إجابات مباشرة بلا وعود مبالغ فيها." : "Straight answers without inflated promises."}</p></div>
           <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <div key={i} className="bg-[#151520] rounded-xl border border-white/[0.04] overflow-hidden">
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between p-4 text-right">
-                  <span className="text-white font-medium text-sm">{faq.q}</span>
-                  {openFaq === i ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+            {faqs.map(([question, answer], index) => (
+              <div key={question} className="rounded-2xl border border-gray-200 overflow-hidden">
+                <button type="button" aria-expanded={openFaq === index} onClick={() => setOpenFaq(openFaq === index ? null : index)} className="w-full flex items-center justify-between gap-4 p-5 text-start font-bold">
+                  {question}<ChevronDown className={`w-5 h-5 text-gray-400 transition ${openFaq === index ? "rotate-180" : ""}`} />
                 </button>
-                {openFaq === i && (
-                  <div className="px-4 pb-4 text-gray-400 text-sm leading-relaxed">{faq.a}</div>
-                )}
+                {openFaq === index && <p className="px-5 pb-5 text-gray-600 leading-7">{answer}</p>}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════ STICKY MOBILE CTA ═══════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-3 flex items-center gap-2">
-        <Link to="/contact" className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold text-sm">
-          <Phone className="w-4 h-4" /> {isAr ? 'استشارة مجانية' : 'Free Consultation'}
-        </Link>
-        <a href="https://wa.me/966500000000" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-emerald-600 text-white py-3 px-4 rounded-xl font-bold text-sm">
-          <MessageCircle className="w-4 h-4" />
-        </a>
-      </div>
-
-      {/* Spacer for mobile sticky CTA */}
-      <div className="h-16 md:hidden" />
-    </div>
+      <section className="bg-[#080b12] text-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl md:text-5xl font-black mb-5">{isAr ? "ابدأ بالسؤال الصحيح لمشروعك" : "Start with the right question"}</h2>
+          <p className="text-gray-400 text-lg leading-8 mb-8">{isAr ? "أرسل لنا هدفك والتحدي الحالي. سنناقش ما يستحق التنفيذ وما يمكن تأجيله." : "Tell us your goal and current challenge. We will discuss what is worth doing now and what can wait."}</p>
+          <Link to="/contact" className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 font-black text-[#0b0e15] hover:bg-blue-50 transition">{isAr ? "تواصل مع DigZoom" : "Talk to DigZoom"}<Arrow className="w-5 h-5" /></Link>
+        </div>
+      </section>
+    </main>
   );
 }

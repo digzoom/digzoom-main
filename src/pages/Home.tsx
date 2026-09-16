@@ -2,11 +2,13 @@ import { Link } from "react-router";
 import {
   ArrowLeft,
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Code2,
   FileText,
   Headphones,
   Languages,
+  Megaphone,
   Layers3,
   PackageCheck,
   Palette,
@@ -14,6 +16,7 @@ import {
   ShieldCheck,
   ShoppingCart,
   Sparkles,
+  Store,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCart } from "@/hooks/useCart";
@@ -58,6 +61,11 @@ export default function Home() {
           "تصفح المتجر أو تواصل معنا وسنساعدك في الوصول إلى الخيار المناسب.",
         add: "تمت الإضافة إلى السلة",
         loading: "جاري تجهيز المنتجات…",
+        growthEyebrow: "DIGZOOM GROWTH",
+        growthTitle: "خدمات نمو تكمّل منتجاتك الرقمية",
+        growthSub:
+          "من الاستراتيجية والحملات إلى تطوير المتجر والتحليلات—نحدد ما يحتاجه مشروعك ثم نبني نطاقاً واضحاً للتنفيذ.",
+        growthCta: "استكشف خدمات النمو",
       }
     : {
         eyebrow: "Digital products built for real work",
@@ -81,6 +89,11 @@ export default function Home() {
           "Browse the store or contact us and we will help point you in the right direction.",
         add: "Added to cart",
         loading: "Preparing products…",
+        growthEyebrow: "DIGZOOM GROWTH",
+        growthTitle: "Growth services that complement your digital products",
+        growthSub:
+          "From strategy and campaigns to commerce and analytics—we diagnose what your business needs, then define a clear delivery scope.",
+        growthCta: "Explore growth services",
       };
   const benefits = isAr
     ? [
@@ -126,6 +139,18 @@ export default function Home() {
           title: "Organized catalog",
           text: "Categories and search help you find products faster.",
         },
+      ];
+
+  const growthServices = isAr
+    ? [
+        { icon: Megaphone, title: "استراتيجية وحملات", text: "أهداف وقنوات ورسائل ومؤشرات أداء ضمن خطة قابلة للتنفيذ.", image: "/images/services/strategy-session.jpg" },
+        { icon: Store, title: "تطوير المتجر", text: "واجهة ورحلة شراء وصفحات منتجات أوضح وأكثر إقناعاً.", image: "/images/services/ecommerce-workspace.jpg" },
+        { icon: BarChart3, title: "قياس وتحسين", text: "تحليلات وتقارير تساعدك على اتخاذ قرارات مبنية على بيانات.", image: "/images/services/analytics-dashboard.jpg" },
+      ]
+    : [
+        { icon: Megaphone, title: "Strategy and campaigns", text: "Goals, channels, messages, and KPIs in an executable plan.", image: "/images/services/strategy-session.jpg" },
+        { icon: Store, title: "Store development", text: "A clearer, more persuasive storefront and buying journey.", image: "/images/services/ecommerce-workspace.jpg" },
+        { icon: BarChart3, title: "Measure and improve", text: "Analytics and reporting for better evidence-based decisions.", image: "/images/services/analytics-dashboard.jpg" },
       ];
 
   return (
@@ -288,6 +313,36 @@ export default function Home() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="relative border-y border-white/[.06] bg-[#0d1018] py-20 md:py-24 overflow-hidden">
+        <div className="absolute -top-40 end-0 h-96 w-96 rounded-full bg-blue-600/10 blur-3xl" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+            <div className="max-w-3xl">
+              <p className="text-blue-400 text-sm font-black tracking-widest mb-3">{copy.growthEyebrow}</p>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4">{copy.growthTitle}</h2>
+              <p className="text-gray-400 text-lg leading-8">{copy.growthSub}</p>
+            </div>
+            <Link to="/marketing" className="inline-flex items-center gap-2 text-blue-400 font-bold shrink-0">
+              {copy.growthCta}<Arrow className="w-5 h-5" />
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {growthServices.map(({ icon: Icon, title, text, image }) => (
+              <Link key={title} to="/marketing" className="group overflow-hidden rounded-3xl border border-white/[.08] bg-[#141824] hover:-translate-y-1 hover:border-blue-400/30 transition duration-300">
+                <div className="relative aspect-[16/10] overflow-hidden bg-[#171b25]">
+                  <img src={image} alt={title} loading="lazy" className="h-full w-full object-cover group-hover:scale-105 transition duration-500" />
+                  <div className="absolute bottom-4 start-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-xl"><Icon className="w-5 h-5" /></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-black text-xl mb-2 group-hover:text-blue-400 transition">{title}</h3>
+                  <p className="text-sm leading-6 text-gray-400">{text}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="border-y border-white/[.05] bg-white/[.018] py-20">
