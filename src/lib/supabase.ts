@@ -8,7 +8,6 @@ if (!supabaseUrl || !supabaseKey) {
   console.warn('Supabase URL or Anon Key not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env');
 }
 
-// Disable WebSocket/Realtime to prevent browser hanging
 // detectSessionInUrl=false because we use HashRouter (#/ paths)
 export const supabase = createClient<Database>(
   supabaseUrl || '',
@@ -19,9 +18,6 @@ export const supabase = createClient<Database>(
       persistSession: true,
       detectSessionInUrl: false,
       flowType: 'pkce',
-    },
-    realtime: {
-      enabled: false,
     },
     global: {
       fetch: (input: RequestInfo | URL, init?: RequestInit) =>

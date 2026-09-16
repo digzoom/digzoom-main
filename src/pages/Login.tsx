@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Zap, LogIn, UserPlus, ArrowLeft, Globe, Eye, EyeOff } from 'lucide-react';
+import { Zap, LogIn, UserPlus, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 
