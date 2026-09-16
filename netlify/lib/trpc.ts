@@ -10,7 +10,19 @@ interface TrpcContext {
 
 // NOTE: superjson transformer removed — both client and server use plain JSON.
 // This fixes the batch payload format mismatch.
-const t = initTRPC.context<TrpcContext>().create();
+const t = initTRPC.context<TrpcContext>().create({
+  // Never expose server file paths or stack traces to storefront clients.
+  isDev: false,
+  errorFormatter({ shape }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        stack: undefined,
+      },
+    };
+  },
+});
 
 export const createRouter = t.router;
 export const publicQuery = t.procedure;
