@@ -98,6 +98,13 @@ export const adminRouter = createRouter({
       })
     )
     .mutation(async ({ input }) => {
+      // Fail closed until a verified payment flow is connected. This must be
+      // enabled explicitly on the server; hiding the checkout button alone is
+      // not sufficient because this public mutation can be called directly.
+      if (process.env.CHECKOUT_ENABLED !== "true") {
+        throw new Error("Checkout is temporarily unavailable");
+      }
+
       const orderId = `DZ-${Date.now().toString(36).toUpperCase()}`;
 
       // 1. Insert order

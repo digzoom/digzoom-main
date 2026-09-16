@@ -9,6 +9,10 @@ import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { productTitle } from '@/lib/i18n';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { trpc } from '@/providers/trpc';
+import { toast } from 'sonner';
+
+const CHECKOUT_ENABLED = import.meta.env.VITE_CHECKOUT_ENABLED === 'true';
 
 /* ── Secure payment UI ── */
 const paymentMethods = [
@@ -81,6 +85,15 @@ export default function Checkout() {
   }
 
   const handleCheckout = async () => {
+    if (!CHECKOUT_ENABLED) {
+      toast.info(
+        lang === 'ar'
+          ? 'الدفع الإلكتروني غير متاح مؤقتًا. لن يتم إنشاء أي طلب أو خصم أي مبلغ.'
+          : 'Online payment is temporarily unavailable. No order or charge will be created.'
+      );
+      return;
+    }
+
     const finalName = form.name || user?.name || '';
     const finalEmail = form.email || user?.email || '';
     if (!finalEmail || !finalName) {
@@ -136,8 +149,8 @@ export default function Checkout() {
 
         <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">{t.checkout.title}</h1>
 
-        {/* Trust badges row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-6 md:mb-8">
+        {/* Trust badges row — shown only when the verified checkout is enabled */}
+        {CHECKOUT_ENABLED && <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-6 md:mb-8">
           {trustItems.map((item, i) => (
             <div
               key={i}
@@ -149,7 +162,25 @@ export default function Checkout() {
               </span>
             </div>
           ))}
-        </div>
+        </div>}
+
+        {!CHECKOUT_ENABLED && (
+          <div className="mb-6 md:mb-8 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 md:p-5">
+            <div className="flex items-start gap-3">
+              <Clock className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-300" />
+              <div>
+                <h2 className="font-semibold text-amber-200">
+                  {lang === 'ar' ? 'الدفع الإلكتروني غير متاح مؤقتًا' : 'Online payment is temporarily unavailable'}
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-gray-300">
+                  {lang === 'ar'
+                    ? 'نعمل على ربط بوابة الدفع. لن يتم إنشاء طلب أو خصم أي مبلغ خلال هذه الفترة.'
+                    : 'We are connecting the payment gateway. No order or charge will be created during this time.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Form */}
@@ -208,7 +239,7 @@ export default function Checkout() {
             </div>
 
             {/* Secure Payment Preview */}
-            <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-4 md:p-6">
+            {CHECKOUT_ENABLED && <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-4 md:p-6">
               <h3 className="text-white font-semibold mb-4 flex items-center gap-2 text-sm md:text-base">
                 <span className="w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
                   <Lock className="w-3.5 h-3.5" />
@@ -280,10 +311,10 @@ export default function Checkout() {
                   ? 'بياناتك مشفرة بالكامل. لا نحتفظ بأي معلومات دفع.'
                   : 'Your data is fully encrypted. We never store payment information.'}
               </p>
-            </div>
+            </div>}
 
             {/* Secure note */}
-            <div className="flex items-start gap-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-3 md:p-4">
+            {CHECKOUT_ENABLED && <div className="flex items-start gap-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-3 md:p-4">
               <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-gray-300 text-xs md:text-sm font-medium">
@@ -295,7 +326,7 @@ export default function Checkout() {
                     : 'If you\'re not satisfied, we\'ll refund you in full - no questions asked.'}
                 </p>
               </div>
-            </div>
+            </div>}
           </div>
 
           {/* Summary */}
@@ -342,10 +373,15 @@ export default function Checkout() {
             {/* Pay button (mobile bottom) */}
             <button
               onClick={handleCheckout}
-              disabled={loading}
+              disabled={loading || !CHECKOUT_ENABLED}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 active:scale-[0.98] text-white py-3.5 md:py-4 rounded-xl text-base md:text-lg font-medium transition-all shadow-lg shadow-blue-500/15 flex items-center justify-center gap-2"
             >
-              {loading ? (
+              {!CHECKOUT_ENABLED ? (
+                <>
+                  <Clock className="w-4 h-4" />
+                  {lang === 'ar' ? 'الدفع غير متاح مؤقتًا' : 'Payment temporarily unavailable'}
+                </>
+              ) : loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   {lang === 'ar' ? 'جاري معالجة الطلب...' : 'Processing order...'}
@@ -358,10 +394,12 @@ export default function Checkout() {
               )}
             </button>
 
-            <p className="text-gray-600 text-xs text-center flex items-center justify-center gap-1.5">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              {lang === 'ar' ? 'دفع آمن ومحمي' : 'Secure & Protected Payment'}
-            </p>
+            {CHECKOUT_ENABLED && (
+              <p className="text-gray-600 text-xs text-center flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                {lang === 'ar' ? 'دفع آمن ومحمي' : 'Secure & Protected Payment'}
+              </p>
+            )}
           </div>
         </div>
       </div>
