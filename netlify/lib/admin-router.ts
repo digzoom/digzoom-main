@@ -529,7 +529,8 @@ export const adminRouter = createRouter({
     try {
       const { count } = await s
         .from("products")
-        .select("id", { count: "exact", head: true });
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true);
       productCount = count ?? 0;
     } catch (e: any) {
       console.error("[getStats] products:", e.message);
@@ -581,6 +582,7 @@ export const adminRouter = createRouter({
       const { data } = await s
         .from("products")
         .select("id,title,price,created_at")
+        .eq("is_active", true)
         .order("created_at", { ascending: false })
         .limit(5);
       latestProducts = data ?? [];
