@@ -9,7 +9,9 @@ import {
   ChevronDown,
   CircleCheckBig,
   Lightbulb,
+  Loader2,
   Megaphone,
+  PackageOpen,
   PenTool,
   Search,
   ShoppingBag,
@@ -20,6 +22,8 @@ import {
   Users,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
+import { productDescription, productTitle } from "@/lib/i18n";
 
 type Service = {
   slug: string;
@@ -35,6 +39,10 @@ export default function MarketingServices() {
   const isAr = lang === "ar";
   const Arrow = isAr ? ArrowLeft : ArrowRight;
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const { products, loading: productsLoading } = useSupabaseProducts();
+  const featuredProducts = [...products]
+    .sort((a, b) => Number(b.is_featured) - Number(a.is_featured) || a.id - b.id)
+    .slice(0, 4);
 
   const services: Service[] = isAr
     ? [
@@ -251,6 +259,64 @@ export default function MarketingServices() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
+                <PackageOpen className="h-4 w-4" />
+                {isAr ? "منتجات رقمية عملية" : "Practical digital products"}
+              </div>
+              <h2 className="mb-4 text-3xl font-black tracking-tight md:text-5xl">
+                {isAr ? "أدوات جاهزة تختصر عليك وقت التنفيذ" : "Ready-made tools that save execution time"}
+              </h2>
+              <p className="text-lg leading-8 text-slate-600">
+                {isAr
+                  ? "قوالب ولوحات متابعة قابلة للتعديل تساعدك على التخطيط والقياس والعمل بصورة أوضح. يمكنك استعراض التفاصيل الآن، وسيُفتح الشراء بعد اكتمال بوابة الدفع."
+                  : "Editable templates and tracking dashboards for clearer planning and measurement. Explore the details now; purchasing will open once the payment gateway is ready."}
+              </p>
+            </div>
+            <Link to="/shop" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 font-black text-slate-900 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
+              {isAr ? "عرض جميع المنتجات" : "View all products"}
+              <Arrow className="h-5 w-5" />
+            </Link>
+          </div>
+
+          {productsLoading ? (
+            <div className="flex min-h-48 items-center justify-center rounded-3xl border border-slate-200 bg-slate-50">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredProducts.map((product) => (
+                <Link key={product.id} to={`/product/${product.id}`} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-200">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                    <img src={product.image_url} alt={productTitle(product, lang)} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                    <span className="absolute start-3 top-3 rounded-full border border-white/20 bg-slate-950/85 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
+                      {isAr ? "الشراء يفتح قريباً" : "Purchasing soon"}
+                    </span>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="mb-2 line-clamp-2 text-lg font-black text-slate-950">{productTitle(product, lang)}</h3>
+                    <p className="mb-5 line-clamp-2 min-h-12 text-sm leading-6 text-slate-600">{productDescription(product, lang)}</p>
+                    <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                      <span className="text-lg font-black text-blue-700">{product.price} {isAr ? "ر.س" : "SAR"}</span>
+                      <span className="inline-flex items-center gap-1 text-sm font-black text-slate-700 group-hover:text-blue-700">
+                        {isAr ? "التفاصيل" : "Details"}<Arrow className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center text-slate-600">
+              {isAr ? "سيتم عرض المنتجات الرقمية هنا عند نشرها من لوحة التحكم." : "Digital products will appear here when published from the admin dashboard."}
+            </div>
+          )}
         </div>
       </section>
 
