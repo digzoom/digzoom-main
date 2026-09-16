@@ -23,42 +23,42 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['شراء', 'اشتري', 'أشتري', 'شرى', 'اشتر', 'طلب', 'اطلب', 'أطلب', 'تسوق', 'أشتري', 'آخذ', 'أخذ'],
-      response: 'عملية الشراء سهلة جداً! 📦\n\n1. تصفح المتجر واختر المنتج اللي يعجبك\n2. اضغط "أضف للسلة" 🛒\n3. اذهب لصفحة الدفع واملأ بياناتك\n4. ادفع بأي طريقة تناسبك\n5. تحصل على رابط التحميل فوراً بعد الدفع ✅',
+      response: 'يمكنك الآن تصفح المنتجات وفتح صفحة كل منتج للاطلاع على الصور والمزايا. 🛍️\n\nالدفع والشراء مقفلان مؤقتاً إلى أن تكتمل بوابة الدفع والتسليم الآمن. لن يطلب منك الموقع دفع أي مبلغ حالياً، وسنحدّث هذه الرسالة عند الإطلاق.',
       suggestions: ['طرق الدفع', 'كيف أحمل المنتج؟', 'المنتجات المتوفرة']
     },
     {
       keywords: ['دفع', 'الدفع', 'فيزا', 'ماستر', 'مدى', 'بطاقة', 'أبل باي', 'جوجل باي', 'سترايب', 'حوالة', 'تحويل'],
-      response: 'نقبل جميع طرق الدفع الشائعة 💳:\n\n• Visa / Mastercard\n• Apple Pay 🍎\n• Google Pay 🤖\n• مدى (Mada)\n• Stripe\n\nكل المعاملات مشفرة وآمنة 100% 🔒',
+      response: 'بوابة الدفع قيد التجهيز حالياً، لذلك لا نقبل مدفوعات من الموقع في هذه المرحلة. 🔒\n\nلن نعرض وسيلة دفع قبل ربطها واختبارها رسمياً. للاستفسار تواصل معنا على info@digzoom.com.',
       suggestions: ['الأسعار', 'كيف أشتري؟', 'ضمان الاسترجاع']
     },
     {
       keywords: ['تحميل', 'احمل', 'أحمل', 'الملف', 'الملفات', 'ينزل', 'نزل', 'تنزيل', '_DOWNLOAD_', 'download', 'فتح', 'وصل'],
-      response: 'بعد إتمام الشراء مباشرة: 📥\n\n1. اذهب لصفحة "طلباتي" في حسابك\n2. اضغط على المنتج اللي اشتريته\n3. اضغط "تحميل" واحفظ الملف\n\n⚡ المنتجات رقمية 100% - التحميل فوري بعد الدفع!\n📧 كمان نرسل لك رابط التحميل على بريدك الإلكتروني.',
+      response: 'ملفات المنتجات محفوظة بشكل خاص، وسيُفعّل رابط التنزيل الآمن بعد تشغيل الدفع والتحقق من الطلب. 📥\n\nالتنزيل غير متاح قبل إتمام ربط بوابة الدفع، ولا توجد روابط ملفات عامة.',
       suggestions: ['مشكلة في التحميل', 'كيف أشتري؟', 'تواصل مع الدعم']
     },
     {
       keywords: ['استرجاع', 'رجع', 'استرداد', 'فلوس', 'للأسف', 'ما عجبني', 'رد', 'المنتج ما يشتغل', 'عطلان', 'مكسور', 'ما يفتح'],
-      response: 'لا تقلق! 😊 عندك ضمان استرجاع كامل لمدة 30 يوم 📅\n\nإذا واجهتك أي مشكلة أو ما كنت راضي عن المنتج:\n\n1. تواصل معنا من صفحة "اتصل بنا"\n2. أو راسلنا على واتساب 📱\n\nنرجع لك فلوسك كاملة بدون أي أسئلة! 💰',
+      response: 'إذا واجهتك مشكلة بعد الإطلاق، تواصل معنا من صفحة "اتصل بنا" أو عبر info@digzoom.com. تُراجع طلبات الاسترجاع وفق سياسة الاسترجاع المنشورة وشروط المنتجات الرقمية.',
       suggestions: ['تواصل مع الدعم', 'سياسة الاسترجاع', 'المنتج ما يشتغل']
     },
     {
       keywords: ['منتج', 'منتجات', 'كتب', 'قوالب', 'فيديو', 'صور', 'خطوط', 'كورسات', 'تصاميم', 'PLR', 'مكتبة', 'عندكم'],
-      response: 'عندنا أكثر من 150 منتج رقمي متنوع 🎨:\n\n📚 كتب إلكترونية (21+)\n📋 قوالب جاهزة (21+)\n🎬 فيديوهات وكورسات\n🎵 صوتيات ومؤثرات\n💻 أكواد ومواقع\n📷 صور احترافية\n🎨 خطوط عربية\n🎲 نماذج 3D\n🖼️ تصاميم جرافيك (26+)\n\nتصفح المتجر واكتشف بنفسك! 🔥',
+      response: 'المتجر يعرض حالياً 10 قوالب Excel احترافية أصلية تشمل المحاسبة والمبيعات والمخزون والميزانيات وإدارة المشاريع. 📊\n\nكل منتج يتضمن بيانات نموذجية وصيغاً ولوحة معلومات وتعليمات بالعربية والإنجليزية.',
       suggestions: ['المنتجات الأكثر مبيعاً', 'كيف أشتري؟', 'الاشتراكات']
     },
     {
       keywords: ['سعر', 'أسعار', 'السعر', 'بكم', 'كام', 'رخيص', 'غالي', 'تكلفة', 'درهم', 'دولار', 'ريال', 'خصم', 'عرض', 'تخفيض'],
-      response: 'أسعارنا تبدأ من 29 ر.س فقط! 💰\n\n📌 كل المنتجات بخصم 50% دائم\n📌 اشتر مرة واستفيد مدى الحياة\n📌 تحديثات مجانية\n\n🎁 اشتراكات شهرية تبدأ من 49 ر.س/شهر\n(تحميلات غير محدودة!)',
+      response: 'تظهر الأسعار الحالية في صفحة كل منتج بالريال السعودي. لا توجد خصومات دائمة أو اشتراكات مفعّلة حالياً، والدفع مقفل إلى حين اكتمال التجهيز.',
       suggestions: ['الاشتراكات', 'كيف أشتري؟', 'طرق الدفع']
     },
     {
       keywords: ['اشتراك', 'اشتراكات', 'شهري', 'سنوي', 'باقة', 'خطة', 'Subscribe', 'subscription', 'pro', 'أعمال', 'أساسي'],
-      response: 'عندنا 3 خطط اشتراك ممتازة 📦:\n\n⭐ أساسي - 49 ر.س/شهر\n(10 تحميلات، دعم أساسي)\n\n🔥 احترافي - 99 ر.س/شهر\n(تحميلات غير محدودة + ترخيص تجاري)\n\n🏢 أعمال - 199 ر.س/شهر\n(5 أعضاء فريق + API + مدير حساب)\n\nوفر 20% بالاشتراك السنوي!',
+      response: 'لا توجد خطط اشتراك متاحة حالياً. المتجر يجهّز بيع المنتجات الفردية أولاً، ولن نعلن أي اشتراك قبل تفعيله واختباره رسمياً.',
       suggestions: ['كيف أشترك؟', 'المنتجات المتوفرة', 'طرق الدفع']
     },
     {
       keywords: ['دعم', 'مساعدة', 'مساعدتي', 'مشكلة', 'مشكلتي', 'مساعدة', 'ساعدني', 'ساعد', 'فزعة', 'مساعده', 'تواصل', 'واتس', 'واتساب', 'اتصال', 'كلم', 'رقم', 'تلفون', 'جوال', 'هاتف', 'whatsapp', 'اتصل', 'شكوى', 'ابلاغ'],
-      response: 'فريق الدعم جاهز يساعدك! 🛎️\n\n📱 واتساب: 00966569888456\n📧 بريد: info@digzoom.com\n💬 أو ابقى معي هنا في الدردشة!\n\nمتاحين 24/7 على مدار الساعة 🕐',
+      response: 'فريق الدعم جاهز يساعدك! 🛎️\n\n📱 واتساب: 00966569888456\n📧 بريد: info@digzoom.com\n💬 أو ابقى معي هنا في الدردشة.\n\nنرد عادة خلال 24 ساعة عمل.',
       suggestions: ['مشكلة في التحميل', 'المنتج ما يشتغل', 'طلب استرجاع']
     },
     {
@@ -90,42 +90,42 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['buy', 'purchase', 'order', 'shop', 'get', 'how to buy', 'checkout', 'cart', 'add to cart'],
-      response: 'Buying is super easy! 📦\n\n1. Browse the shop and pick a product\n2. Click "Add to Cart" 🛒\n3. Go to checkout and fill your details\n4. Pay with any method you prefer\n5. Get instant download link after payment ✅',
+      response: 'You can browse the catalog and open each product page to review its previews and features. 🛍️\n\nCheckout is temporarily locked while payment and secure delivery are being finalized. The site will not ask you to pay at this stage.',
       suggestions: ['Payment methods', 'How to download?', 'Available products']
     },
     {
       keywords: ['pay', 'payment', 'visa', 'mastercard', 'mada', 'card', 'apple pay', 'google pay', 'stripe', 'credit card'],
-      response: 'We accept all major payment methods 💳:\n\n• Visa / Mastercard\n• Apple Pay 🍎\n• Google Pay 🤖\n• Mada (Saudi Arabia)\n• Stripe\n\nAll transactions are encrypted and 100% secure 🔒',
+      response: 'The payment gateway is still being configured, so the website is not accepting payments yet. 🔒\n\nNo payment method will be advertised before it is officially connected and tested. Contact info@digzoom.com for questions.',
       suggestions: ['Pricing', 'How to buy?', 'Refund policy']
     },
     {
       keywords: ['download', 'get file', 'files', 'extract', 'save', 'link'],
-      response: 'After completing your purchase: 📥\n\n1. Go to "My Orders" in your account\n2. Click on the product you bought\n3. Hit "Download" and save the file\n\n⚡ All products are 100% digital - instant download!\n📧 We also email you the download link.',
+      response: 'Product files are stored privately. Secure download links will be enabled only after payment integration and order verification are complete. 📥\n\nThere are no public file links.',
       suggestions: ['Download issue', 'How to buy?', 'Contact support']
     },
     {
       keywords: ['refund', 'return', 'money back', 'not working', 'broken', 'issue', 'problem', 'doesn\'t work'],
-      response: 'No worries! 😊 We have a 30-day money-back guarantee 📅\n\nIf you face any issue or aren\'t satisfied:\n\n1. Contact us via "Contact Us" page\n2. Or message us on WhatsApp 📱\n\nWe\'ll refund you 100% - no questions asked! 💰',
+      response: 'If you encounter an issue after launch, contact us through the Contact page or at info@digzoom.com. Refund requests are reviewed under the published refund policy and its terms for digital products.',
       suggestions: ['Contact support', 'Refund policy', 'Download issue']
     },
     {
       keywords: ['products', 'product', 'books', 'templates', 'videos', 'images', 'fonts', 'courses', 'designs', 'plr', 'library', 'what do you have'],
-      response: 'We have 150+ digital products 🎨:\n\n📚 E-Books (21+)\n📋 Templates (21+)\n🎬 Videos & Courses\n🎵 Audio & Sound Effects\n💻 Code & Web Assets\n📷 Professional Photos\n🎨 Arabic Fonts\n🎲 3D Models\n🖼️ Graphics (26+)\n\nBrowse the shop and discover more! 🔥',
+      response: 'The store currently features 10 original professional Excel templates covering accounting, sales, inventory, budgeting, and project management. 📊\n\nEach includes sample data, formulas, a dashboard, and Arabic/English instructions.',
       suggestions: ['Best sellers', 'How to buy?', 'Subscriptions']
     },
     {
       keywords: ['price', 'prices', 'cost', 'how much', 'cheap', 'expensive', 'discount', 'offer', 'sale', 'deal', 'promo'],
-      response: 'Prices start from just 29 SAR! 💰\n\n📌 All products have 50% permanent discount\n📌 Buy once, keep forever\n📌 Free updates included\n\n🎁 Monthly subscriptions from 49 SAR/month\n(Unlimited downloads!)',
+      response: 'Current prices are shown on each product page in SAR. There are no permanent discounts or active subscriptions, and checkout remains locked until setup is complete.',
       suggestions: ['Subscriptions', 'How to buy?', 'Payment methods']
     },
     {
       keywords: ['subscription', 'subscribe', 'monthly', 'yearly', 'plan', 'pro', 'business', 'basic'],
-      response: 'We have 3 subscription plans 📦:\n\n⭐ Basic - 49 SAR/month\n(10 downloads, basic support)\n\n🔥 Pro - 99 SAR/month\n(Unlimited downloads + commercial license)\n\n🏢 Business - 199 SAR/month\n(5 team members + API + account manager)\n\nSave 20% with yearly billing!',
+      response: 'No subscription plans are available at this time. The store is preparing individual product sales first, and no subscription will be announced before it is live and tested.',
       suggestions: ['How to subscribe?', 'Available products', 'Payment methods']
     },
     {
       keywords: ['support', 'help', 'assist', 'contact', 'whatsapp', 'phone', 'call', 'number', 'reach', 'complaint', 'report', 'customer service'],
-      response: 'Our support team is ready to help! 🛎️\n\n📱 WhatsApp: 00966569888456\n📧 Email: info@digzoom.com\n💬 Or chat with me right here!\n\nAvailable 24/7 around the clock 🕐',
+      response: 'Our support team is ready to help! 🛎️\n\n📱 WhatsApp: 00966569888456\n📧 Email: info@digzoom.com\n💬 Or chat with me right here.\n\nWe usually respond within one business day.',
       suggestions: ['Download issue', 'Product not working', 'Refund request']
     },
     {
@@ -152,8 +152,8 @@ const botResponses: Record<string, ChatResponse[]> = {
 };
 
 const defaultResponses: Record<string, string> = {
-  ar: 'أنا آسف، ما فهمت سؤالك بالضبط 🤔\n\nتقدر تسأل عن:\n• كيفية الشراء 💳\n• طريقة التحميل 📥\n• طرق الدفع 💰\n• الاشتراكات 📦\n• المنتجات المتوفرة 📚\n\nأو تواصل معنا مباشرة 📱 00966569888456',
-  en: 'I\'m sorry, I didn\'t quite understand 🤔\n\nYou can ask about:\n• How to buy 💳\n• Download process 📥\n• Payment methods 💰\n• Subscriptions 📦\n• Available products 📚\n\nOr contact us directly 📱 00966569888456',
+  ar: 'أنا آسف، ما فهمت سؤالك بالضبط 🤔\n\nتقدر تسأل عن:\n• المنتجات المتوفرة 📚\n• حالة الدفع 💳\n• التسليم الآمن 📥\n• التواصل مع الدعم 🛎️\n\nأو تواصل معنا مباشرة 📱 00966569888456',
+  en: 'I\'m sorry, I didn\'t quite understand 🤔\n\nYou can ask about:\n• Available products 📚\n• Payment status 💳\n• Secure delivery 📥\n• Contacting support 🛎️\n\nOr contact us directly 📱 00966569888456',
 };
 
 export function useChat(lang: 'ar' | 'en' = 'ar') {
