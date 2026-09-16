@@ -28,6 +28,7 @@ const DeliveryPolicy = lazy(() => import('./pages/DeliveryPolicy'));
 const AcceptableUsePolicy = lazy(() => import('./pages/AcceptableUsePolicy'));
 const CompanyInformation = lazy(() => import('./pages/CompanyInformation'));
 const MarketingServices = lazy(() => import('./pages/MarketingServices'));
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
 const TrustSecurity = lazy(() => import('./pages/TrustSecurity'));
 
 /* Placeholder pages for user dropdown links */
@@ -65,7 +66,8 @@ export default function App() {
             {!isAdminRoute && <Navbar />}
             <Suspense fallback={<div className="min-h-screen bg-[#08090d] flex items-center justify-center text-gray-500">Loading…</div>}>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<MarketingServices />} />
+              <Route path="/store" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Login />} />
               <Route path="/about" element={<About />} />
@@ -86,6 +88,7 @@ export default function App() {
               <Route path="/company" element={<CompanyInformation />} />
               <Route path="/trust-security" element={<TrustSecurity />} />
               <Route path="/marketing" element={<MarketingServices />} />
+              <Route path="/services/:slug" element={<ServiceDetail />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="*" element={<NotFound />} />
