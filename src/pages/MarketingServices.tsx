@@ -215,7 +215,7 @@ export default function MarketingServices() {
               <div className="absolute inset-x-7 bottom-7 rounded-2xl border border-white/10 bg-black/75 p-5 backdrop-blur-xl">
                 <div className="flex items-center gap-3 text-sm font-semibold">
                   <CircleCheckBig className="w-5 h-5 text-emerald-400 shrink-0" />
-                  {isAr ? "صورة واقعية، خدمة واضحة، وقرار مبني على احتياجك" : "Real people, clear scope, decisions based on your needs"}
+                  {isAr ? "نفهم مشروعك أولاً، ثم نبني خطة تناسب أهدافك وميزانيتك" : "We understand your business first, then build a plan around your goals and budget"}
                 </div>
               </div>
             </div>
