@@ -322,7 +322,7 @@ export const adminRouter = createRouter({
       let query = admin()
         .from("products")
         .select(
-          "id,title,price,original_price,discount_percent,is_on_sale,image_url,in_stock,is_active,category_id,created_at,updated_at,description"
+          "id,slug,title,title_ar,title_en,description,description_ar,description_en,long_description,long_description_ar,long_description_en,price,original_price,discount_percent,is_on_sale,image_url,in_stock,stock_quantity,is_active,is_featured,is_trending,category_id,product_type,delivery_type,file_type,file_size,features,storage_path,created_at,updated_at"
         )
         .order("id", { ascending: false })
         .limit(input?.limit ?? 100);
@@ -341,15 +341,31 @@ export const adminRouter = createRouter({
     .input(
       z.object({
         title: z.string().min(1),
+        title_ar: z.string().optional(),
+        title_en: z.string().optional(),
         description: z.string().optional(),
+        description_ar: z.string().optional(),
+        description_en: z.string().optional(),
+        long_description: z.string().optional(),
+        long_description_ar: z.string().optional(),
+        long_description_en: z.string().optional(),
+        slug: z.string().min(1).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
         price: z.number().min(0),
         original_price: z.number().optional(),
         discount_percent: z.number().min(0).max(100).optional(),
         is_on_sale: z.boolean().optional(),
         image_url: z.string().optional(),
         category_id: z.number().default(1),
+        product_type: z.enum(["digital_download", "code_delivery", "subscription_account", "smm_service", "manual_service"]).default("digital_download"),
+        delivery_type: z.enum(["instant_download", "auto_code", "account_credentials", "api_webhook", "manual_delivery"]).default("instant_download"),
+        file_type: z.string().max(20).optional(),
+        file_size: z.string().max(40).optional(),
+        features: z.array(z.string().min(1).max(160)).max(30).default([]),
+        stock_quantity: z.number().int().min(0).nullable().optional(),
         in_stock: z.boolean().default(true),
         is_active: z.boolean().default(true),
+        is_featured: z.boolean().default(false),
+        is_trending: z.boolean().default(false),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -366,19 +382,31 @@ export const adminRouter = createRouter({
         .from("products")
         .insert({
           title: input.title,
+          title_ar: input.title_ar || input.title,
+          title_en: input.title_en || input.title,
           description: input.description ?? "",
+          description_ar: input.description_ar || input.description || "",
+          description_en: input.description_en || input.description || "",
+          long_description: input.long_description || input.long_description_ar || "",
+          long_description_ar: input.long_description_ar || input.long_description || "",
+          long_description_en: input.long_description_en || input.long_description || "",
           price: input.price,
           original_price: input.original_price ?? input.price,
           discount_percent: input.discount_percent ?? 0,
           is_on_sale: input.is_on_sale ?? false,
           image_url: imageUrl,
           category_id: input.category_id,
+          product_type: input.product_type,
+          delivery_type: input.delivery_type,
+          file_type: input.file_type || "XLSX",
+          file_size: input.file_size || "",
+          features: input.features,
+          stock_quantity: input.stock_quantity ?? null,
           in_stock: input.in_stock,
           is_active: input.is_active,
-          slug: "p-" + Date.now(),
-          features: [],
-          file_type: "ZIP",
-          file_size: "10 MB",
+          is_featured: input.is_featured,
+          is_trending: input.is_trending,
+          slug: input.slug,
           rating: 5,
           reviews_count: 0,
           added_by: user?.id,
@@ -407,16 +435,32 @@ export const adminRouter = createRouter({
     .input(
       z.object({
         id: z.number(),
+        slug: z.string().min(1).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
         title: z.string().optional(),
+        title_ar: z.string().optional(),
+        title_en: z.string().optional(),
         description: z.string().optional(),
+        description_ar: z.string().optional(),
+        description_en: z.string().optional(),
+        long_description: z.string().optional(),
+        long_description_ar: z.string().optional(),
+        long_description_en: z.string().optional(),
         price: z.number().optional(),
         original_price: z.number().optional(),
         discount_percent: z.number().min(0).max(100).optional(),
         is_on_sale: z.boolean().optional(),
         image_url: z.string().optional(),
         category_id: z.number().optional(),
+        product_type: z.enum(["digital_download", "code_delivery", "subscription_account", "smm_service", "manual_service"]).optional(),
+        delivery_type: z.enum(["instant_download", "auto_code", "account_credentials", "api_webhook", "manual_delivery"]).optional(),
+        file_type: z.string().max(20).optional(),
+        file_size: z.string().max(40).optional(),
+        features: z.array(z.string().min(1).max(160)).max(30).optional(),
+        stock_quantity: z.number().int().min(0).nullable().optional(),
         in_stock: z.boolean().optional(),
         is_active: z.boolean().optional(),
+        is_featured: z.boolean().optional(),
+        is_trending: z.boolean().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -670,21 +714,29 @@ export const adminRouter = createRouter({
       product_id: z.number().int().positive(),
       filename: z.string().min(1).max(160),
       base64: z.string().min(1),
+      content_type: z.string().min(1).max(120),
     }))
     .mutation(async ({ input }) => {
       const buffer = Buffer.from(input.base64, "base64");
       if (buffer.length === 0 || buffer.length > 10 * 1024 * 1024) {
         throw new Error("Product file must be between 1 byte and 10 MB");
       }
-      if (!input.filename.toLowerCase().endsWith(".xlsx")) {
-        throw new Error("Only XLSX product files are allowed");
+      const extension = input.filename.toLowerCase().split('.').pop() || '';
+      const allowedTypes: Record<string, string> = {
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        pdf: 'application/pdf',
+        zip: 'application/zip',
+      };
+      if (!allowedTypes[extension]) throw new Error("Only XLSX, PDF, and ZIP product files are allowed");
+      if (input.content_type !== allowedTypes[extension] && !(extension === 'zip' && input.content_type === 'application/x-zip-compressed')) {
+        throw new Error("File type does not match its extension");
       }
       const safeName = input.filename.replace(/[^a-zA-Z0-9._-]/g, "-");
-      const storagePath = `${input.product_id}/${safeName}`;
+      const storagePath = `${input.product_id}/${Date.now()}-${safeName}`;
       const { error: uploadError } = await admin().storage
         .from("digital-products")
         .upload(storagePath, buffer, {
-          contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          contentType: allowedTypes[extension],
           cacheControl: "3600",
           upsert: true,
         });
@@ -695,7 +747,7 @@ export const adminRouter = createRouter({
         .update({
           storage_path: storagePath,
           download_url: null,
-          file_type: "XLSX",
+          file_type: extension.toUpperCase(),
           file_size: `${Math.max(1, Math.ceil(buffer.length / 1024))} KB`,
           updated_at: new Date().toISOString(),
         })
