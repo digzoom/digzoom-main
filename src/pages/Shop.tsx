@@ -10,13 +10,15 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
+  Languages,
+  Headphones,
 } from "lucide-react";
 import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/hooks/useCart";
 import { useLanguage } from "@/hooks/useLanguage";
 import { productTitle, productDescription } from "@/lib/i18n";
 import { toast } from "sonner";
-import AnimatedBackground from "@/components/AnimatedBackground";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -154,24 +156,21 @@ export default function Shop() {
   // Loading state
   if (loading) {
     return (
-      <AnimatedBackground>
-        <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+      <main className="min-h-screen bg-[#08090d] pt-24 pb-16 flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="w-10 h-10 text-blue-400 animate-spin mx-auto mb-4" />
             <p className="text-gray-400">
               {lang === "ar" ? "جاري تحميل المنتجات..." : "Loading products..."}
             </p>
           </div>
-        </div>
-      </AnimatedBackground>
+      </main>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <AnimatedBackground>
-        <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+      <main className="min-h-screen bg-[#08090d] pt-24 pb-16 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto">
             <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
               <PackageOpen className="w-8 h-8 text-red-400" />
@@ -187,38 +186,51 @@ export default function Shop() {
               {lang === "ar" ? "إعادة المحاولة" : "Retry"}
             </button>
           </div>
-        </div>
-      </AnimatedBackground>
+      </main>
     );
   }
 
   return (
-    <AnimatedBackground>
-      <div className="min-h-screen pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+    <main className="min-h-screen bg-[#f6f7fb] text-slate-950">
+      <section className="relative overflow-hidden bg-[#08090d] px-4 pb-20 pt-32 text-white sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_15%,rgba(91,82,255,.2),transparent_34%),radial-gradient(circle_at_18%_70%,rgba(0,163,255,.12),transparent_30%)]" />
+        <div className="relative mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+            <span className="mb-5 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
+              {lang === "ar" ? "متجر DigZoom الرقمي" : "DigZoom digital store"}
+            </span>
+            <h1 className="mb-4 text-4xl font-black sm:text-5xl">
               {t.shop.title}
             </h1>
-            <p className="text-gray-400">{t.shop.subtitle}</p>
+            <p className="max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">{t.shop.subtitle}</p>
+            <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300">
+              <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2"><ShieldCheck className="h-4 w-4 text-emerald-400" />{lang === "ar" ? "تفاصيل واضحة" : "Clear details"}</span>
+              <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2"><Languages className="h-4 w-4 text-blue-400" />{lang === "ar" ? "عربي وإنجليزي" : "Arabic & English"}</span>
+              <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2"><Headphones className="h-4 w-4 text-purple-400" />{lang === "ar" ? "دعم مباشر" : "Direct support"}</span>
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section className="relative -mt-8 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Search + Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          {products.length > 0 && <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/5 mb-8 flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search
-                className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 ${lang === "ar" ? "right-4" : "left-4"}`}
+                className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 ${lang === "ar" ? "right-4" : "left-4"}`}
               />
               <input
                 value={search}
                 onChange={e => handleSearch(e.target.value)}
                 placeholder={t.shop.searchPlaceholder}
-                className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-xl py-3 text-white text-sm focus:outline-none focus:border-blue-500/40 transition-colors placeholder:text-gray-600 ${lang === "ar" ? "pr-11 pl-4" : "pl-11 pr-4"}`}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl py-3 text-slate-950 text-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition placeholder:text-slate-400 ${lang === "ar" ? "pr-11 pl-4" : "pl-11 pr-4"}`}
               />
               {search && (
                 <button
                   onClick={() => handleSearch("")}
-                  className={`absolute top-1/2 -translate-y-1/2 text-gray-500 hover:text-white ${lang === "ar" ? "left-4" : "right-4"}`}
+                  className={`absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-950 ${lang === "ar" ? "left-4" : "right-4"}`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -228,7 +240,7 @@ export default function Shop() {
               <select
                 value={sort}
                 onChange={e => setSort(e.target.value)}
-                className="bg-white/[0.03] border border-white/[0.06] text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500/40"
+                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
               >
                 {sortOptions.map(o => (
                   <option key={o.value} value={o.value}>
@@ -236,28 +248,28 @@ export default function Shop() {
                   </option>
                 ))}
               </select>
-              <div className="hidden sm:flex bg-white/[0.03] border border-white/[0.06] rounded-xl p-1">
+              <div className="hidden sm:flex bg-slate-50 border border-slate-200 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-blue-500/20 text-blue-400" : "text-gray-500 hover:text-white"}`}
+                  className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-900"}`}
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-blue-500/20 text-blue-400" : "text-gray-500 hover:text-white"}`}
+                  className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-900"}`}
                 >
                   <List className="w-4 h-4" />
                 </button>
               </div>
             </div>
-          </div>
+          </div>}
 
           {/* Categories */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          {products.length > 0 && <div className="flex flex-wrap gap-2 mb-6">
             <button
               onClick={() => handleCat("all")}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeCat === "all" ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "bg-white/[0.03] text-gray-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"}`}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeCat === "all" ? "bg-slate-950 text-white shadow-lg" : "bg-white text-slate-600 hover:text-slate-950 border border-slate-200"}`}
             >
               {t.shop.showAll}
             </button>
@@ -267,17 +279,17 @@ export default function Shop() {
                 onClick={() => handleCat(cat.slug)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   activeCat === cat.slug
-                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                    : "bg-white/[0.03] text-gray-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
+                    ? "bg-slate-950 text-white shadow-lg"
+                    : "bg-white text-slate-600 hover:text-slate-950 border border-slate-200"
                 }`}
               >
                 {lang === "ar" ? cat.name_ar : cat.name_en}
               </button>
             ))}
-          </div>
+          </div>}
 
-          <div className="flex items-center gap-3 mb-6">
-            <p className="text-gray-600 text-sm">
+          {products.length > 0 && <div className="flex items-center gap-3 mb-6">
+            <p className="text-slate-500 text-sm">
               {filtered.length} {t.shop.products}
             </p>
             {search.trim() && (
@@ -288,7 +300,7 @@ export default function Shop() {
                   : `Search results for: "${search}"`}
               </span>
             )}
-          </div>
+          </div>}
 
           {/* Grid View */}
           {viewMode === "grid" && filtered.length > 0 && (
@@ -296,7 +308,7 @@ export default function Shop() {
               {visibleProducts.map(p => (
                 <div
                   key={p.id}
-                  className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/5"
+                  className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:border-blue-300 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/10"
                 >
                   <Link to={`/product/${p.id}`} className="block relative">
                     <div className="aspect-[3/4] overflow-hidden">
@@ -315,16 +327,16 @@ export default function Shop() {
                   </Link>
                   <div className="p-5">
                     <Link to={`/product/${p.id}`}>
-                      <h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors text-sm leading-relaxed">
+                      <h3 className="text-slate-950 font-semibold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors text-sm leading-relaxed">
                         {getTitle(p)}
                       </h3>
                     </Link>
-                    <p className="text-gray-500 text-xs mb-3 line-clamp-2">
+                    <p className="text-slate-500 text-xs mb-3 line-clamp-2">
                       {getDesc(p)}
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-white">
+                        <span className="text-lg font-bold text-slate-950">
                           {p.price} {t.featured.currency}
                         </span>
                         {p.original_price && (
@@ -352,7 +364,7 @@ export default function Shop() {
               {visibleProducts.map(p => (
                 <div
                   key={p.id}
-                  className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all flex flex-col sm:flex-row"
+                  className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:border-blue-300 hover:shadow-xl hover:shadow-slate-900/5 transition-all flex flex-col sm:flex-row"
                 >
                   <Link
                     to={`/product/${p.id}`}
@@ -375,17 +387,17 @@ export default function Shop() {
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
                       <Link to={`/product/${p.id}`}>
-                        <h3 className="text-white font-semibold mb-2 text-lg group-hover:text-blue-400 transition-colors">
+                        <h3 className="text-slate-950 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors">
                           {getTitle(p)}
                         </h3>
                       </Link>
-                      <p className="text-gray-400 text-sm mb-3 line-clamp-2">
+                      <p className="text-slate-500 text-sm mb-3 line-clamp-2">
                         {getDesc(p)}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl font-bold text-white">
+                        <span className="text-2xl font-bold text-slate-950">
                           {p.price} {t.featured.currency}
                         </span>
                         {p.original_price && (
@@ -410,20 +422,20 @@ export default function Shop() {
 
           {/* Empty State */}
           {filtered.length === 0 && (
-            <div className="text-center py-16 md:py-20">
+            <div className="rounded-[2rem] border border-slate-200 bg-white px-6 py-16 text-center shadow-xl shadow-slate-900/5 md:py-20">
               <div className="relative mb-8 inline-block">
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-[#151520] border border-white/[0.06] flex items-center justify-center mx-auto">
-                  <PackageOpen className="w-12 h-12 md:w-14 md:h-14 text-gray-600" />
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 flex items-center justify-center mx-auto">
+                  <PackageOpen className="w-12 h-12 md:w-14 md:h-14 text-blue-500" />
                 </div>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+              <h3 className="text-xl md:text-2xl font-bold text-slate-950 mb-3">
                 {search.trim()
                   ? lang === "ar"
                     ? "لا توجد نتائج"
                     : "No Results Found"
                   : t.shop.empty}
               </h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto text-sm md:text-base">
+              <p className="text-slate-500 mb-8 max-w-xl mx-auto text-sm md:text-base leading-7">
                 {search.trim()
                   ? lang === "ar"
                     ? `لم نعثر على منتجات تطابق "${search}". جرب كلمة بحث مختلفة.`
@@ -432,16 +444,25 @@ export default function Shop() {
                     ? "أوقفنا المنتجات التجريبية، ونعمل حالياً على تجهيز منتجات حقيقية بملفات وتسليم واضح."
                     : "We removed the demo catalog and are preparing real products with verified files and clear delivery."}
               </p>
-              <button
-                onClick={() => {
-                  setActiveCat("all");
-                  handleSearch("");
-                  setSearchParams({});
-                }}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 md:px-8 py-3 rounded-xl text-sm font-medium transition-all hover:shadow-lg hover:shadow-blue-500/15"
-              >
-                {t.shop.showAll}
-              </button>
+              {search.trim() ? (
+                <button
+                  onClick={() => {
+                    setActiveCat("all");
+                    handleSearch("");
+                    setSearchParams({});
+                  }}
+                  className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 md:px-8 py-3 rounded-xl text-sm font-semibold transition-all hover:bg-blue-600"
+                >
+                  {t.shop.showAll}
+                </button>
+              ) : (
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 md:px-8 py-3 rounded-xl text-sm font-semibold transition-all hover:bg-blue-600"
+                >
+                  {lang === "ar" ? "اطلب منتجاً أو خدمة" : "Request a product or service"}
+                </Link>
+              )}
             </div>
           )}
 
@@ -454,25 +475,25 @@ export default function Shop() {
                 aria-label="Previous page"
                 disabled={page === 1}
                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                className="p-2.5 rounded-xl border border-white/10 text-gray-300 disabled:opacity-30 hover:bg-white/5"
+                className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-30 hover:bg-slate-50"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-slate-500">
                 {page} / {pageCount}
               </span>
               <button
                 aria-label="Next page"
                 disabled={page === pageCount}
                 onClick={() => setPage(p => Math.min(pageCount, p + 1))}
-                className="p-2.5 rounded-xl border border-white/10 text-gray-300 disabled:opacity-30 hover:bg-white/5"
+                className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-30 hover:bg-slate-50"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           )}
         </div>
-      </div>
-    </AnimatedBackground>
+      </section>
+    </main>
   );
 }
