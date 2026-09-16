@@ -23,14 +23,19 @@ app.use(cors({
 
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
-app.use("/api/trpc/*", async (c) => {
+const handleTrpc = async (c: any) => {
   return fetchRequestHandler({
-    endpoint: "/api/trpc",
+    endpoint: c.req.path.startsWith("/api/trpc") ? "/api/trpc" : "/api",
     req: c.req.raw,
     router: appRouter,
     createContext,
   });
-});
+};
+
+// The current storefront calls /api directly. /api/trpc remains supported for
+// clients that use the conventional tRPC path.
+app.use("/api", handleTrpc);
+app.use("/api/*", handleTrpc);
 app.all("/api/*", (c) => c.json({ error: "Not Found" }, 404));
 
 export default app;
