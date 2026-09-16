@@ -13,15 +13,23 @@ export const supabaseAdminRouter = createRouter({
       z.object({
         limit: z.number().min(1).max(500).default(100),
         search: z.string().optional(),
+        status: z.enum(["active", "inactive", "all"]).default("active"),
       }).optional()
     )
     .query(async ({ input }) => {
       const admin = getAdmin();
       let query = admin
         .from("products")
-        .select("id,title,price,image_url,in_stock,is_active,category_id,created_at")
+        .select("id,title,description,price,original_price,discount_percent,is_on_sale,image_url,in_stock,is_active,category_id,created_at")
+        .order("is_active", { ascending: false })
         .order("id", { ascending: false })
         .limit(input?.limit ?? 100);
+
+      if ((input?.status ?? "active") === "active") {
+        query = query.eq("is_active", true);
+      } else if (input?.status === "inactive") {
+        query = query.eq("is_active", false);
+      }
 
       if (input?.search) {
         query = query.ilike("title", `%${input.search}%`);
@@ -30,7 +38,9 @@ export const supabaseAdminRouter = createRouter({
       const { data, error } = await query;
       if (error) throw new Error(error.message);
       return (data as Array<{
-        id: number; title: string; price: number;
+        id: number; title: string; description: string | null; price: number;
+        original_price: number | null; discount_percent: number | null;
+        is_on_sale: boolean;
         image_url: string; in_stock: boolean;
         is_active: boolean; category_id: number; created_at: string;
       }>) ?? [];
