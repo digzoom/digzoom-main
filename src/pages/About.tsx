@@ -103,13 +103,13 @@ export default function About() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
             {(lang === 'ar' ? [
               { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'شركة أمريكية مسجلة', desc: 'LLC في وايومنغ' },
-              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'تسليم رقمي آمن', desc: 'تحميل فوري بعد الدفع' },
+              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'تسليم رقمي آمن', desc: 'ملفات خاصة وروابط محمية' },
               { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'دعم احترافي', desc: 'رد خلال 24 ساعة' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'منتجات رقمية', desc: 'قوالب، كتب، ملفات' },
               { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'ممارسات شفافة', desc: 'أمان وموثوقية' },
             ] : [
               { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'U.S. Registered', desc: 'Wyoming LLC' },
-              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'Secure Delivery', desc: 'Instant downloads' },
+              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'Secure Delivery', desc: 'Private, protected files' },
               { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'Pro Support', desc: '24-hour response' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'Digital Products', desc: 'Templates, ebooks' },
               { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'Transparent', desc: 'Safe & trusted' },
@@ -154,7 +154,7 @@ export default function About() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: <Download className="w-6 h-6 text-blue-400" />, title: lang === 'ar' ? 'المنتجات الرقمية' : 'Digital Products', desc: lang === 'ar' ? 'قوالب، كتب، أدوات، دورات — آلاف المنتجات الجاهزة' : 'Templates, ebooks, tools, courses — thousands of ready products' },
+              { icon: <Download className="w-6 h-6 text-blue-400" />, title: lang === 'ar' ? 'المنتجات الرقمية' : 'Digital Products', desc: lang === 'ar' ? 'مجموعة مختارة من القوالب والأدوات العملية' : 'A curated catalog of practical templates and tools' },
               { icon: <Briefcase className="w-6 h-6 text-purple-400" />, title: lang === 'ar' ? 'التسويق الرقمي' : 'Digital Marketing', desc: lang === 'ar' ? 'إدارة حملات، SEO، إعلانات، تحليلات' : 'Campaign management, SEO, ads, analytics' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: lang === 'ar' ? 'حلول النمو' : 'Growth Solutions', desc: lang === 'ar' ? 'تطوير متاجر، تحول رقمي، استشارات' : 'Store development, digital transformation, consulting' },
               { icon: <Globe className="w-6 h-6 text-emerald-400" />, title: lang === 'ar' ? 'دعم عالمي' : 'Global Support', desc: lang === 'ar' ? 'نخدم الأفراد والشركات في جميع أنحاء العالم' : 'Serving individuals and businesses worldwide' },
