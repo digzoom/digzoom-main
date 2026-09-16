@@ -15,7 +15,7 @@ export default function Hero() {
         <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-5 py-2 mb-8">
           <Sparkles className="w-4 h-4 text-purple-400" />
           <span className="text-gray-300 text-sm">
-            {lang === 'ar' ? 'أكثر من 300 منتج رقمي مميز' : '300+ Premium Digital Products'}
+            {lang === 'ar' ? '10 منتجات رقمية احترافية' : '10 Professional Digital Products'}
           </span>
         </div>
 

@@ -20,13 +20,13 @@
   },
   "stats": {
     "products": "Digital Products",
-    "customers": "Happy Customers",
-    "downloads": "Downloads",
-    "rating": "Average Rating",
-    "productsValue": "300+",
-    "customersValue": "12,000+",
-    "downloadsValue": "75,000+",
-    "ratingValue": "4.9"
+    "customers": "Supported Languages",
+    "downloads": "Data Dashboards",
+    "rating": "Private Files",
+    "productsValue": "10",
+    "customersValue": "—",
+    "downloadsValue": "10",
+    "ratingValue": "100%"
   },
   "categories": {
     "title": "Browse by Category",
@@ -154,14 +154,14 @@
     "v3Desc": "Arab products that compete globally.",
     "v4Title": "Continuous Innovation",
     "v4Desc": "We invest in technology for seamless experience.",
-    "stat1": "Digital Products",
-    "stat1Value": "12,000+",
-    "stat2": "Active Sellers",
-    "stat2Value": "500+",
-    "stat3": "Happy Customers",
-    "stat3Value": "8,500+",
-    "stat4": "Arab Countries",
-    "stat4Value": "15+"
+    "stat1": "Professional Products",
+    "stat1Value": "10",
+    "stat2": "Supported Languages",
+    "stat2Value": "2",
+    "stat3": "Data Dashboards",
+    "stat3Value": "10",
+    "stat4": "Private Files",
+    "stat4Value": "100%"
   },
   "contact": {
     "title": "Contact Us",
