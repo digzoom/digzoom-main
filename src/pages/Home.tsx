@@ -2,11 +2,13 @@ import { Link } from "react-router";
 import {
   ArrowLeft,
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Code2,
   FileText,
   Headphones,
   Languages,
+  Megaphone,
   Layers3,
   PackageCheck,
   Palette,
@@ -14,6 +16,7 @@ import {
   ShieldCheck,
   ShoppingCart,
   Sparkles,
+  Store,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCart } from "@/hooks/useCart";
@@ -58,6 +61,11 @@ export default function Home() {
           "تصفح المتجر أو تواصل معنا وسنساعدك في الوصول إلى الخيار المناسب.",
         add: "تمت الإضافة إلى السلة",
         loading: "جاري تجهيز المنتجات…",
+        growthEyebrow: "DIGZOOM GROWTH",
+        growthTitle: "خدمات نمو تكمّل منتجاتك الرقمية",
+        growthSub:
+          "من الاستراتيجية والحملات إلى تطوير المتجر والتحليلات—نحدد ما يحتاجه مشروعك ثم نبني نطاقاً واضحاً للتنفيذ.",
+        growthCta: "استكشف خدمات النمو",
       }
     : {
         eyebrow: "Digital products built for real work",
@@ -81,6 +89,11 @@ export default function Home() {
           "Browse the store or contact us and we will help point you in the right direction.",
         add: "Added to cart",
         loading: "Preparing products…",
+        growthEyebrow: "DIGZOOM GROWTH",
+        growthTitle: "Growth services that complement your digital products",
+        growthSub:
+          "From strategy and campaigns to commerce and analytics—we diagnose what your business needs, then define a clear delivery scope.",
+        growthCta: "Explore growth services",
       };
   const benefits = isAr
     ? [
@@ -126,6 +139,18 @@ export default function Home() {
           title: "Organized catalog",
           text: "Categories and search help you find products faster.",
         },
+      ];
+
+  const growthServices = isAr
+    ? [
+        { icon: Megaphone, title: "استراتيجية وحملات", text: "أهداف وقنوات ورسائل ومؤشرات أداء ضمن خطة قابلة للتنفيذ.", image: "/images/services/strategy-session.jpg" },
+        { icon: Store, title: "تطوير المتجر", text: "واجهة ورحلة شراء وصفحات منتجات أوضح وأكثر إقناعاً.", image: "/images/services/ecommerce-workspace.jpg" },
+        { icon: BarChart3, title: "قياس وتحسين", text: "تحليلات وتقارير تساعدك على اتخاذ قرارات مبنية على بيانات.", image: "/images/services/analytics-dashboard.jpg" },
+      ]
+    : [
+        { icon: Megaphone, title: "Strategy and campaigns", text: "Goals, channels, messages, and KPIs in an executable plan.", image: "/images/services/strategy-session.jpg" },
+        { icon: Store, title: "Store development", text: "A clearer, more persuasive storefront and buying journey.", image: "/images/services/ecommerce-workspace.jpg" },
+        { icon: BarChart3, title: "Measure and improve", text: "Analytics and reporting for better evidence-based decisions.", image: "/images/services/analytics-dashboard.jpg" },
       ];
 
   return (
