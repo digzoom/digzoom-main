@@ -11,9 +11,8 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 const getNavLinks = (lang: string) => {
   const isAr = lang === 'ar';
   return [
-    { name: isAr ? 'الرئيسية' : 'Home', path: '/' },
+    { name: isAr ? 'خدمات التسويق الرقمي' : 'Digital Marketing', path: '/' },
     { name: isAr ? 'المتجر' : 'Shop', path: '/shop' },
-    { name: isAr ? 'خدمات النمو الرقمي' : 'Growth Services', path: '/marketing' },
     { name: isAr ? 'من نحن' : 'About', path: '/about' },
     { name: isAr ? 'اتصل بنا' : 'Contact', path: '/contact' },
   ];

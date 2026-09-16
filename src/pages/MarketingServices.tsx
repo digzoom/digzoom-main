@@ -22,6 +22,7 @@ import {
 import { useLanguage } from "@/hooks/useLanguage";
 
 type Service = {
+  slug: string;
   icon: typeof Target;
   title: string;
   description: string;
@@ -38,6 +39,7 @@ export default function MarketingServices() {
   const services: Service[] = isAr
     ? [
         {
+          slug: "growth-strategy",
           icon: Target,
           title: "استراتيجية النمو الرقمي",
           description: "نحوّل أهداف النشاط إلى أولويات وقنوات ومؤشرات أداء قابلة للقياس.",
@@ -45,6 +47,7 @@ export default function MarketingServices() {
           image: "/images/services/strategy-session.jpg",
         },
         {
+          slug: "paid-campaigns",
           icon: Megaphone,
           title: "الحملات الإعلانية",
           description: "تخطيط وتشغيل وتحسين الحملات بحسب الهدف والميزانية الفعلية.",
@@ -52,6 +55,7 @@ export default function MarketingServices() {
           image: "/images/services/analytics-dashboard.jpg",
         },
         {
+          slug: "social-presence",
           icon: Users,
           title: "إدارة الحضور الاجتماعي",
           description: "تقويم محتوى واتجاه بصري ونشر منظم يخدم هوية النشاط.",
@@ -59,6 +63,7 @@ export default function MarketingServices() {
           image: "/images/services/growth-team.jpg",
         },
         {
+          slug: "creative-content",
           icon: PenTool,
           title: "المحتوى الإبداعي",
           description: "محتوى مكتوب وبصري يشرح القيمة ويهيئ العميل لاتخاذ القرار.",
@@ -66,6 +71,7 @@ export default function MarketingServices() {
           image: "/images/services/content-production.jpg",
         },
         {
+          slug: "ecommerce-development",
           icon: Store,
           title: "تطوير المتاجر الإلكترونية",
           description: "تحسين الواجهة ورحلة الشراء وصفحات المنتجات لرفع الوضوح والثقة.",
@@ -73,6 +79,7 @@ export default function MarketingServices() {
           image: "/images/services/ecommerce-workspace.jpg",
         },
         {
+          slug: "search-analytics",
           icon: Search,
           title: "الظهور والتحليلات",
           description: "تهيئة أساسية للبحث وقياس السلوك حتى تكون القرارات مبنية على بيانات.",
@@ -82,6 +89,7 @@ export default function MarketingServices() {
       ]
     : [
         {
+          slug: "growth-strategy",
           icon: Target,
           title: "Digital growth strategy",
           description: "We translate business goals into measurable priorities, channels, and KPIs.",
@@ -89,6 +97,7 @@ export default function MarketingServices() {
           image: "/images/services/strategy-session.jpg",
         },
         {
+          slug: "paid-campaigns",
           icon: Megaphone,
           title: "Paid campaigns",
           description: "Campaign planning, operation, and optimization around real goals and budgets.",
@@ -96,6 +105,7 @@ export default function MarketingServices() {
           image: "/images/services/analytics-dashboard.jpg",
         },
         {
+          slug: "social-presence",
           icon: Users,
           title: "Social presence",
           description: "A focused content calendar, visual direction, and consistent publishing.",
@@ -103,6 +113,7 @@ export default function MarketingServices() {
           image: "/images/services/growth-team.jpg",
         },
         {
+          slug: "creative-content",
           icon: PenTool,
           title: "Creative content",
           description: "Written and visual content that explains value and supports decisions.",
@@ -110,6 +121,7 @@ export default function MarketingServices() {
           image: "/images/services/content-production.jpg",
         },
         {
+          slug: "ecommerce-development",
           icon: Store,
           title: "E-commerce development",
           description: "Sharper storefronts, buying journeys, and product pages that build confidence.",
@@ -117,6 +129,7 @@ export default function MarketingServices() {
           image: "/images/services/ecommerce-workspace.jpg",
         },
         {
+          slug: "search-analytics",
           icon: Search,
           title: "Search and analytics",
           description: "Search foundations and behavior tracking for evidence-based decisions.",
@@ -182,9 +195,9 @@ export default function MarketingServices() {
                 {isAr ? "اطلب جلسة تشخيص" : "Request a discovery call"}
                 <Arrow className="w-5 h-5" />
               </Link>
-              <a href="#services" className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[.04] px-7 py-4 font-semibold hover:bg-white/[.08] transition">
+              <button type="button" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[.04] px-7 py-4 font-semibold hover:bg-white/[.08] transition">
                 {isAr ? "استكشف الخدمات" : "Explore services"}
-              </a>
+              </button>
             </div>
           </div>
           <div className="relative">
@@ -220,8 +233,8 @@ export default function MarketingServices() {
           <p className="text-gray-600 text-lg leading-8">{isAr ? "نبدأ بما يحتاجه مشروعك فعلاً، لا بقائمة خدمات جاهزة. اختر المجال وسنحدد النطاق والنتيجة المتوقعة قبل التنفيذ." : "We start with what your business actually needs—not a preset bundle. Choose an area and we will define scope and expected outcomes before execution."}</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map(({ icon: Icon, title, description, deliverables, image }) => (
-            <article key={title} className="group overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+          {services.map(({ slug, icon: Icon, title, description, deliverables, image }) => (
+            <Link to={`/services/${slug}`} key={slug} className="group overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-200">
               <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                 <img src={image} alt={title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 <div className="absolute bottom-4 start-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-lg"><Icon className="w-5 h-5" /></div>
@@ -232,8 +245,11 @@ export default function MarketingServices() {
                 <ul className="space-y-2">
                   {deliverables.map(item => <li key={item} className="flex items-center gap-2 text-sm text-gray-700"><Check className="w-4 h-4 text-emerald-600 shrink-0" />{item}</li>)}
                 </ul>
+                <span className="mt-6 inline-flex items-center gap-2 text-sm font-black text-blue-700">
+                  {isAr ? "التفاصيل والتسعير" : "Details and pricing"}<Arrow className="w-4 h-4" />
+                </span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </section>
