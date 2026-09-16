@@ -504,6 +504,7 @@ function AnalyticsTab() {
    ═══════════════════════════════════════════════════════════ */
 function ProductsTab() {
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<'active' | 'inactive' | 'all'>('active');
   const [showForm, setShowForm] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showGallery, setShowGallery] = useState<number | null>(null);
@@ -515,7 +516,7 @@ function ProductsTab() {
   const isAr = lang === 'ar';
 
   const utils = trpc.useUtils();
-  const { data: items, isLoading } = trpc.listProducts.useQuery({ limit: 100, search: search || undefined });
+  const { data: items, isLoading } = trpc.listProducts.useQuery({ limit: 100, search: search || undefined, status });
 
   const createMutation = trpc.createProduct.useMutation({
     onSuccess: () => { setToast(t.admin.added); setShowForm(false); resetForm(); utils.listProducts.invalidate(); utils.getStats?.invalidate?.(); },
@@ -562,8 +563,27 @@ function ProductsTab() {
     <div className="space-y-4">
       {toast && <div className={`px-4 py-3 rounded-xl text-sm font-bold ${toast.includes('خطأ') || toast.includes('error') || toast.includes('failed') ? 'bg-red-500/15 text-red-400 border border-red-500/20' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'}`}>{toast}</div>}
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">{t.admin.products}<span className="bg-blue-500/20 text-blue-400 text-xs px-2.5 py-1 rounded-full">{items?.length ?? 0}</span></h2>
-        <div className="flex gap-2">
+        <div className="space-y-3">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">{t.admin.products}<span className="bg-blue-500/20 text-blue-400 text-xs px-2.5 py-1 rounded-full">{items?.length ?? 0}</span></h2>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={isAr ? 'تصفية المنتجات حسب الحالة' : 'Filter products by status'}>
+            {([
+              ['active', isAr ? 'النشطة' : 'Active'],
+              ['inactive', isAr ? 'المعطلة' : 'Inactive'],
+              ['all', isAr ? 'الكل' : 'All'],
+            ] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setStatus(value)}
+                aria-pressed={status === value}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${status === value ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2 self-start">
           <div className="relative"><Search className={`w-4 h-4 absolute ${isAr ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-500`} />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t.admin.search} className={`bg-[#1A1F2E] border border-white/10 rounded-xl ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 text-white text-sm w-48 focus:border-blue-500/50 focus:outline-none`} />
           </div>
