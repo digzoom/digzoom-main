@@ -502,6 +502,46 @@ function AnalyticsTab() {
 /* ═══════════════════════════════════════════════════════════
    PRODUCTS TAB (with multi-image support)
    ═══════════════════════════════════════════════════════════ */
+const EMPTY_PRODUCT_FORM = {
+  slug: '', title: '', title_ar: '', title_en: '',
+  description: '', description_ar: '', description_en: '',
+  long_description: '', long_description_ar: '', long_description_en: '',
+  price: '', original_price: '', discount_percent: '0', is_on_sale: false,
+  image_url: '', category_id: '3', product_type: 'digital_download',
+  delivery_type: 'instant_download', file_type: 'XLSX', file_size: '',
+  features_text: '', stock_quantity: '', in_stock: true, is_active: true,
+  is_featured: false, is_trending: false, storage_path: '',
+};
+
+const productPayload = (form: typeof EMPTY_PRODUCT_FORM) => ({
+  slug: form.slug.trim().toLowerCase(),
+  title: form.title_ar.trim() || form.title.trim(),
+  title_ar: form.title_ar.trim() || form.title.trim(),
+  title_en: form.title_en.trim() || form.title_ar.trim() || form.title.trim(),
+  description: form.description_ar.trim() || form.description.trim(),
+  description_ar: form.description_ar.trim() || form.description.trim(),
+  description_en: form.description_en.trim() || form.description_ar.trim() || form.description.trim(),
+  long_description: form.long_description_ar.trim() || form.long_description.trim(),
+  long_description_ar: form.long_description_ar.trim() || form.long_description.trim(),
+  long_description_en: form.long_description_en.trim() || form.long_description_ar.trim() || form.long_description.trim(),
+  price: Number(form.price),
+  original_price: form.original_price ? Number(form.original_price) : undefined,
+  discount_percent: Number(form.discount_percent) || 0,
+  is_on_sale: form.is_on_sale,
+  image_url: form.image_url.trim(),
+  category_id: Number(form.category_id),
+  product_type: form.product_type as 'digital_download',
+  delivery_type: form.delivery_type as 'instant_download',
+  file_type: form.file_type.trim() || 'XLSX',
+  file_size: form.file_size.trim(),
+  features: form.features_text.split('\n').map((item) => item.trim()).filter(Boolean),
+  stock_quantity: form.stock_quantity ? Number(form.stock_quantity) : null,
+  in_stock: form.in_stock,
+  is_active: form.is_active,
+  is_featured: form.is_featured,
+  is_trending: form.is_trending,
+});
+
 function ProductsTab() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<'active' | 'inactive' | 'all'>('active');
@@ -509,8 +549,8 @@ function ProductsTab() {
   const [showEdit, setShowEdit] = useState(false);
   const [showGallery, setShowGallery] = useState<number | null>(null);
   const [editProduct, setEditProduct] = useState<any>(null);
-  const [form, setForm] = useState({ title: '', description: '', price: '', original_price: '', discount_percent: '0', is_on_sale: false, image_url: '', category_id: '1', in_stock: true, is_active: true });
-  const [editForm, setEditForm] = useState({ title: '', description: '', price: '', original_price: '', discount_percent: '0', is_on_sale: false, image_url: '', category_id: '1', in_stock: true, is_active: true });
+  const [form, setForm] = useState({ ...EMPTY_PRODUCT_FORM });
+  const [editForm, setEditForm] = useState({ ...EMPTY_PRODUCT_FORM });
   const [toast, setToast] = useState('');
   const { lang, t } = useLanguage();
   const isAr = lang === 'ar';
@@ -535,25 +575,37 @@ function ProductsTab() {
     onError: (e) => setToast(e.message),
   });
 
-  const resetForm = () => setForm({ title: '', description: '', price: '', original_price: '', discount_percent: '0', is_on_sale: false, image_url: '', category_id: '1', in_stock: true, is_active: true });
+  const resetForm = () => setForm({ ...EMPTY_PRODUCT_FORM });
 
   const save = () => {
     const price = Number(form.price);
-    if (!form.title || price <= 0) { setToast(t.admin.titleRequired); return; }
-    createMutation.mutate({ title: form.title, description: form.description, price, original_price: form.original_price ? Number(form.original_price) : undefined, discount_percent: Number(form.discount_percent) || 0, is_on_sale: form.is_on_sale, image_url: form.image_url, category_id: Number(form.category_id), in_stock: form.in_stock, is_active: form.is_active });
+    if (!form.title_ar.trim() || !form.title_en.trim() || !form.slug.trim() || price <= 0) { setToast(isAr ? 'العنوان العربي والإنجليزي والرابط والسعر مطلوبة' : 'Arabic/English titles, slug, and price are required'); return; }
+    createMutation.mutate(productPayload(form));
   };
 
   const startEdit = (p: any) => {
     setEditProduct(p);
-    setEditForm({ title: p.title, description: p.description || '', price: String(p.price), original_price: String(p.original_price || p.price), discount_percent: String(p.discount_percent || 0), is_on_sale: p.is_on_sale || false, image_url: p.image_url, category_id: String(p.category_id), in_stock: p.in_stock, is_active: p.is_active });
+    setEditForm({
+      ...EMPTY_PRODUCT_FORM,
+      slug: p.slug || '', title: p.title || '', title_ar: p.title_ar || p.title || '', title_en: p.title_en || '',
+      description: p.description || '', description_ar: p.description_ar || p.description || '', description_en: p.description_en || '',
+      long_description: p.long_description || '', long_description_ar: p.long_description_ar || p.long_description || '', long_description_en: p.long_description_en || '',
+      price: String(p.price), original_price: p.original_price ? String(p.original_price) : '', discount_percent: String(p.discount_percent || 0),
+      is_on_sale: Boolean(p.is_on_sale), image_url: p.image_url || '', category_id: String(p.category_id || 3),
+      product_type: p.product_type || 'digital_download', delivery_type: p.delivery_type || 'instant_download',
+      file_type: p.file_type || 'XLSX', file_size: p.file_size || '',
+      features_text: Array.isArray(p.features) ? p.features.join('\n') : '', stock_quantity: p.stock_quantity == null ? '' : String(p.stock_quantity),
+      in_stock: Boolean(p.in_stock), is_active: Boolean(p.is_active), is_featured: Boolean(p.is_featured), is_trending: Boolean(p.is_trending),
+      storage_path: p.storage_path || '',
+    });
     setShowEdit(true);
   };
 
   const saveEdit = () => {
     if (!editProduct) return;
     const price = Number(editForm.price);
-    if (!editForm.title || price <= 0) { setToast(t.admin.titleRequired); return; }
-    updateMutation.mutate({ id: editProduct.id, title: editForm.title, description: editForm.description, price, original_price: editForm.original_price ? Number(editForm.original_price) : undefined, discount_percent: Number(editForm.discount_percent) || 0, is_on_sale: editForm.is_on_sale, image_url: editForm.image_url, category_id: Number(editForm.category_id), in_stock: editForm.in_stock, is_active: editForm.is_active });
+    if (!editForm.title_ar.trim() || !editForm.title_en.trim() || !editForm.slug.trim() || price <= 0) { setToast(isAr ? 'العنوان العربي والإنجليزي والرابط والسعر مطلوبة' : 'Arabic/English titles, slug, and price are required'); return; }
+    updateMutation.mutate({ id: editProduct.id, ...productPayload(editForm) });
   };
 
   const toggleField = (id: number, field: 'is_active' | 'in_stock', current: boolean) => { toggleMutation.mutate({ id, field, value: !current }); };
@@ -631,7 +683,7 @@ function ProductsTab() {
       )}
 
       {showForm && <ProductModal title={t.admin.addProduct} form={form} setForm={setForm} onSave={save} onClose={() => setShowForm(false)} isPending={createMutation.isPending} />}
-      {showEdit && editProduct && <ProductModal title={t.admin.editProduct} form={editForm} setForm={setEditForm} onSave={saveEdit} onClose={() => { setShowEdit(false); setEditProduct(null); }} isPending={updateMutation.isPending} />}
+      {showEdit && editProduct && <ProductModal productId={editProduct.id} title={t.admin.editProduct} form={editForm} setForm={setEditForm} onSave={saveEdit} onClose={() => { setShowEdit(false); setEditProduct(null); }} isPending={updateMutation.isPending} />}
       {showGallery && <ProductGalleryModal productId={showGallery} onClose={() => setShowGallery(null)} />}
     </div>
   );
@@ -715,16 +767,26 @@ function ProductGalleryModal({ productId, onClose }: { productId: number; onClos
 /* ═══════════════════════════════════════════════════════════
    PRODUCT MODAL (create/edit)
    ═══════════════════════════════════════════════════════════ */
-function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
-  title: string; form: any; setForm: any; onSave: () => void; onClose: () => void; isPending: boolean;
+function ProductModal({ productId, title, form, setForm, onSave, onClose, isPending }: {
+  productId?: number; title: string; form: typeof EMPTY_PRODUCT_FORM; setForm: (value: typeof EMPTY_PRODUCT_FORM) => void; onSave: () => void; onClose: () => void; isPending: boolean;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [fileMessage, setFileMessage] = useState('');
   const [previewUrl, setPreviewUrl] = useState(form.image_url || '');
   const { t } = useLanguage();
   const uploadMutation = trpc.uploadImage?.useMutation?.({
     onSuccess: (data: any) => { setForm({ ...form, image_url: data.url }); setPreviewUrl(data.url); setUploading(false); },
     onError: () => setUploading(false),
   }) ?? null;
+  const utils = trpc.useUtils();
+  const productFileMutation = trpc.uploadDigitalProduct.useMutation({
+    onSuccess: (data: any) => {
+      setForm({ ...form, storage_path: data.storage_path, file_size: `${Math.max(1, Math.ceil(data.size_bytes / 1024))} KB` });
+      setFileMessage('تم رفع ملف المنتج وحمايته بنجاح');
+      utils.listProducts.invalidate();
+    },
+    onError: (error) => setFileMessage(error.message),
+  });
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -739,9 +801,26 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
     reader.readAsDataURL(file);
   };
 
+  const handleProductFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !productId) return;
+    if (file.size > 10 * 1024 * 1024) { setFileMessage('الحد الأعلى لملف المنتج 10 MB'); return; }
+    const extension = file.name.split('.').pop()?.toUpperCase() || '';
+    if (!['XLSX', 'PDF', 'ZIP'].includes(extension)) { setFileMessage('الملفات المسموحة: XLSX أو PDF أو ZIP'); return; }
+    setFileMessage('');
+    const reader = new FileReader();
+    reader.onloadend = () => productFileMutation.mutate({
+      product_id: productId,
+      filename: file.name,
+      base64: String(reader.result).split(',')[1],
+      content_type: file.type || (extension === 'ZIP' ? 'application/zip' : 'application/octet-stream'),
+    });
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-[#131722] rounded-2xl border border-white/10 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[#131722] rounded-2xl border border-white/10 p-6 max-w-4xl w-full max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-bold text-white">{title}</h3>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 text-gray-400"><X className="w-5 h-5" /></button>
@@ -761,20 +840,42 @@ function ProductModal({ title, form, setForm, onSave, onClose, isPending }: {
             <input value={form.image_url} onChange={(e) => { setForm({ ...form, image_url: e.target.value }); setPreviewUrl(e.target.value); }} placeholder={t.admin.imageUrl} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" />
           </div>
 
-          <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.title} *</label><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t.admin.titlePlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" /></div>
-          <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.description}</label><input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t.admin.descriptionPlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" /></div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid md:grid-cols-2 gap-3">
+            <div><label className="text-gray-400 text-xs mb-1 block">العنوان بالعربية *</label><input value={form.title_ar} onChange={(e) => setForm({ ...form, title_ar: e.target.value, title: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">English title *</label><input dir="ltr" value={form.title_en} onChange={(e) => setForm({ ...form, title_en: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+          </div>
+          <div><label className="text-gray-400 text-xs mb-1 block">رابط المنتج (إنجليزي بدون مسافات) *</label><input dir="ltr" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })} placeholder="annual-marketing-plan" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div><label className="text-gray-400 text-xs mb-1 block">الوصف المختصر بالعربية</label><textarea rows={3} value={form.description_ar} onChange={(e) => setForm({ ...form, description_ar: e.target.value, description: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">Short description in English</label><textarea dir="ltr" rows={3} value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">الوصف الكامل بالعربية</label><textarea rows={5} value={form.long_description_ar} onChange={(e) => setForm({ ...form, long_description_ar: e.target.value, long_description: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+            <div><label className="text-gray-400 text-xs mb-1 block">Full description in English</label><textarea dir="ltr" rows={5} value={form.long_description_en} onChange={(e) => setForm({ ...form, long_description_en: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div><label className="text-gray-400 text-xs mb-1 block">المميزات — ميزة في كل سطر</label><textarea rows={5} value={form.features_text} onChange={(e) => setForm({ ...form, features_text: e.target.value })} placeholder={'قابل للتعديل\nلوحة مؤشرات\nتعليمات عربية وإنجليزية'} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm" /></div>
+            <div className="grid grid-cols-2 gap-3 content-start">
+              <div><label className="text-gray-400 text-xs mb-1 block">نوع المنتج</label><select value={form.product_type} onChange={(e) => setForm({ ...form, product_type: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm"><option value="digital_download">تحميل رقمي</option><option value="manual_service">خدمة يدوية</option><option value="subscription_account">اشتراك</option><option value="code_delivery">كود</option></select></div>
+              <div><label className="text-gray-400 text-xs mb-1 block">طريقة التسليم</label><select value={form.delivery_type} onChange={(e) => setForm({ ...form, delivery_type: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm"><option value="instant_download">تحميل فوري</option><option value="manual_delivery">تسليم يدوي</option><option value="auto_code">كود تلقائي</option><option value="account_credentials">بيانات حساب</option></select></div>
+              <div><label className="text-gray-400 text-xs mb-1 block">نوع الملف</label><input value={form.file_type} onChange={(e) => setForm({ ...form, file_type: e.target.value.toUpperCase() })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm" /></div>
+              <div><label className="text-gray-400 text-xs mb-1 block">حجم الملف</label><input value={form.file_size} onChange={(e) => setForm({ ...form, file_size: e.target.value })} placeholder="850 KB" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm" /></div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.price} *</label><input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder={t.admin.pricePlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" /></div>
             <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.category}</label><select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none">{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
             <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.originalPrice}</label><input type="number" value={form.original_price} onChange={(e) => setForm({ ...form, original_price: e.target.value })} placeholder={t.admin.originalPricePlaceholder} className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" /></div>
             <div><label className="text-gray-400 text-xs mb-1 block">{t.admin.discountPercent}</label><input type="number" min="0" max="100" value={form.discount_percent} onChange={(e) => setForm({ ...form, discount_percent: e.target.value })} placeholder="0" className="w-full bg-[#1A1F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-blue-500/50 focus:outline-none" dir="ltr" /></div>
-            <div className="flex items-end pb-2"><label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_on_sale} onChange={(e) => setForm({ ...form, is_on_sale: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />{t.admin.onSale}</label></div>
           </div>
-          <div className="flex gap-6 pt-2">
+          {productId ? <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between"><div><div className="font-bold text-white">ملف المنتج المحمي</div><div className="text-xs text-gray-400 mt-1">XLSX أو PDF أو ZIP — الحد الأعلى 10 MB</div>{form.storage_path && <div dir="ltr" className="text-xs text-emerald-400 mt-1 break-all">{form.storage_path}</div>}</div><label className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white cursor-pointer"><Upload className="w-4 h-4" />{productFileMutation.isPending ? 'جاري الرفع...' : 'رفع/استبدال الملف'}<input type="file" accept=".xlsx,.pdf,.zip" onChange={handleProductFile} className="hidden" /></label></div>
+            {fileMessage && <div className="mt-2 text-xs text-amber-300">{fileMessage}</div>}
+          </div> : <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-sm text-amber-300">احفظ المنتج أولاً، ثم افتحه للتعديل وارفع ملفه الرقمي.</div>}
+          <div className="flex flex-wrap gap-5 pt-2">
+            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_on_sale} onChange={(e) => setForm({ ...form, is_on_sale: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />{t.admin.onSale}</label>
             <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.in_stock} onChange={(e) => setForm({ ...form, in_stock: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />{t.admin.available}</label>
             <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />{t.admin.active}</label>
+            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_featured} onChange={(e) => setForm({ ...form, is_featured: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />مميز في الرئيسية</label>
+            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer"><input type="checkbox" checked={form.is_trending} onChange={(e) => setForm({ ...form, is_trending: e.target.checked })} className="w-4 h-4 rounded accent-blue-600" />الأكثر طلباً</label>
           </div>
         </div>
 
