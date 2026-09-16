@@ -232,30 +232,18 @@ export default function ProductDetail() {
             {/* CTA Section - id for sticky detection */}
             <div id="product-cta-section" className="flex flex-col sm:flex-row gap-2 md:gap-3">
               <button
-                onClick={() => {
-                  addToCart(product);
-                  navigate('/cart');
-                  toast.success(lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Added to cart');
-                }}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 active:scale-[0.98] text-white px-6 md:px-8 py-3.5 md:py-4 rounded-xl transition-all font-medium shadow-lg shadow-blue-500/15 text-sm md:text-base"
+                disabled
+                className="flex-1 flex items-center justify-center gap-2 bg-white/[0.06] text-gray-400 px-6 md:px-8 py-3.5 md:py-4 rounded-xl font-medium text-sm md:text-base cursor-not-allowed border border-white/[0.08]"
               >
-                <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" /> {t.product.buyNow}
-              </button>
-              <button
-                onClick={() => {
-                  addToCart(product);
-                  toast.success(lang === 'ar' ? `تمت إضافة "${pTitle}" إلى السلة` : `"${pTitle}" added to cart`);
-                }}
-                className="flex items-center justify-center gap-2 border border-white/10 text-white hover:bg-white/5 active:scale-[0.98] px-6 md:px-8 py-3.5 md:py-4 rounded-xl transition-all font-medium text-sm md:text-base"
-              >
-                {t.product.addToCart}
+                <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                {lang === 'ar' ? 'قريباً — الدفع قيد التجهيز' : 'Coming soon — payment setup in progress'}
               </button>
             </div>
 
             {/* Guarantee */}
             <div className="flex items-center gap-2 mt-4 md:mt-5 text-gray-500 text-xs md:text-sm">
               <ShieldCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              <span>{t.product.guarantee}</span>
+              <span>{lang === 'ar' ? 'يمكنك تصفح تفاصيل المنتج الآن، وسيُفتح الشراء بعد اكتمال بوابة الدفع.' : 'Product details are available now. Purchasing will open after payment setup is complete.'}</span>
             </div>
           </div>
         </div>
@@ -319,26 +307,11 @@ export default function ProductDetail() {
           </div>
           <div className="flex-1 flex gap-2">
             <button
-              onClick={() => {
-                addToCart(product);
-                navigate('/cart');
-                toast.success(lang === 'ar' ? 'تمت الإضافة إلى السلة' : 'Added to cart');
-              }}
-              className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 active:scale-[0.97] text-white py-3 rounded-xl font-medium text-sm shadow-lg shadow-blue-500/15"
+              disabled
+              className="flex-1 flex items-center justify-center gap-2 bg-white/[0.06] text-gray-400 py-3 rounded-xl font-medium text-sm cursor-not-allowed border border-white/[0.08]"
             >
               <ShoppingCart className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.product.buyNow}</span>
-              <span className="sm:hidden">{product.price} {t.featured.currency}</span>
-            </button>
-            <button
-              onClick={() => {
-                addToCart(product);
-                toast.success(lang === 'ar' ? 'أُضيف للسلة' : 'Added to cart');
-              }}
-              className="px-4 flex items-center justify-center border border-white/10 text-white active:scale-[0.97] rounded-xl transition-all"
-              title={t.product.addToCart}
-            >
-              <ShoppingCart className="w-4 h-4" />
+              <span>{lang === 'ar' ? 'قريباً — الدفع قيد التجهيز' : 'Coming soon — payment in progress'}</span>
             </button>
           </div>
         </div>
