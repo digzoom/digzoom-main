@@ -1,32 +1,34 @@
-import { Routes, Route } from 'react-router';
+import { Routes, Route, useLocation } from 'react-router';
+import { lazy, Suspense } from 'react';
 import { Toaster } from '@/components/ui/sonner';
 import ScrollToTop from '@/components/ScrollToTop';
 import { LanguageProvider } from '@/hooks/useLanguage.tsx';
 import { CartProvider } from '@/hooks/useCart.tsx';
 import { AuthProvider } from '@/hooks/useAuth.tsx';
 import { SupabaseAuthProvider } from '@/hooks/useSupabaseAuth.tsx';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Shop from './pages/Shop';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import ThankYou from './pages/ThankYou';
-import Payment from './pages/Payment';
-import AdminDashboard from './pages/AdminDashboard';
-import Privacy from './pages/Privacy';
-import Terms from './pages/Terms';
-import Refund from './pages/Refund';
-import DeliveryPolicy from './pages/DeliveryPolicy';
-import AcceptableUsePolicy from './pages/AcceptableUsePolicy';
-import CompanyInformation from './pages/CompanyInformation';
-import MarketingServices from './pages/MarketingServices';
-import TrustSecurity from './pages/TrustSecurity';
 import Navbar from './components/Navbar';
 import AdminGuard from './components/AdminGuard';
+
+const Home = lazy(() => import('./pages/Home'));
+const Login = lazy(() => import('./pages/Login'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const ThankYou = lazy(() => import('./pages/ThankYou'));
+const Payment = lazy(() => import('./pages/Payment'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Refund = lazy(() => import('./pages/Refund'));
+const DeliveryPolicy = lazy(() => import('./pages/DeliveryPolicy'));
+const AcceptableUsePolicy = lazy(() => import('./pages/AcceptableUsePolicy'));
+const CompanyInformation = lazy(() => import('./pages/CompanyInformation'));
+const MarketingServices = lazy(() => import('./pages/MarketingServices'));
+const TrustSecurity = lazy(() => import('./pages/TrustSecurity'));
 
 /* Placeholder pages for user dropdown links */
 function ProfilePage() {
@@ -51,13 +53,17 @@ function OrdersPage() {
 }
 
 export default function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
     <LanguageProvider>
       <CartProvider>
         <SupabaseAuthProvider>
           <AuthProvider>
             <ScrollToTop />
-            <Navbar />
+            {!isAdminRoute && <Navbar />}
+            <Suspense fallback={<div className="min-h-screen bg-[#08090d] flex items-center justify-center text-gray-500">Loading…</div>}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -84,6 +90,7 @@ export default function App() {
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
             <Toaster />
           </AuthProvider>
         </SupabaseAuthProvider>

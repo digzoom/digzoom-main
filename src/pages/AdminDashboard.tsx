@@ -244,22 +244,16 @@ function CustomersTab() {
 function CouponsTab() {
   const { t } = useLanguage();
   const [showForm, setShowForm] = useState(false);
-  const [editCoupon, setEditCoupon] = useState<any>(null);
   const [toast, setToast] = useState('');
   const [form, setForm] = useState({ code: '', discount_percent: '', max_uses: '', valid_until: '', min_order_amount: '' });
-  const [debug, setDebug] = useState<any>(null);
 
   const utils = trpc.useUtils();
   const { data: coupons, isLoading } = trpc.listCoupons.useQuery({ limit: 100 });
-  const { data: meData } = trpc.me.useQuery();
-  const { data: meDebugData } = trpc.meDebug.useQuery();
   const createMutation = trpc.createCoupon.useMutation({
-    onSuccess: (data) => {
-      setDebug((prev: any) => ({ ...prev, apiStatus: 'SUCCESS', apiResponse: data }));
+    onSuccess: () => {
       setToast(t.admin.couponCreated); setShowForm(false); resetForm(); utils.listCoupons.invalidate();
     },
     onError: (e) => {
-      setDebug((prev: any) => ({ ...prev, apiStatus: 'ERROR', apiError: e.message }));
       setToast(e.message);
     },
   });
@@ -272,21 +266,6 @@ function CouponsTab() {
     const code = form.code?.trim();
     const discount = Number(form.discount_percent);
 
-    setDebug({
-      formCode: form.code,
-      formDiscount: form.discount_percent,
-      formMaxUses: form.max_uses,
-      formMinOrder: form.min_order_amount,
-      codeTrimmed: code,
-      discountParsed: discount,
-      isCodeValid: !!code,
-      isDiscountValid: !!form.discount_percent && !isNaN(discount) && discount >= 1 && discount <= 100,
-      apiStatus: 'SENDING...',
-      payload: null,
-      apiResponse: null,
-      apiError: null,
-    });
-
     if (!code) { setToast('Code required'); return; }
     if (!form.discount_percent || isNaN(discount) || discount < 1 || discount > 100) { setToast('Discount must be 1-100'); return; }
 
@@ -297,7 +276,6 @@ function CouponsTab() {
       valid_until: form.valid_until || undefined,
       min_order_amount: form.min_order_amount ? Number(form.min_order_amount) : undefined,
     };
-    setDebug((prev: any) => ({ ...prev, payload }));
     createMutation.mutate(payload);
   };
 
@@ -323,47 +301,6 @@ function CouponsTab() {
             <button onClick={save} disabled={createMutation.isPending} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-xl text-sm font-bold"><Save className="w-4 h-4 inline mr-1" />{t.admin.save}</button>
             <button onClick={() => { setShowForm(false); resetForm(); }} className="bg-white/5 hover:bg-white/10 text-gray-400 px-6 py-2 rounded-xl text-sm">{t.admin.cancel}</button>
           </div>
-          {/* DEBUG: Backend's view of current user — always visible */}
-          <div className="mt-3 p-3 bg-purple-900/30 border border-purple-500/30 rounded-xl text-xs font-mono space-y-1">
-            <div className="text-purple-400 font-bold mb-2">BACKEND AUTH CONTEXT</div>
-            <div className="text-gray-300"><span className="text-purple-500">hasUser:</span> {JSON.stringify(meData?.hasUser)}</div>
-            <div className="text-gray-300"><span className="text-purple-500">userId:</span> {JSON.stringify(meData?.userId)}</div>
-            <div className="text-gray-300"><span className="text-purple-500">email:</span> {JSON.stringify(meData?.email)}</div>
-            <div className="text-gray-300"><span className="text-purple-500">role:</span> <span className={meData?.role === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meData?.role)}</span></div>
-            <div className="text-gray-300"><span className="text-purple-500">isAdmin:</span> <span className={meData?.isAdmin ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meData?.isAdmin)}</span></div>
-          </div>
-
-          {/* DEBUG: Raw user_roles query — always visible */}
-          <div className="mt-3 p-3 bg-blue-900/30 border border-blue-500/30 rounded-xl text-xs font-mono space-y-1">
-            <div className="text-blue-400 font-bold mb-2">RAW USER ROLES QUERY</div>
-            <div className="text-gray-300"><span className="text-blue-500">hasUser:</span> {JSON.stringify(meDebugData?.hasUser)}</div>
-            <div className="text-gray-300"><span className="text-blue-500">userId:</span> {JSON.stringify(meDebugData?.userId)}</div>
-            <div className="text-gray-300"><span className="text-blue-500">email:</span> {JSON.stringify(meDebugData?.email)}</div>
-            <div className="text-gray-300"><span className="text-blue-500">userRolesError:</span> {JSON.stringify(meDebugData?.userRolesError)}</div>
-            <div className="text-gray-300"><span className="text-blue-500">rawUserRoles:</span> <span className={meDebugData?.rawUserRoles?.role === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meDebugData?.rawUserRoles)}</span></div>
-            <div className="text-gray-300"><span className="text-blue-500">profilesError:</span> {JSON.stringify(meDebugData?.profilesError)}</div>
-            <div className="text-gray-300"><span className="text-blue-500">rawProfiles:</span> {JSON.stringify(meDebugData?.rawProfiles)}</div>
-            <div className="text-gray-300"><span className="text-blue-500">computedRole:</span> <span className={meDebugData?.computedRole === 'admin' ? 'text-emerald-400 font-bold' : 'text-red-400'}>{JSON.stringify(meDebugData?.computedRole)}</span></div>
-          </div>
-
-          {/* DEBUG PANEL — visible on page */}
-          {debug && (
-            <div className="mt-3 p-3 bg-yellow-900/30 border border-yellow-500/30 rounded-xl text-xs font-mono space-y-1">
-              <div className="text-yellow-400 font-bold mb-2">DEBUG OUTPUT</div>
-              <div className="text-gray-300"><span className="text-yellow-500">form.code:</span> {JSON.stringify(debug.formCode)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">form.discount_percent:</span> {JSON.stringify(debug.formDiscount)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">form.max_uses:</span> {JSON.stringify(debug.formMaxUses)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">form.min_order_amount:</span> {JSON.stringify(debug.formMinOrder)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">codeTrimmed:</span> {JSON.stringify(debug.codeTrimmed)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">discountParsed:</span> {JSON.stringify(debug.discountParsed)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">isCodeValid:</span> {JSON.stringify(debug.isCodeValid)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">isDiscountValid:</span> {JSON.stringify(debug.isDiscountValid)}</div>
-              <div className="text-gray-300"><span className="text-yellow-500">apiStatus:</span> <span className={debug.apiStatus === 'SUCCESS' ? 'text-emerald-400' : debug.apiStatus === 'ERROR' ? 'text-red-400' : 'text-blue-400'}>{debug.apiStatus}</span></div>
-              {debug.payload && <div className="text-gray-300"><span className="text-yellow-500">payload:</span> {JSON.stringify(debug.payload)}</div>}
-              {debug.apiResponse && <div className="text-emerald-400"><span className="text-yellow-500">apiResponse:</span> {JSON.stringify(debug.apiResponse)}</div>}
-              {debug.apiError && <div className="text-red-400"><span className="text-yellow-500">apiError:</span> {JSON.stringify(debug.apiError)}</div>}
-            </div>
-          )}
         </div>
       )}
 

@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { Star, ShoppingCart, Search, LayoutGrid, List, X, PackageOpen, Tag, Loader2 } from 'lucide-react';
+import { ShoppingCart, Search, LayoutGrid, List, X, PackageOpen, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSupabaseProducts } from '@/hooks/useSupabaseProducts';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -15,6 +15,8 @@ export default function Shop() {
   const [sort, setSort] = useState('popular');
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [page, setPage] = useState(1);
+  const pageSize = 24;
   const { addToCart } = useCart();
   const { lang, t } = useLanguage();
 
@@ -106,6 +108,10 @@ export default function Shop() {
   const getTitle = (p: typeof products[0]) => productTitle(p, lang);
   const getDesc = (p: typeof products[0]) => productDescription(p, lang);
 
+  useEffect(() => setPage(1), [activeCat, sort, search]);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const visibleProducts = filtered.slice((page - 1) * pageSize, page * pageSize);
+
   const handleAdd = (p: typeof products[0]) => {
     const title = getTitle(p);
     addToCart(p as any);
@@ -189,6 +195,10 @@ export default function Shop() {
 
         {/* Categories */}
         <div className="flex flex-wrap gap-2 mb-6">
+          <button onClick={() => handleCat('all')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeCat === 'all' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'bg-white/[0.03] text-gray-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]'}`}>
+            {t.shop.showAll}
+          </button>
           {categories.map(cat => (
             <button key={cat.id} onClick={() => handleCat(cat.slug)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -214,7 +224,7 @@ export default function Shop() {
         {/* Grid View */}
         {viewMode === 'grid' && filtered.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-            {filtered.map(p => (
+            {visibleProducts.map(p => (
               <div key={p.id} className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/5">
                 <Link to={`/product/${p.id}`} className="block relative">
                   <div className="aspect-[3/4] overflow-hidden">
@@ -228,11 +238,7 @@ export default function Shop() {
                 </Link>
                 <div className="p-5">
                   <Link to={`/product/${p.id}`}><h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors text-sm leading-relaxed">{getTitle(p)}</h3></Link>
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                    <span className="text-gray-300 text-xs">{p.rating}</span>
-                    <span className="text-gray-600 text-xs">({p.reviews_count})</span>
-                  </div>
+                  <p className="text-gray-500 text-xs mb-3 line-clamp-2">{getDesc(p)}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-white">{p.price} {t.featured.currency}</span>
@@ -251,7 +257,7 @@ export default function Shop() {
         {/* List View */}
         {viewMode === 'list' && filtered.length > 0 && (
           <div className="space-y-4">
-            {filtered.map(p => (
+            {visibleProducts.map(p => (
               <div key={p.id} className="group bg-[#151520] rounded-2xl border border-white/[0.04] overflow-hidden hover:border-blue-500/20 transition-all flex flex-col sm:flex-row">
                 <Link to={`/product/${p.id}`} className="sm:w-56 flex-shrink-0 relative">
                   <div className="aspect-[3/4] sm:aspect-auto sm:h-full overflow-hidden">
@@ -267,11 +273,6 @@ export default function Shop() {
                   <div>
                     <Link to={`/product/${p.id}`}><h3 className="text-white font-semibold mb-2 text-lg group-hover:text-blue-400 transition-colors">{getTitle(p)}</h3></Link>
                     <p className="text-gray-400 text-sm mb-3 line-clamp-2">{getDesc(p)}</p>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      <span className="text-gray-300 text-sm">{p.rating}</span>
-                      <span className="text-gray-600 text-sm">({p.reviews_count} {lang === 'ar' ? 'تقييم' : 'reviews'})</span>
-                    </div>
                   </div>
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center gap-3">
@@ -311,6 +312,14 @@ export default function Shop() {
             >
               {t.shop.showAll}
             </button>
+          </div>
+        )}
+
+        {filtered.length > pageSize && (
+          <div className="mt-10 flex items-center justify-center gap-3" dir="ltr">
+            <button aria-label="Previous page" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="p-2.5 rounded-xl border border-white/10 text-gray-300 disabled:opacity-30 hover:bg-white/5"><ChevronLeft className="w-4 h-4" /></button>
+            <span className="text-sm text-gray-400">{page} / {pageCount}</span>
+            <button aria-label="Next page" disabled={page === pageCount} onClick={() => setPage(p => Math.min(pageCount, p + 1))} className="p-2.5 rounded-xl border border-white/10 text-gray-300 disabled:opacity-30 hover:bg-white/5"><ChevronRight className="w-4 h-4" /></button>
           </div>
         )}
       </div>

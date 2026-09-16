@@ -2,23 +2,22 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Link } from 'react-router';
 import {
-  Star, ShoppingCart, Check, FileText, HardDrive, Download,
-  ArrowLeft, ArrowRight, ShieldCheck, Heart, Clock, RefreshCw,
-  Award, Headphones, Zap, ChevronUp, Loader2
+  ShoppingCart, Check, FileText, HardDrive,
+  ArrowLeft, ArrowRight, ShieldCheck, Heart, Clock,
+  Headphones, Zap, ChevronUp, Loader2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/database';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
-import { productTitle, productDescription, productLongDescription } from '@/lib/i18n';
+import { productTitle, productLongDescription } from '@/lib/i18n';
 import { toast } from 'sonner';
 
 /* ── Trust badges ── */
-const trustBadges = [
-  { icon: <ShieldCheck className="w-5 h-5" />, labelAr: 'دفع آمن 100%', labelEn: '100% Secure Payment' },
-  { icon: <Clock className="w-5 h-5" />, labelAr: 'تحميل فوري', labelEn: 'Instant Download' },
-  { icon: <RefreshCw className="w-5 h-5" />, labelAr: 'ضمان 30 يوم', labelEn: '30-Day Guarantee' },
-  { icon: <Headphones className="w-5 h-5" />, labelAr: 'دعم 24/7', labelEn: '24/7 Support' },
+const getTrustBadges = (hasDeliveryAsset: boolean) => [
+  { icon: <ShieldCheck className="w-5 h-5" />, labelAr: 'بيانات شراء محمية', labelEn: 'Protected checkout data' },
+  { icon: <Clock className="w-5 h-5" />, labelAr: hasDeliveryAsset ? 'ملف رقمي جاهز' : 'تأكيد التسليم بعد الطلب', labelEn: hasDeliveryAsset ? 'Digital file ready' : 'Delivery confirmed after order' },
+  { icon: <Headphones className="w-5 h-5" />, labelAr: 'دعم عبر البريد', labelEn: 'Email support' },
 ];
 
 export default function ProductDetail() {
@@ -36,7 +35,6 @@ export default function ProductDetail() {
 
   // Bilingual helpers
   const pTitle = product ? productTitle(product, lang) : '';
-  const pDesc = product ? productDescription(product, lang) : '';
   const pLongDesc = product ? productLongDescription(product, lang) : '';
 
   // Fetch product from Supabase
@@ -120,6 +118,7 @@ export default function ProductDetail() {
 
   const discount = product.original_price ? Math.round((1 - product.price / product.original_price) * 100) : 0;
   const features = (product.features as string[]) || [];
+  const trustBadges = getTrustBadges(Boolean(product.download_url || product.storage_path));
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pt-20 md:pt-24 pb-24 md:pb-16">
@@ -178,22 +177,6 @@ export default function ProductDetail() {
               {pLongDesc}
             </p>
 
-            {/* Rating */}
-            <div className="flex items-center gap-2 md:gap-3 mb-5 md:mb-6 flex-wrap">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-700'}`}
-                  />
-                ))}
-              </div>
-              <span className="text-gray-300 text-sm">{product.rating}</span>
-              <span className="text-gray-600 text-xs sm:text-sm">
-                ({product.reviews_count} {lang === 'ar' ? 'تقييم' : 'reviews'})
-              </span>
-            </div>
-
             {/* Price */}
             <div className="flex flex-wrap items-baseline gap-3 md:gap-4 mb-6 md:mb-8">
               <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
@@ -220,10 +203,6 @@ export default function ProductDetail() {
               <div className="flex items-center gap-2 bg-white/[0.03] rounded-xl px-3 md:px-4 py-2 md:py-2.5 border border-white/[0.06]">
                 <HardDrive className="w-3.5 h-3.5 md:w-4 md:h-4 text-purple-400" />
                 <span className="text-gray-300 text-xs md:text-sm">{product.file_size}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/[0.03] rounded-xl px-3 md:px-4 py-2 md:py-2.5 border border-white/[0.06]">
-                <Download className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400" />
-                <span className="text-gray-300 text-xs md:text-sm">{t.product.download}</span>
               </div>
             </div>
 
