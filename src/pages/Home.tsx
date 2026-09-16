@@ -3,9 +3,13 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  Code2,
+  FileText,
   Headphones,
   Languages,
+  Layers3,
   PackageCheck,
+  Palette,
   Search,
   ShieldCheck,
   ShoppingCart,
@@ -164,21 +168,37 @@ export default function Home() {
           </div>
           <div className="relative hidden md:block">
             <div className="absolute -inset-8 bg-blue-500/10 blur-3xl rounded-full" />
-            <div className="relative rounded-[2rem] border border-white/10 bg-[#11131b]/90 p-3 shadow-2xl shadow-blue-950/40 rotate-1">
-              <img
-                src="/images/digzoom-logo-side-new.jpg"
-                alt="DigZoom digital store"
-                className="w-full aspect-[4/3] object-cover rounded-[1.4rem] opacity-90"
-              />
-              <div className="absolute bottom-7 inset-x-7 rounded-2xl border border-white/10 bg-black/70 backdrop-blur-xl p-5">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-                  <span className="font-semibold">
-                    {isAr
-                      ? "تسوق واضح، سريع، وثنائي اللغة"
-                      : "Clear, focused, bilingual shopping"}
-                  </span>
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#11131b]/95 p-5 shadow-2xl shadow-blue-950/40 rotate-1">
+              <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex gap-1.5" dir="ltr">
+                  <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
                 </div>
+                <span className="rounded-lg bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-400">DIGZOOM STORE</span>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/15 to-purple-500/10 p-6">
+                <p className="mb-2 text-xs font-bold text-blue-300">{isAr ? "كتالوج رقمي منظم" : "CURATED DIGITAL CATALOG"}</p>
+                <h2 className="mb-5 text-2xl font-black">{isAr ? "اعثر على أداتك التالية" : "Find your next digital tool"}</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { icon: Palette, ar: "قوالب وتصميم", en: "Design assets", color: "text-pink-300" },
+                    { icon: FileText, ar: "ملفات وكتب", en: "Files & guides", color: "text-blue-300" },
+                    { icon: Code2, ar: "أكواد وأدوات", en: "Code & tools", color: "text-emerald-300" },
+                    { icon: Layers3, ar: "حزم رقمية", en: "Digital bundles", color: "text-purple-300" },
+                  ].map(({ icon: Icon, ar, en, color }) => (
+                    <div key={en} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                      <Icon className={`mb-3 h-5 w-5 ${color}`} />
+                      <span className="text-sm font-semibold text-slate-200">{isAr ? ar : en}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4">
+                <CheckCircle2 className="w-6 h-6 shrink-0 text-emerald-400" />
+                <span className="font-semibold">
+                  {isAr ? "تسوق واضح وثنائي اللغة" : "Clear bilingual shopping"}
+                </span>
               </div>
             </div>
           </div>
