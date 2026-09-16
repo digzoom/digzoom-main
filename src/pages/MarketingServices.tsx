@@ -154,18 +154,18 @@ export default function MarketingServices() {
   ];
   const steps = isAr
     ? [
-        ["01", "نستمع ونشخّص", "نفهم النشاط والجمهور والهدف والموارد المتاحة."],
+        ["01", "نفهم مشروعك", "نتعرف على نشاطك وجمهورك وأهدافك والموارد المتاحة."],
         ["02", "نحدد الأولويات", "نختار الأعمال الأعلى أثراً ونوضح نطاق التنفيذ."],
-        ["03", "ننطلق ونقيس", "ننّفذ، نراقب المؤشرات، ونشاركك ما تحقق بوضوح."],
+        ["03", "ننفذ ونقيس", "نبدأ العمل، نتابع المؤشرات، ونشاركك النتائج بوضوح."],
       ]
     : [
-        ["01", "Listen and diagnose", "We understand the business, audience, goals, and resources."],
+        ["01", "Understand your business", "We learn about your business, audience, goals, and available resources."],
         ["02", "Set priorities", "We choose the highest-impact work and define the scope."],
         ["03", "Launch and measure", "We execute, track the right signals, and report clearly."],
       ];
   const faqs = isAr
     ? [
-        ["هل توجد باقات ثابتة؟", "نحدد النطاق والسعر بعد التشخيص لأن احتياج كل نشاط مختلف. ستحصل على عرض واضح قبل بدء أي عمل."],
+        ["هل توجد باقات ثابتة؟", "نقدم عرضاً مخصصاً لأن احتياج كل مشروع مختلف. ستعرف نطاق العمل والسعر والمدة قبل أن نبدأ."],
         ["هل ميزانية الإعلانات ضمن أتعاب الإدارة؟", "تُفصل ميزانية المنصات الإعلانية عن أتعاب الإدارة، ويُوضح الاثنان في العرض."],
         ["هل يمكن البدء بخدمة واحدة؟", "نعم. يمكن البدء بمشروع محدد ثم التوسع بناءً على النتائج والأولوية."],
         ["كيف تتم متابعة العمل؟", "نحدد مؤشرات الأداء وآلية التواصل والتقارير ضمن نطاق المشروع المتفق عليه."],
@@ -200,7 +200,7 @@ export default function MarketingServices() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-4 font-bold shadow-lg shadow-blue-900/30 hover:bg-blue-500 transition">
-                {isAr ? "اطلب جلسة تشخيص" : "Request a discovery call"}
+                {isAr ? "اطلب استشارة أولية" : "Request an initial consultation"}
                 <Arrow className="w-5 h-5" />
               </Link>
               <button type="button" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[.04] px-7 py-4 font-semibold hover:bg-white/[.08] transition">
@@ -325,7 +325,7 @@ export default function MarketingServices() {
           <img src="/images/services/strategy-session.jpg" alt={isAr ? "جلسة تخطيط استراتيجية" : "Strategy planning session"} loading="lazy" className="w-full aspect-[4/3] object-cover rounded-[2rem]" />
           <div>
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-400 mb-6"><Lightbulb className="w-6 h-6" /></div>
-            <h2 className="text-3xl md:text-4xl font-black mb-5">{isAr ? "من التشخيص إلى التنفيذ" : "From diagnosis to delivery"}</h2>
+            <h2 className="text-3xl md:text-4xl font-black mb-5">{isAr ? "من الفكرة إلى نتائج قابلة للقياس" : "From ideas to measurable results"}</h2>
             <p className="text-gray-400 leading-8 mb-9">{isAr ? "ثلاث مراحل بسيطة تقلل التخمين، وتربط كل عمل بهدف ومقياس واضح." : "Three simple stages reduce guesswork and connect every activity to a clear goal and measure."}</p>
             <div className="space-y-7">
               {steps.map(([num, title, description]) => (
@@ -343,9 +343,9 @@ export default function MarketingServices() {
         <div className="grid lg:grid-cols-[.85fr_1.15fr] gap-12">
           <div>
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-700 mb-6"><BarChart3 className="w-6 h-6" /></div>
-            <h2 className="text-3xl md:text-4xl font-black mb-5">{isAr ? "السعر بعد التشخيص، وليس قبله" : "Pricing follows diagnosis"}</h2>
-            <p className="text-gray-600 leading-8 mb-7">{isAr ? "لا نعرض باقات وهمية أو سعراً واحداً لاحتياجات مختلفة. بعد فهم المشروع، نرسل نطاقاً يتضمن الأعمال والمخرجات والمدة والتكلفة." : "We do not force different needs into a generic package. After discovery, we send a scope covering work, deliverables, timeline, and cost."}</p>
-            <Link to="/contact" className="inline-flex items-center gap-2 font-bold text-blue-700">{isAr ? "اطلب عرضاً واضحاً" : "Request a clear proposal"}<Arrow className="w-4 h-4" /></Link>
+            <h2 className="text-3xl md:text-4xl font-black mb-5">{isAr ? "عرض مخصص حسب احتياج مشروعك" : "A proposal tailored to your business"}</h2>
+            <p className="text-gray-600 leading-8 mb-7">{isAr ? "بعد فهم أهدافك، نرسل عرضاً واضحاً يحدد الأعمال والمخرجات والمدة والتكلفة، حتى تعرف ما ستحصل عليه قبل الموافقة." : "After understanding your goals, we send a clear proposal covering the work, deliverables, timeline, and cost so you know exactly what to expect before approving it."}</p>
+            <Link to="/contact" className="inline-flex items-center gap-2 font-bold text-blue-700">{isAr ? "اطلب عرضاً لمشروعك" : "Request a proposal"}<Arrow className="w-4 h-4" /></Link>
           </div>
           <div className="rounded-3xl border border-gray-200 bg-white p-7 md:p-9 shadow-sm">
             <h3 className="text-xl font-black mb-6">{isAr ? "يتضمن العرض قبل الموافقة" : "Your proposal includes"}</h3>
@@ -376,8 +376,8 @@ export default function MarketingServices() {
 
       <section className="bg-[#080b12] text-white py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl md:text-5xl font-black mb-5">{isAr ? "ابدأ بالسؤال الصحيح لمشروعك" : "Start with the right question"}</h2>
-          <p className="text-gray-400 text-lg leading-8 mb-8">{isAr ? "أرسل لنا هدفك والتحدي الحالي. سنناقش ما يستحق التنفيذ وما يمكن تأجيله." : "Tell us your goal and current challenge. We will discuss what is worth doing now and what can wait."}</p>
+          <h2 className="text-3xl md:text-5xl font-black mb-5">{isAr ? "خلّنا نعرف أين تريد أن تصل" : "Tell us where you want to go"}</h2>
+          <p className="text-gray-400 text-lg leading-8 mb-8">{isAr ? "شاركنا هدفك والتحدي الذي تواجهه الآن، وسنقترح عليك الخطوة الأنسب بوضوح." : "Share your goal and current challenge, and we will recommend the clearest next step."}</p>
           <Link to="/contact" className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 font-black text-[#0b0e15] hover:bg-blue-50 transition">{isAr ? "تواصل مع DigZoom" : "Talk to DigZoom"}<Arrow className="w-5 h-5" /></Link>
         </div>
       </section>
