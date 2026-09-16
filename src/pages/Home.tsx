@@ -92,7 +92,7 @@ export default function Home() {
         growthEyebrow: "DIGZOOM GROWTH",
         growthTitle: "Growth services that complement your digital products",
         growthSub:
-          "From strategy and campaigns to commerce and analytics—we diagnose what your business needs, then define a clear delivery scope.",
+          "From strategy and campaigns to commerce and analytics—we understand what your business needs, then define a clear delivery scope.",
         growthCta: "Explore growth services",
       };
   const benefits = isAr

@@ -19,7 +19,7 @@ const services = {
   "growth-strategy": {
     icon: Target,
     image: "/images/services/strategy-session.jpg",
-    ar: { title: "استراتيجية النمو الرقمي", intro: "خطة عملية تربط أهداف النشاط بالقنوات والرسائل ومؤشرات الأداء.", includes: ["مراجعة النشاط والحضور الحالي", "تحليل الجمهور والمنافسين", "تحديد الأولويات والقنوات", "خطة تنفيذ ومؤشرات قياس"], fit: "للأنشطة التي تنفذ أعمالاً متفرقة وتحتاج إلى اتجاه واضح قبل زيادة الإنفاق.", timeline: "تُحدد بعد جلسة التشخيص بحسب حجم النشاط والبيانات المتاحة." },
+    ar: { title: "استراتيجية النمو الرقمي", intro: "خطة عملية تربط أهداف النشاط بالقنوات والرسائل ومؤشرات الأداء.", includes: ["مراجعة النشاط والحضور الحالي", "تحليل الجمهور والمنافسين", "تحديد الأولويات والقنوات", "خطة تنفيذ ومؤشرات قياس"], fit: "للأنشطة التي تنفذ أعمالاً متفرقة وتحتاج إلى اتجاه واضح قبل زيادة الإنفاق.", timeline: "تُحدد بعد مراجعة احتياج المشروع وحجم النشاط والبيانات المتاحة." },
     en: { title: "Digital growth strategy", intro: "An actionable plan connecting business goals with channels, messages, and KPIs.", includes: ["Business and presence audit", "Audience and competitor review", "Channel prioritization", "Action plan and KPIs"], fit: "For businesses doing disconnected activities that need direction before increasing spend.", timeline: "Confirmed after discovery based on business size and available data." },
   },
   "paid-campaigns": {
@@ -31,7 +31,7 @@ const services = {
   "social-presence": {
     icon: Users,
     image: "/images/services/growth-team.jpg",
-    ar: { title: "إدارة الحضور الاجتماعي", intro: "حضور منظم يعكس هوية النشاط ويخدم هدفاً واضحاً بدلاً من النشر العشوائي.", includes: ["تحديد محاور المحتوى", "تقويم نشر", "تصميم وكتابة المحتوى", "متابعة الأداء"], fit: "للشركات والعلامات التي تحتاج إلى انتظام وهوية ورسائل موحدة.", timeline: "النطاق الشهري وعدد المنصات والمخرجات يحدد بعد التشخيص." },
+    ar: { title: "إدارة الحضور الاجتماعي", intro: "حضور منظم يعكس هوية النشاط ويخدم هدفاً واضحاً بدلاً من النشر العشوائي.", includes: ["تحديد محاور المحتوى", "تقويم نشر", "تصميم وكتابة المحتوى", "متابعة الأداء"], fit: "للشركات والعلامات التي تحتاج إلى انتظام وهوية ورسائل موحدة.", timeline: "يُحدد النطاق الشهري بعد معرفة عدد المنصات والمخرجات المطلوبة." },
     en: { title: "Social presence management", intro: "A consistent presence built around brand identity and a clear objective.", includes: ["Content pillars", "Publishing calendar", "Design and copy", "Performance review"], fit: "For brands that need consistency, identity, and unified messaging.", timeline: "Monthly scope, platforms, and deliverables are confirmed after discovery." },
   },
   "creative-content": {
@@ -97,8 +97,8 @@ export default function ServiceDetail() {
           <div className="rounded-3xl bg-[#0b0e15] text-white p-7">
             <CircleCheckBig className="w-7 h-7 text-emerald-400 mb-5" />
             <p className="text-sm text-blue-300 font-bold mb-2">{isAr ? "التسعير" : "Pricing"}</p>
-            <h2 className="text-2xl font-black mb-4">{isAr ? "عرض مخصص بعد التشخيص" : "Custom proposal after discovery"}</h2>
-            <p className="text-gray-400 leading-7 text-sm">{isAr ? "لا نعرض رقماً وهمياً لخدمات تختلف باختلاف النطاق. تحصل قبل البدء على السعر والمخرجات والمدة وطريقة الدفع مكتوبة بوضوح." : "We do not publish a made-up price for variable work. Before starting, you receive the cost, deliverables, timeline, and payment terms in writing."}</p>
+            <h2 className="text-2xl font-black mb-4">{isAr ? "عرض مخصص لمشروعك" : "A proposal tailored to your business"}</h2>
+            <p className="text-gray-400 leading-7 text-sm">{isAr ? "قبل بدء العمل، تستلم عرضاً واضحاً يحدد السعر والمخرجات والمدة وطريقة الدفع." : "Before work begins, you receive a clear proposal covering the cost, deliverables, timeline, and payment terms."}</p>
           </div>
           <div className="rounded-3xl border border-gray-200 bg-white p-7">
             <Clock3 className="w-6 h-6 text-blue-600 mb-4" />

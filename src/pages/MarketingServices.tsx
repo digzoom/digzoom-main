@@ -51,7 +51,7 @@ export default function MarketingServices() {
           icon: Target,
           title: "استراتيجية النمو الرقمي",
           description: "نحوّل أهداف النشاط إلى أولويات وقنوات ومؤشرات أداء قابلة للقياس.",
-          deliverables: ["تشخيص الوضع الحالي", "خريطة فرص واضحة", "خطة تنفيذ مرحلية"],
+          deliverables: ["مراجعة الوضع الحالي", "خريطة فرص واضحة", "خطة تنفيذ مرحلية"],
           image: "/images/services/strategy-session.jpg",
         },
         {
@@ -171,7 +171,7 @@ export default function MarketingServices() {
         ["كيف تتم متابعة العمل؟", "نحدد مؤشرات الأداء وآلية التواصل والتقارير ضمن نطاق المشروع المتفق عليه."],
       ]
     : [
-        ["Do you offer fixed packages?", "Scope and price follow diagnosis because each business is different. You receive a clear proposal before work starts."],
+        ["Do you offer fixed packages?", "We tailor the scope and price to your business. You receive the deliverables, timeline, and cost before work starts."],
         ["Is ad spend included?", "Platform spend is separate from management fees, and both are stated in the proposal."],
         ["Can we start with one service?", "Yes. We can start with a focused project, then expand based on priority and results."],
         ["How is work tracked?", "KPIs, communication, and reporting are defined in the agreed project scope."],
