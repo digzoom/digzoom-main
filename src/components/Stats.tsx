@@ -1,10 +1,10 @@
-import { Users, Package, Download, Star } from 'lucide-react';
+import { Languages, Package, ChartNoAxesCombined, ShieldCheck } from 'lucide-react';
 
 const stats = [
-  { icon: <Package className="w-6 h-6" />, value: '300+', label: 'منتج رقمي' },
-  { icon: <Users className="w-6 h-6" />, value: '12,000+', label: 'عميل سعيد' },
-  { icon: <Download className="w-6 h-6" />, value: '75,000+', label: 'عملية تحميل' },
-  { icon: <Star className="w-6 h-6" />, value: '4.9', label: 'متوسط التقييم' },
+  { icon: <Package className="w-6 h-6" />, value: '10', label: 'منتجات احترافية' },
+  { icon: <Languages className="w-6 h-6" />, value: '2', label: 'لغات مدعومة' },
+  { icon: <ChartNoAxesCombined className="w-6 h-6" />, value: '10', label: 'لوحات بيانات' },
+  { icon: <ShieldCheck className="w-6 h-6" />, value: '100%', label: 'ملفات خاصة' },
 ];
 
 export default function Stats() {
