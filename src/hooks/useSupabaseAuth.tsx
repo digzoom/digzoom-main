@@ -55,32 +55,23 @@ async function restQuery(token: string, table: string, select: string, eq?: { co
 
 // Fetch profile + role using USER token (passes RLS)
 async function loadProfile(token: string, userId: string, email: string, metadata: any): Promise<User> {
-  console.log('[AUTH] loadProfile for userId:', userId);
 
   // 1. Query profiles
   const profileRes = await restQuery(token, 'profiles', 'full_name,avatar_url,role,phone', { col: 'id', val: userId });
-  console.log('[AUTH] profiles response status:', profileRes.status);
   const profiles = await profileRes.json().catch(() => []);
   const profile = Array.isArray(profiles) ? profiles[0] : profiles;
-  console.log('[AUTH] profiles data:', JSON.stringify(profile || {}));
 
   // 2. Query user_roles
   const rolesRes = await restQuery(token, 'user_roles', 'role,is_active', { col: 'user_id', val: userId });
-  console.log('[AUTH] user_roles response status:', rolesRes.status);
   const userRoles = await rolesRes.json().catch(() => []);
   const ur = Array.isArray(userRoles) ? userRoles[0] : userRoles;
-  console.log('[AUTH] user_roles data:', JSON.stringify(ur || {}));
 
   // 3. Resolve role
   let resolvedRole: UserRole = 'user';
   if (ur?.is_active === true && ur?.role) {
     resolvedRole = ur.role;
-    console.log('[AUTH] role from user_roles:', resolvedRole);
   } else if (profile?.role) {
     resolvedRole = profile.role;
-    console.log('[AUTH] role from profiles:', resolvedRole);
-  } else {
-    console.log('[AUTH] no role found, defaulting to user');
   }
 
   // 4. Resolve name
@@ -89,7 +80,6 @@ async function loadProfile(token: string, userId: string, email: string, metadat
   // 5. Resolve avatar
   const avatar = profile?.avatar_url || metadata?.avatar_url || metadata?.picture || '';
 
-  console.log('[AUTH] FINAL name:', name, 'role:', resolvedRole, 'hasAvatar:', !!avatar);
 
   return {
     id: userId,
@@ -120,14 +110,12 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Core: load user from token
   const loadUser = useCallback(async (token: string) => {
-    console.log('[AUTH] loadUser token length:', token?.length);
     try {
       // Get auth user info
       const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
         headers: makeUserHeaders(token),
         signal: AbortSignal.timeout(10000),
       });
-      console.log('[AUTH] /auth/v1/user status:', res.status);
 
       if (!res.ok) {
         console.error('[AUTH] /auth/v1/user FAILED');
@@ -137,9 +125,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       }
 
       const authUser = await res.json();
-      console.log('[AUTH] authUser id:', authUser.id);
-      console.log('[AUTH] expected admin: 866de745-c743-4611-b6b1-839470b3cf4a');
-      console.log('[AUTH] IDs match:', authUser.id === '866de745-c743-4611-b6b1-839470b3cf4a');
 
       // Load profile + role with user token (passes RLS)
       const userData = await loadProfile(token, authUser.id, authUser.email, authUser.user_metadata);
@@ -156,7 +141,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
     const init = async () => {
       setLoading(true);
-      console.log('[AUTH] === init ===');
 
       // 1. Check for PKCE OAuth callback (?code= in search params)
       // We use detectSessionInUrl=false so we handle this manually.
@@ -166,13 +150,11 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       const code = url.searchParams.get('code');
 
       if (code) {
-        console.log('[AUTH] PKCE callback detected, code:', code.substring(0, 8) + '...');
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (error) {
           console.error('[AUTH] exchangeCodeForSession FAILED:', error.message);
         } else if (data.session) {
-          console.log('[AUTH] PKCE SUCCESS! token length:', data.session.access_token.length);
           localStorage.setItem('sb_access_token', data.session.access_token);
           localStorage.setItem('sb_refresh_token', data.session.refresh_token);
 
@@ -192,7 +174,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (session?.access_token) {
-        console.log('[AUTH] Session found! token length:', session.access_token.length);
         localStorage.setItem('sb_access_token', session.access_token);
         localStorage.setItem('sb_refresh_token', session.refresh_token);
         if (mounted) await loadUser(session.access_token);
@@ -200,10 +181,8 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         // Fallback: try stored token
         const token = localStorage.getItem('sb_access_token');
         if (token) {
-          console.log('[AUTH] No session, trying stored token');
           if (mounted) await loadUser(token);
         } else {
-          console.log('[AUTH] No session, no token');
           if (mounted) setUser(null);
         }
       }
@@ -215,7 +194,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AUTH] onAuthStateChange:', event, 'hasSession:', !!session);
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
         localStorage.setItem('sb_access_token', session.access_token);
         if (mounted) await loadUser(session.access_token);
