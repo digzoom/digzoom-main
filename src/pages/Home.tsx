@@ -290,6 +290,36 @@ export default function Home() {
         )}
       </section>
 
+      <section className="relative border-y border-white/[.06] bg-[#0d1018] py-20 md:py-24 overflow-hidden">
+        <div className="absolute -top-40 end-0 h-96 w-96 rounded-full bg-blue-600/10 blur-3xl" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+            <div className="max-w-3xl">
+              <p className="text-blue-400 text-sm font-black tracking-widest mb-3">{copy.growthEyebrow}</p>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4">{copy.growthTitle}</h2>
+              <p className="text-gray-400 text-lg leading-8">{copy.growthSub}</p>
+            </div>
+            <Link to="/marketing" className="inline-flex items-center gap-2 text-blue-400 font-bold shrink-0">
+              {copy.growthCta}<Arrow className="w-5 h-5" />
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {growthServices.map(({ icon: Icon, title, text, image }) => (
+              <Link key={title} to="/marketing" className="group overflow-hidden rounded-3xl border border-white/[.08] bg-[#141824] hover:-translate-y-1 hover:border-blue-400/30 transition duration-300">
+                <div className="relative aspect-[16/10] overflow-hidden bg-[#171b25]">
+                  <img src={image} alt={title} loading="lazy" className="h-full w-full object-cover group-hover:scale-105 transition duration-500" />
+                  <div className="absolute bottom-4 start-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-xl"><Icon className="w-5 h-5" /></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-black text-xl mb-2 group-hover:text-blue-400 transition">{title}</h3>
+                  <p className="text-sm leading-6 text-gray-400">{text}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-white/[.05] bg-white/[.018] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10">
