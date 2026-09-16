@@ -664,7 +664,11 @@
     "removeImage": "Remove",
     "dragToReorder": "Drag to reorder",
     "days": "days",
-    "primary": "Primary"
+    "primary": "Primary",
+    "email": "Email",
+    "usage": "Usage",
+    "orderNo": "Order number",
+    "noData": "No data available"
   },
   "login": {
     "welcome": "Welcome",

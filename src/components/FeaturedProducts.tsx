@@ -3,7 +3,7 @@ import { Star, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
-import { productTitle, productDescription } from '@/lib/i18n';
+import { productTitle } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 

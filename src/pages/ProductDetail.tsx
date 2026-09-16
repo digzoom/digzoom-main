@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useParams } from 'react-router';
 import { Link } from 'react-router';
 import {
   ShoppingCart, Check, FileText, HardDrive,
@@ -8,10 +8,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/database';
-import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
 import { productTitle, productLongDescription } from '@/lib/i18n';
-import { toast } from 'sonner';
 
 /* ── Trust badges ── */
 const getTrustBadges = (hasDeliveryAsset: boolean) => [
@@ -22,8 +20,6 @@ const getTrustBadges = (hasDeliveryAsset: boolean) => [
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { addToCart } = useCart();
   const { lang, t } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);

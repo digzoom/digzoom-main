@@ -62,7 +62,7 @@ function saveCartToStorage(items: CartItem[]) {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadCartFromStorage);
-  const [conflictWarning, setConflictWarning] = useState<string | null>(null);
+  const [conflictWarning] = useState<string | null>(null);
 
   // Persist cart to localStorage on every change
   useEffect(() => {

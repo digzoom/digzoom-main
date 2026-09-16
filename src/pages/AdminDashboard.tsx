@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router';
 import { trpc } from '@/providers/trpc';
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Tag,
-  Receipt, BarChart3, Bell, ClipboardList, Settings,
+  Receipt, BarChart3, Settings,
   Plus, Search, Edit3, Trash2, X, Save, ChevronLeft,
-  TrendingUp, DollarSign, ShoppingCart, UserPlus,
+  TrendingUp, DollarSign, ShoppingCart,
   LogOut, Upload, Image, Activity, Star, Eye, CheckCircle,
   XCircle, ImagePlus, Crown
 } from 'lucide-react';

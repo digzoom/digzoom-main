@@ -314,6 +314,7 @@ export const adminRouter = createRouter({
         .object({
           limit: z.number().min(1).max(500).default(100),
           search: z.string().optional(),
+          status: z.enum(["active", "inactive", "all"]).default("active"),
         })
         .optional()
     )
@@ -326,6 +327,8 @@ export const adminRouter = createRouter({
         .order("id", { ascending: false })
         .limit(input?.limit ?? 100);
       if (input?.search) query = query.ilike("title", `%${input.search}%`);
+      if ((input?.status ?? "active") === "active") query = query.eq("is_active", true);
+      if (input?.status === "inactive") query = query.eq("is_active", false);
       const { data, error } = await query;
       if (error) {
         console.error("[listProducts] DB error:", error.message);
@@ -1193,3 +1196,5 @@ export const adminRouter = createRouter({
     return result;
   }),
 });
+
+export type AdminRouter = typeof adminRouter;

@@ -63,7 +63,10 @@ export async function verifySupabaseToken(
 
     // Step 2: Read role using admin client (service role, bypasses RLS)
     // Same approach as meDebug endpoint — unified role resolution
-    const admin = getSupabaseAdmin();
+    // The admin client intentionally has no generated database type. Keep the
+    // authentication response narrow at this boundary instead of leaking
+    // `never` into the tRPC router types.
+    const admin = getSupabaseAdmin() as any;
 
     // Check user_roles first
     const { data: userRole, error: rolesErr } = await admin

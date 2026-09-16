@@ -31,6 +31,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
+        Relationships: [];
       };
       user_roles: {
         Row: {
@@ -50,6 +51,8 @@ export interface Database {
           revoked_at?: string | null;
           is_active?: boolean;
         };
+        Update: Partial<Database['public']['Tables']['user_roles']['Insert']>;
+        Relationships: [];
       };
       categories: {
         Row: {
@@ -62,6 +65,9 @@ export interface Database {
           is_active: boolean;
           created_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['categories']['Row']>;
+        Update: Partial<Database['public']['Tables']['categories']['Row']>;
+        Relationships: [];
       };
       products: {
         Row: {
@@ -104,6 +110,7 @@ export interface Database {
         };
         Insert: Omit<Database['public']['Tables']['products']['Row'], 'id' | 'created_at' | 'updated_at'> & { id?: number };
         Update: Partial<Database['public']['Tables']['products']['Insert']>;
+        Relationships: [];
       };
       orders: {
         Row: {
@@ -130,6 +137,9 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['orders']['Row']>;
+        Update: Partial<Database['public']['Tables']['orders']['Row']>;
+        Relationships: [];
       };
       order_items: {
         Row: {
@@ -147,6 +157,9 @@ export interface Database {
           max_downloads: number;
           created_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['order_items']['Row']>;
+        Update: Partial<Database['public']['Tables']['order_items']['Row']>;
+        Relationships: [];
       };
       coupons: {
         Row: {
@@ -164,6 +177,9 @@ export interface Database {
           created_by: string | null;
           created_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['coupons']['Row']>;
+        Update: Partial<Database['public']['Tables']['coupons']['Row']>;
+        Relationships: [];
       };
       order_status_history: {
         Row: {
@@ -174,6 +190,9 @@ export interface Database {
           reason: string | null;
           created_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['order_status_history']['Row']>;
+        Update: Partial<Database['public']['Tables']['order_status_history']['Row']>;
+        Relationships: [];
       };
       download_logs: {
         Row: {
@@ -184,6 +203,9 @@ export interface Database {
           user_agent: string | null;
           downloaded_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['download_logs']['Row']>;
+        Update: Partial<Database['public']['Tables']['download_logs']['Row']>;
+        Relationships: [];
       };
       admin_audit_logs: {
         Row: {
@@ -198,8 +220,15 @@ export interface Database {
           ip_address: string | null;
           created_at: string;
         };
+        Insert: Partial<Database['public']['Tables']['admin_audit_logs']['Row']>;
+        Update: Partial<Database['public']['Tables']['admin_audit_logs']['Row']>;
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
 
