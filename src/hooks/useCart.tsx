@@ -15,7 +15,8 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_STORAGE_KEY = 'digzoom_cart_v1';
+// v2 intentionally invalidates carts that may still contain the retired demo catalog.
+const CART_STORAGE_KEY = 'digzoom_cart_v2';
 
 /* ── Bundle conflict mapping ──
    Defines which product IDs are bundles that contain other product IDs.
