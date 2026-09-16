@@ -121,6 +121,7 @@ export default function Checkout() {
 
       // Store minimal order reference for thank-you page
       localStorage.setItem('lastOrderId', result.orderId);
+      localStorage.setItem('lastOrderEmail', finalEmail.trim().toLowerCase());
 
       setOrderCompleted(true);
       toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح!' : 'Order created successfully!');

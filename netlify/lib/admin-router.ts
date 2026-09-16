@@ -105,6 +105,42 @@ export const adminRouter = createRouter({
         throw new Error("Checkout is temporarily unavailable");
       }
 
+      // Never trust prices, titles, product state, or totals supplied by the
+      // browser. Rebuild the order from active database products.
+      const productIds = [...new Set(input.items.map((item) => item.product_id))];
+      const { data: products, error: productsError } = await admin()
+        .from("products")
+        .select("id,title,title_ar,title_en,price,product_type,is_active,in_stock")
+        .in("id", productIds);
+
+      if (productsError) throw new Error("Unable to validate cart");
+      if (!products || products.length !== productIds.length) {
+        throw new Error("One or more products are unavailable");
+      }
+
+      const productsById = new Map(products.map((product: any) => [product.id, product]));
+      const validatedItems = input.items.map((item) => {
+        const product: any = productsById.get(item.product_id);
+        if (!product?.is_active || !product?.in_stock) {
+          throw new Error("One or more products are unavailable");
+        }
+        const price = Number(product.price);
+        return {
+          product_id: product.id,
+          quantity: item.quantity,
+          price,
+          title: product.title_ar || product.title || product.title_en,
+          product_type: product.product_type || "digital_download",
+        };
+      });
+
+      const subtotal = validatedItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+      const taxAmount = Math.round(subtotal * 0.15);
+      const totalAmount = subtotal + taxAmount;
+
       const orderId = `DZ-${Date.now().toString(36).toUpperCase()}`;
 
       // 1. Insert order
@@ -113,16 +149,16 @@ export const adminRouter = createRouter({
         .insert({
           id: orderId,
           status: "pending",
-          subtotal: input.subtotal,
-          tax_amount: input.tax_amount,
-          total_amount: input.total_amount,
-          discount_amount: input.discount_amount,
+          subtotal,
+          tax_amount: taxAmount,
+          total_amount: totalAmount,
+          discount_amount: 0,
           payment_method: "pending",
           customer_name: input.customer_name,
           customer_email: input.customer_email,
           customer_phone: input.customer_phone || null,
-          coupon_code: input.coupon_code || null,
-          coupon_discount: input.coupon_discount || 0,
+          coupon_code: null,
+          coupon_discount: 0,
           customer_notes: input.customer_notes || null,
           customer_input: {},
           payment_payload: {},
@@ -134,7 +170,7 @@ export const adminRouter = createRouter({
       }
 
       // 2. Insert order items
-      const orderItems = input.items.map((item) => ({
+      const orderItems = validatedItems.map((item) => ({
         order_id: orderId,
         product_id: item.product_id,
         quantity: item.quantity,
@@ -158,6 +194,117 @@ export const adminRouter = createRouter({
       }
 
       return { orderId, status: "pending" };
+    }),
+
+  /* Secure digital delivery. Metadata is separate from signed-link creation
+     so refreshing the confirmation page does not consume a download. */
+  listOrderDownloads: publicQuery
+    .input(z.object({ order_id: z.string().min(6), email: z.string().email() }))
+    .query(async ({ input }) => {
+      const { data: order, error: orderError } = await admin()
+        .from("orders")
+        .select("id,customer_email,status,paid_at")
+        .eq("id", input.order_id)
+        .maybeSingle();
+
+      const paid = order && (order.status === "paid" || order.status === "completed" || !!order.paid_at);
+      if (orderError || !paid || order.customer_email?.trim().toLowerCase() !== input.email.trim().toLowerCase()) {
+        throw new Error("Downloads are not available for this order");
+      }
+
+      const { data: items, error: itemsError } = await admin()
+        .from("order_items")
+        .select("id,product_id,product_title,download_count,max_downloads,delivery_status")
+        .eq("order_id", input.order_id);
+      if (itemsError) throw new Error("Unable to load order downloads");
+
+      const productIds = (items ?? []).map((item: any) => item.product_id).filter(Boolean);
+      const { data: products, error: productsError } = await admin()
+        .from("products")
+        .select("id,title_ar,title_en,file_type,file_size,image_url,storage_path")
+        .in("id", productIds);
+      if (productsError) throw new Error("Unable to load product files");
+      const productsById = new Map((products ?? []).map((product: any) => [product.id, product]));
+
+      return (items ?? []).map((item: any) => {
+        const product: any = productsById.get(item.product_id);
+        return {
+          order_item_id: item.id,
+          title_ar: product?.title_ar || item.product_title,
+          title_en: product?.title_en || item.product_title,
+          file_type: product?.file_type || "XLSX",
+          file_size: product?.file_size || "",
+          image_url: product?.image_url || "",
+          download_count: item.download_count || 0,
+          max_downloads: item.max_downloads || 5,
+          available: Boolean(product?.storage_path) && (item.download_count || 0) < (item.max_downloads || 5),
+        };
+      });
+    }),
+
+  createDownloadLink: publicQuery
+    .input(z.object({
+      order_id: z.string().min(6),
+      order_item_id: z.number().int().positive(),
+      email: z.string().email(),
+    }))
+    .mutation(async ({ input }) => {
+      const { data: order } = await admin()
+        .from("orders")
+        .select("id,customer_email,status,paid_at,user_id")
+        .eq("id", input.order_id)
+        .maybeSingle();
+      const paid = order && (order.status === "paid" || order.status === "completed" || !!order.paid_at);
+      if (!paid || order.customer_email?.trim().toLowerCase() !== input.email.trim().toLowerCase()) {
+        throw new Error("Download authorization failed");
+      }
+
+      const { data: item } = await admin()
+        .from("order_items")
+        .select("id,product_id,download_count,max_downloads")
+        .eq("id", input.order_item_id)
+        .eq("order_id", input.order_id)
+        .maybeSingle();
+      if (!item || item.download_count >= item.max_downloads) {
+        throw new Error("Download limit reached");
+      }
+
+      const { data: product } = await admin()
+        .from("products")
+        .select("storage_path,title_en")
+        .eq("id", item.product_id)
+        .maybeSingle();
+      if (!product?.storage_path) throw new Error("Product file is not ready");
+
+      // Compare-and-swap prevents concurrent requests from exceeding the limit.
+      const { data: updated, error: updateError } = await admin()
+        .from("order_items")
+        .update({
+          download_count: item.download_count + 1,
+          delivery_status: "delivered",
+          delivered_at: new Date().toISOString(),
+        })
+        .eq("id", item.id)
+        .eq("download_count", item.download_count)
+        .lt("download_count", item.max_downloads)
+        .select("id")
+        .maybeSingle();
+      if (updateError || !updated) throw new Error("Please retry the download");
+
+      const filename = `${product.title_en || "digzoom-product"}.xlsx`.replace(/[^a-zA-Z0-9._ -]/g, "");
+      const { data: signed, error: signedError } = await admin().storage
+        .from("digital-products")
+        .createSignedUrl(product.storage_path, 60, { download: filename });
+      if (signedError || !signed?.signedUrl) {
+        await admin().from("order_items").update({ download_count: item.download_count }).eq("id", item.id);
+        throw new Error("Unable to create secure download link");
+      }
+
+      await admin().from("download_logs").insert({
+        order_item_id: item.id,
+        user_id: order.user_id || null,
+      });
+      return { url: signed.signedUrl, expires_in: 60 };
     }),
 
   /* ─── Products ─── */
@@ -513,6 +660,48 @@ export const adminRouter = createRouter({
       });
 
       return { url: urlData.publicUrl };
+    }),
+
+  uploadDigitalProduct: adminQuery
+    .input(z.object({
+      product_id: z.number().int().positive(),
+      filename: z.string().min(1).max(160),
+      base64: z.string().min(1),
+    }))
+    .mutation(async ({ input }) => {
+      const buffer = Buffer.from(input.base64, "base64");
+      if (buffer.length === 0 || buffer.length > 10 * 1024 * 1024) {
+        throw new Error("Product file must be between 1 byte and 10 MB");
+      }
+      if (!input.filename.toLowerCase().endsWith(".xlsx")) {
+        throw new Error("Only XLSX product files are allowed");
+      }
+      const safeName = input.filename.replace(/[^a-zA-Z0-9._-]/g, "-");
+      const storagePath = `${input.product_id}/${safeName}`;
+      const { error: uploadError } = await admin().storage
+        .from("digital-products")
+        .upload(storagePath, buffer, {
+          contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          cacheControl: "3600",
+          upsert: true,
+        });
+      if (uploadError) throw new Error("Upload failed: " + uploadError.message);
+
+      const { error: productError } = await admin()
+        .from("products")
+        .update({
+          storage_path: storagePath,
+          download_url: null,
+          file_type: "XLSX",
+          file_size: `${Math.max(1, Math.ceil(buffer.length / 1024))} KB`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", input.product_id);
+      if (productError) {
+        await admin().storage.from("digital-products").remove([storagePath]);
+        throw new Error("Product record update failed");
+      }
+      return { storage_path: storagePath, size_bytes: buffer.length };
     }),
 
   /* ─── Stats (each query independently wrapped) ─── */

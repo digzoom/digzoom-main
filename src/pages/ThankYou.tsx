@@ -1,49 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { CheckCircle, Download, Home, Package, Clock, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Download, Home, Package, Clock, ShieldCheck, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { productTitle } from '@/lib/i18n';
-import type { Product } from '@/types';
-
-interface OrderItem {
-  product: Product;
-  quantity: number;
-}
+import { trpc } from '@/providers/trpc';
+import { toast } from 'sonner';
 
 export default function ThankYou() {
   const { lang } = useLanguage();
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [orderDate] = useState(new Date());
   // Read REAL order ID from localStorage (set by Checkout after createOrder)
   const [orderId] = useState(() => {
     const saved = localStorage.getItem('lastOrderId');
     return saved || '';
   });
+  const [orderEmail] = useState(() => localStorage.getItem('lastOrderEmail') || '');
+  const downloads = trpc.listOrderDownloads.useQuery(
+    { order_id: orderId, email: orderEmail },
+    { enabled: Boolean(orderId && orderEmail), retry: false }
+  );
+  const createLink = trpc.createDownloadLink.useMutation();
 
-  useEffect(() => {
-    // Get order items from localStorage
-    const saved = localStorage.getItem('lastOrder');
-    if (saved) {
-      try {
-        setOrderItems(JSON.parse(saved));
-      } catch {
-        // ignore
-      }
-    }
-  }, []);
-
-  const hasDownloads = orderItems.some(item => item.product.downloadFile);
-
-  const handleDownload = (product: Product) => {
-    if (product.downloadFile) {
-      const link = document.createElement('a');
-      link.href = product.downloadFile;
-      link.download = product.downloadFile.split('/').pop() || 'download';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  const handleDownload = async (orderItemId: number) => {
+    try {
+      const result = await createLink.mutateAsync({
+        order_id: orderId,
+        order_item_id: orderItemId,
+        email: orderEmail,
+      });
+      window.location.assign(result.url);
+      void downloads.refetch();
+    } catch (error: any) {
+      toast.error(error?.message || (lang === 'ar' ? 'تعذر إنشاء رابط التحميل' : 'Unable to create download link'));
     }
   };
+
+  const orderItems = (downloads.data || []) as Array<{
+    order_item_id: number; title_ar: string; title_en: string; file_type: string;
+    file_size: string; image_url: string; download_count: number; max_downloads: number; available: boolean;
+  }>;
+  const verified = downloads.isSuccess;
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pt-24 pb-16">
@@ -54,12 +49,14 @@ export default function ThankYou() {
             <CheckCircle className="w-10 h-10 text-emerald-400" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-            {lang === 'ar' ? 'تم الدفع بنجاح!' : 'Payment Successful!'}
+              {verified
+                ? (lang === 'ar' ? 'تم التحقق من الدفع' : 'Payment verified')
+                : (lang === 'ar' ? 'حالة الطلب' : 'Order status')}
           </h1>
           <p className="text-gray-400 text-lg">
             {lang === 'ar'
-              ? 'شكراً لشرائك! ملفاتك جاهزة للتحميل.'
-              : 'Thank you for your purchase! Your files are ready for download.'}
+              ? (verified ? 'شكراً لشرائك! ملفاتك جاهزة للتحميل الآمن.' : 'لم يتم تأكيد الدفع لهذا الطلب بعد.')
+              : (verified ? 'Thank you! Your files are ready for secure download.' : 'Payment has not been verified for this order yet.')}
           </p>
         </div>
 
@@ -78,14 +75,20 @@ export default function ThankYou() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-emerald-400 text-sm">
-            <ShieldCheck className="w-4 h-4" />
-            <span>{lang === 'ar' ? 'تم إرسال تفاصيل الطلب إلى بريدك الإلكتروني' : 'Order details sent to your email'}</span>
-          </div>
+          {verified ? (
+            <div className="flex items-center gap-2 text-emerald-400 text-sm">
+              <ShieldCheck className="w-4 h-4" />
+              <span>{lang === 'ar' ? 'تم التحقق من الطلب. روابط التحميل مؤقتة ومحمية.' : 'Order verified. Download links are temporary and protected.'}</span>
+            </div>
+          ) : downloads.isLoading ? (
+            <div className="flex items-center gap-2 text-gray-400 text-sm"><Loader2 className="w-4 h-4 animate-spin" />{lang === 'ar' ? 'جاري التحقق من الطلب' : 'Verifying order'}</div>
+          ) : (
+            <div className="flex items-center gap-2 text-amber-300 text-sm"><Clock className="w-4 h-4" />{lang === 'ar' ? 'لا توجد ملفات متاحة قبل تأكيد الدفع.' : 'No files are available before payment confirmation.'}</div>
+          )}
         </div>
 
         {/* Download Section */}
-        {hasDownloads && (
+        {verified && orderItems.length > 0 && (
           <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/5 rounded-2xl border border-blue-500/20 p-6 mb-6">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <Download className="w-6 h-6 text-blue-400" />
@@ -98,27 +101,26 @@ export default function ThankYou() {
             </p>
 
             <div className="space-y-3">
-              {orderItems
-                .filter(item => item.product.downloadFile)
-                .map((item) => (
+              {orderItems.map((item) => (
                   <div
-                    key={item.product.id}
+                    key={item.order_item_id}
                     className="flex items-center gap-4 bg-white/[0.03] rounded-xl p-4 hover:bg-white/[0.05] transition-all"
                   >
                     <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                       <img
-                        src={item.product.image}
-                        alt={productTitle(item.product, lang)}
+                        src={item.image_url || '/logo.png'}
+                        alt={lang === 'ar' ? item.title_ar : item.title_en}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-medium text-sm truncate">{productTitle(item.product, lang)}</h3>
-                      <p className="text-gray-500 text-xs">{item.product.fileType} · {item.product.fileSize}</p>
+                      <h3 className="text-white font-medium text-sm truncate">{lang === 'ar' ? item.title_ar : item.title_en}</h3>
+                      <p className="text-gray-500 text-xs">{item.file_type} · {item.file_size} · {item.download_count}/{item.max_downloads}</p>
                     </div>
                     <button
-                      onClick={() => handleDownload(item.product)}
-                      className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all flex-shrink-0"
+                      onClick={() => handleDownload(item.order_item_id)}
+                      disabled={!item.available || createLink.isPending}
+                      className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all flex-shrink-0"
                     >
                       <Download className="w-4 h-4" />
                       {lang === 'ar' ? 'تحميل' : 'Download'}
@@ -126,48 +128,6 @@ export default function ThankYou() {
                   </div>
                 ))}
             </div>
-
-            {/* Download All Button */}
-            {orderItems.filter(item => item.product.downloadFile).length > 1 && (
-              <button
-                onClick={() => {
-                  orderItems.forEach((item, i) => {
-                    if (item.product.downloadFile) {
-                      setTimeout(() => handleDownload(item.product), i * 500);
-                    }
-                  });
-                }}
-                className="w-full mt-4 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium px-4 py-3 rounded-xl border border-white/10 transition-all"
-              >
-                <Download className="w-4 h-4" />
-                {lang === 'ar' ? 'تحميل الكل' : 'Download All'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Items Without Download */}
-        {orderItems.some(item => !item.product.downloadFile) && (
-          <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-6 mb-6">
-            <h2 className="text-lg font-bold text-white mb-3">
-              {lang === 'ar' ? 'منتجات أخرى' : 'Other Products'}
-            </h2>
-            <p className="text-gray-400 text-sm mb-4">
-              {lang === 'ar'
-                ? 'هذه المنتجات ستتوفر قريباً للتحميل. سنتواصل معك عندما تكون جاهزة.'
-                : 'These products will be available for download soon. We will contact you when they are ready.'}
-            </p>
-            {orderItems
-              .filter(item => !item.product.downloadFile)
-              .map(item => (
-                <div key={item.product.id} className="flex items-center gap-3 text-gray-500 text-sm py-2">
-                  <Package className="w-4 h-4" />
-                  <span>{productTitle(item.product, lang)}</span>
-                  <span className="text-xs bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded-full">
-                    {lang === 'ar' ? 'قريباً' : 'Soon'}
-                  </span>
-                </div>
-              ))}
           </div>
         )}
 
