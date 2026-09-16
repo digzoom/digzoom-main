@@ -20,13 +20,13 @@
   },
   "stats": {
     "products": "منتج رقمي",
-    "customers": "عميل سعيد",
-    "downloads": "عملية تحميل",
-    "rating": "متوسط التقييم",
-    "productsValue": "300+",
-    "customersValue": "12,000+",
-    "downloadsValue": "75,000+",
-    "ratingValue": "4.9"
+    "customers": "لغات مدعومة",
+    "downloads": "لوحات بيانات",
+    "rating": "ملفات خاصة",
+    "productsValue": "10",
+    "customersValue": "—",
+    "downloadsValue": "10",
+    "ratingValue": "100%"
   },
   "categories": {
     "title": "تصفح حسب القسم",
@@ -154,14 +154,14 @@
     "v3Desc": "منتجات عربية تنافس عالمياً وتصل لكل مكان.",
     "v4Title": "ابتكار مستمر",
     "v4Desc": "نستثمر في التقنية لتوفير تجربة سلسة وممتعة للجميع.",
-    "stat1": "منتج رقمي",
-    "stat1Value": "300+",
-    "stat2": "بائع نشط",
-    "stat2Value": "50+",
-    "stat3": "عميل سعيد",
-    "stat3Value": "12,000+",
-    "stat4": "دولة عربية",
-    "stat4Value": "15+"
+    "stat1": "منتجات احترافية",
+    "stat1Value": "10",
+    "stat2": "لغات مدعومة",
+    "stat2Value": "2",
+    "stat3": "لوحات بيانات",
+    "stat3Value": "10",
+    "stat4": "ملفات خاصة",
+    "stat4Value": "100%"
   },
   "contact": {
     "title": "اتصل بنا",
