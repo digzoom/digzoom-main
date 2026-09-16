@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router';
 import {
   Minus, Plus, Trash2, ArrowRight, ArrowLeft, PackageOpen,
-  ShoppingBag, Sparkles, Tag, Store, Home, CreditCard
+  ShoppingBag, Sparkles, Tag, Store, Home, CreditCard, MessageCircle
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -13,8 +13,8 @@ export default function Cart() {
   const { lang, t } = useLanguage();
   const isRTL = lang === 'ar';
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
-  const tax = Math.round(totalPrice * 0.15);
-  const total = totalPrice + tax;
+  const tax = totalPrice - totalPrice / 1.15;
+  const total = totalPrice;
 
   /* ── Empty State ── */
   if (items.length === 0) {
@@ -145,7 +145,7 @@ export default function Cart() {
                 </div>
                 <div className="flex justify-between text-gray-400 text-xs md:text-sm">
                   <span>{t.cart.tax}</span>
-                  <span>{tax} {t.cart.currency}</span>
+                  <span>{tax.toFixed(2)} {t.cart.currency}</span>
                 </div>
                 <div className="flex justify-between text-white font-bold border-t border-white/[0.06] pt-3 md:pt-4">
                   <span className="text-sm md:text-base">{t.cart.total}</span>
@@ -181,8 +181,8 @@ export default function Cart() {
             {/* Trust mini badges */}
             <div className="grid grid-cols-2 gap-2">
               {[
-                { icon: <Tag className="w-3.5 h-3.5" />, textAr: 'خصم 15% تلقائي', textEn: '15% Auto Discount' },
-                { icon: <Sparkles className="w-3.5 h-3.5" />, textAr: 'تحميل فوري', textEn: 'Instant Download' },
+                { icon: <Tag className="w-3.5 h-3.5" />, textAr: 'الضريبة مشمولة', textEn: 'VAT included' },
+                { icon: <MessageCircle className="w-3.5 h-3.5" />, textAr: 'دعم قبل الشراء', textEn: 'Pre-sale support' },
               ].map((badge, i) => (
                 <div
                   key={i}
