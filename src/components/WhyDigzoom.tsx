@@ -2,7 +2,7 @@ import { Zap, Shield, Headphones, RefreshCw } from 'lucide-react';
 
 const features = [
   { icon: Zap, titleAr: 'تحميل فوري', titleEn: 'Instant Download', descAr: 'احصل على منتجاتك فوراً بعد إتمام الدفع — لا انتظار', descEn: 'Get your products immediately after payment' },
-  { icon: Shield, titleAr: 'ضمان استرجاع', titleEn: 'Money Back Guarantee', descAr: '30 يوم ضمان استرجاع كامل إذا لم تكن راضياً', descEn: '30-day full refund if not satisfied' },
+  { icon: Shield, titleAr: 'سياسة استرجاع واضحة', titleEn: 'Clear Refund Policy', descAr: 'طلبات الاسترجاع المؤهلة تُراجع وفق السياسة المنشورة', descEn: 'Eligible refund requests are reviewed under our published policy' },
   { icon: Headphones, titleAr: 'دعم 24/7', titleEn: '24/7 Support', descAr: 'فريق دعم متاح على مدار الساعة لمساعدتك', descEn: 'Support team available around the clock' },
   { icon: RefreshCw, titleAr: 'تحديثات مجانية', titleEn: 'Free Updates', descAr: 'احصل على كل التحديثات الجديدة بدون أي تكلفة إضافية', descEn: 'Get all new updates at no extra cost' },
 ];

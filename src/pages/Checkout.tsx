@@ -25,7 +25,7 @@ const paymentMethods = [
 const trustItems = [
   { icon: <Shield className="w-4 h-4" />, textAr: 'دفع آمن مشفر', textEn: 'Encrypted Secure Payment' },
   { icon: <Clock className="w-4 h-4" />, textAr: 'توصيل فوري', textEn: 'Instant Delivery' },
-  { icon: <Award className="w-4 h-4" />, textAr: 'ضمان استرجاع 30 يوم', textEn: '30-Day Money Back' },
+  { icon: <Award className="w-4 h-4" />, textAr: 'سياسة استرجاع واضحة', textEn: 'Clear Refund Policy' },
   { icon: <Headphones className="w-4 h-4" />, textAr: 'دعم فني على مدار الساعة', textEn: '24/7 Support' },
 ];
 
@@ -63,7 +63,9 @@ export default function Checkout() {
     },
   });
 
-  const tax = Math.round(totalPrice * 0.15);
+  // Do not collect Saudi VAT unless the business is registered and legally
+  // required to do so. Stripe Tax can replace this when payments go live.
+  const tax = 0;
   const total = totalPrice + tax;
 
   // If order was just completed, navigate to thank-you page
@@ -319,12 +321,12 @@ export default function Checkout() {
               <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-gray-300 text-xs md:text-sm font-medium">
-                  {lang === 'ar' ? 'ضمان استرجاع المبلغ خلال 30 يوم' : '30-Day Money-Back Guarantee'}
+                  {lang === 'ar' ? 'طلبات الاسترجاع تخضع للسياسة المنشورة' : 'Refund requests follow the published policy'}
                 </p>
                 <p className="text-gray-500 text-xs mt-1">
                   {lang === 'ar'
-                    ? 'إذا لم تكن راضياً عن المنتج، سنسترجع المبلغ بالكامل بدون أسئلة.'
-                    : 'If you\'re not satisfied, we\'ll refund you in full - no questions asked.'}
+                    ? 'يمكن طلب الاسترجاع خلال 30 يومًا للحالات المؤهلة الموضحة في سياسة الاسترجاع.'
+                    : 'Refunds may be requested within 30 days for eligible cases described in our Refund Policy.'}
                 </p>
               </div>
             </div>}
