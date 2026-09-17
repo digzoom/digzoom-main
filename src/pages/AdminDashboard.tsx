@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -894,21 +894,53 @@ function ProductModal({ productId, title, form, setForm, onSave, onClose, isPend
 function OrdersTab() {
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
   const [toast, setToast] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const { lang, t } = useLanguage();
   const utils = trpc.useUtils();
-  const { data: orders, isLoading } = trpc.listOrders?.useQuery?.({ limit: 100 }) ?? { data: [], isLoading: false };
+  const { data: orders, isLoading, error: ordersError } = trpc.listOrders.useQuery({ limit: 100 });
   const updateStatusMutation = trpc.updateOrderStatus?.useMutation?.({
     onSuccess: () => { setToast(t.admin.updated); utils.listOrders?.invalidate?.(); },
     onError: (e: any) => setToast(e.message),
   }) ?? { isPending: false, mutate: () => {} };
 
   const statusColors: Record<string, string> = { pending: 'bg-amber-500/15 text-amber-400', processing: 'bg-blue-500/15 text-blue-400', completed: 'bg-emerald-500/15 text-emerald-400', cancelled: 'bg-red-500/15 text-red-400', refunded: 'bg-gray-500/15 text-gray-400' };
-  const statusLabels: Record<string, string> = { pending: t.admin.pending, processing: t.admin.processing, completed: t.admin.completed, cancelled: t.admin.cancelled, refunded: t.admin.refunded };
+  const statusLabels: Record<string, string> = { all: lang === 'ar' ? 'الكل' : 'All', pending: t.admin.pending, processing: t.admin.processing, completed: t.admin.completed, cancelled: t.admin.cancelled, refunded: t.admin.refunded };
+  const orderList = Array.isArray(orders) ? orders : [];
+  const filteredOrders = statusFilter === 'all' ? orderList : orderList.filter((order: any) => order.status === statusFilter);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(''), 3000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  if (ordersError) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-white">{t.admin.orders}</h2>
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center">
+          <div className="font-bold text-red-400">{lang === 'ar' ? 'تعذر تحميل الطلبات' : 'Unable to load orders'}</div>
+          <div className="mt-2 text-sm text-gray-400">{ordersError.message}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
       {toast && <div className="px-4 py-3 rounded-xl text-sm font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">{toast}</div>}
-      <h2 className="text-xl font-bold text-white">{t.admin.orders}</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-white">{t.admin.orders}</h2>
+        <span className="text-sm text-gray-500">{orderList.length} {lang === 'ar' ? 'طلب' : 'orders'}</span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {['all', 'pending', 'processing', 'completed', 'cancelled', 'refunded'].map((status) => (
+          <button key={status} type="button" onClick={() => setStatusFilter(status)} className={`rounded-xl border px-4 py-2 text-sm transition-colors ${statusFilter === status ? 'border-white/20 bg-white/10 text-white' : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+            {statusLabels[status]}
+            {status !== 'all' && <span className="ms-1 text-gray-500">{orderList.filter((order: any) => order.status === status).length}</span>}
+          </button>
+        ))}
+      </div>
       {isLoading ? <div className="text-gray-500 text-center py-20 text-sm">{t.admin.loading}</div> : (
         <div className="bg-[#131722] rounded-2xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
@@ -917,9 +949,9 @@ function OrdersTab() {
                 <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.orderNo}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.email}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
-                {(Array.isArray(orders) ? orders : []).map((o: any) => (
-                  <>
-                    <tr key={o.id} className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
+                {filteredOrders.map((o: any) => (
+                  <Fragment key={o.id}>
+                    <tr className="hover:bg-white/[0.02] cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
                       <td className="px-4 py-3"><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center"><Receipt className="w-4 h-4 text-white" /></div><div><div className="text-white font-mono font-medium text-sm">{o.order_number || o.id}</div></div></div></td>
                       <td className="px-4 py-3"><span className="text-white text-sm">{o.customer_name}</span></td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{o.customer_email}</td>
@@ -937,9 +969,9 @@ function OrdersTab() {
                         </div>
                       </td></tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
-                {(!orders || orders.length === 0) && <tr><td colSpan={7} className="text-center text-gray-500 py-16">{t.admin.noOrders}</td></tr>}
+                {filteredOrders.length === 0 && <tr><td colSpan={8} className="text-center text-gray-500 py-16">{t.admin.noOrders}</td></tr>}
               </tbody>
             </table>
           </div>

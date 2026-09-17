@@ -138,7 +138,10 @@ export const adminRouter = createRouter({
         (sum, item) => sum + item.price * item.quantity,
         0
       );
-      const taxAmount = Math.round(subtotal * 0.15);
+      // Keep checkout totals consistent with the storefront. VAT must not be
+      // collected until the business is registered and the tax flow is
+      // explicitly enabled and tested.
+      const taxAmount = 0;
       const totalAmount = subtotal + taxAmount;
 
       const orderId = `DZ-${Date.now().toString(36).toUpperCase()}`;
