@@ -1,101 +1,42 @@
 import { Link } from 'react-router';
-import { ArrowLeft, Shield, Lock, Eye, Server, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Shield, Lock, Eye, Server, Trash2, Share2 } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function Privacy() {
-  return (
-    <div className="min-h-screen bg-[#0a0a0f] pt-20 md:pt-24 pb-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 mb-8">
-          <Link to="/" className="hover:text-blue-400 transition-colors">الرئيسية</Link>
-          <ArrowLeft className="w-3 h-3" />
-          <span className="text-gray-300">سياسة الخصوصية</span>
-        </div>
-
-        <div className="text-center mb-10 md:mb-14">
-          <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-4">
-            <Shield className="w-7 h-7 md:w-8 md:h-8" />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-3">سياسة الخصوصية</h1>
-          <p className="text-gray-400 text-sm md:text-base">آخر تحديث: مايو 2025</p>
-        </div>
-
-        <div className="space-y-8 md:space-y-10">
-          <Section icon={<Eye className="w-5 h-5" />} title="المعلومات التي نجمعها">
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
-              نجمع المعلومات التالية لتقديم أفضل خدمة ممكنة:
-            </p>
-            <ul className="space-y-2 text-gray-400 text-sm md:text-base">
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> معلومات الحساب (الاسم، البريد الإلكتروني، رقم الهاتف)</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> سجل المشتريات والتنزيلات</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> بيانات الاستخدام والتصفح (مجهولة المصدر)</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> معلومات الجهاز والمتصفح لتحسين التجربة</li>
-            </ul>
-          </Section>
-
-          <Section icon={<Lock className="w-5 h-5" />} title="كيف نستخدم معلوماتك">
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-              نستخدم معلوماتك فقط لتقديم الخدمات التي تطلبها: معالجة الطلبات، 
-              تسليم المنتجات الرقمية، تحسين تجربة المستخدم، والتواصل معك بخصوص 
-              طلباتك. لا نبيع أو نشارك بياناتك مع أطراف ثالثة للأغراض التجارية.
-            </p>
-          </Section>
-
-          <Section icon={<Server className="w-5 h-5" />} title="أمن البيانات">
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-              نستخدم تقنيات تشفير حديثة (SSL/TLS) لحماية جميع البيانات المنقلة. 
-              يتم تخزين المعلومات الحساسة في خوادم آمنة مع حماية على مستوى 
-              المؤسسات. نجري مراجعات أمنية دورية لضمان أعلى مستويات الحماية.
-            </p>
-          </Section>
-
-          <Section icon={<Trash2 className="w-5 h-5" />} title="حقوقك">
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-3">
-              لديك الحق الكامل في:
-            </p>
-            <ul className="space-y-2 text-gray-400 text-sm md:text-base">
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> الوصول إلى بياناتك الشخصية</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> طلب تصحيح أو تحديث معلوماتك</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> طلب حذف حسابك وبياناتك</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400 mt-1">•</span> الاعتراض على معالجة بياناتك</li>
-            </ul>
-          </Section>
-
-          <Section icon={<Shield className="w-5 h-5" />} title="الكوكيز (Cookies)">
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-              نستخدم الكوكيز لتحسين تجربة التصفح وتذكر تفضيلاتك. 
-              يمكنك إلغاء تفعيل الكوكيز من إعدادات المتصفح، لكن قد 
-              يؤثر ذلك على بعض وظائف الموقع. نحن لا نستخدم الكوكيز 
-              لتتبع نشاطك خارج موقعنا.
-            </p>
-          </Section>
-
-          <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-5 md:p-6 mt-10">
-            <h3 className="text-white font-semibold mb-3 text-sm md:text-base">للتواصل بخصوص الخصوصية</h3>
-            <p className="text-gray-400 text-sm mb-3">
-              إذا كان لديك أي استفسار حول سياسة الخصوصية، يرجى التواصل معنا:
-            </p>
-            <div className="space-y-1 text-gray-300 text-sm">
-              <p>البريد الإلكتروني: info@digzoom.com</p>
-              <p>واتساب: +966 56 988 8456</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  const { lang } = useLanguage();
+  const isAr = lang === 'ar';
+  const Arrow = isAr ? ArrowLeft : ArrowRight;
+  const c = isAr ? {
+    home: 'الرئيسية', title: 'سياسة الخصوصية', updated: 'آخر تحديث: 17 سبتمبر 2026',
+    sections: [
+      ['المعلومات التي نجمعها', 'قد نجمع الاسم والبريد ورقم الهاتف ومعلومات الطلب والتنزيل، إضافة إلى بيانات تقنية محدودة مثل نوع المتصفح وعنوان IP وسجلات الأمان. لا نخزن بيانات البطاقة الكاملة.'],
+      ['كيف نستخدم المعلومات', 'نستخدم البيانات لإنشاء الحسابات ومعالجة الطلبات وتسليم المنتجات وتقديم الدعم ومنع الاحتيال والوفاء بالالتزامات القانونية وتحسين الموقع.'],
+      ['مشاركة البيانات', 'نشارك الحد الأدنى اللازم مع مزودي الاستضافة وقواعد البيانات والبريد والتحليلات وبوابة الدفع عند تفعيلها. لا نبيع بياناتك الشخصية. وقد نفصح عنها إذا طُلب ذلك قانونيًا.'],
+      ['أمن البيانات والاحتفاظ بها', 'نستخدم HTTPS وضوابط وصول وروابط تنزيل محدودة. نحتفظ بالبيانات بقدر الحاجة لتقديم الخدمة وحفظ السجلات والامتثال القانوني، ثم نحذفها أو نجعلها مجهولة عند عدم الحاجة.'],
+      ['حقوقك', 'يمكنك طلب نسخة من بياناتك أو تصحيحها أو حذفها أو الاعتراض على بعض أوجه معالجتها، مع مراعاة السجلات التي يلزمنا الاحتفاظ بها قانونيًا.'],
+      ['ملفات الارتباط', 'نستخدم ملفات ارتباط ضرورية لتسجيل الدخول والسلة واللغة والأمان، وقد نستخدم تحليلات محدودة لتحسين الأداء. يمكنك التحكم بها من إعدادات المتصفح.'],
+    ],
+    contact: 'طلبات الخصوصية', contactText: 'لأي طلب متعلق بالخصوصية، تواصل عبر info@digzoom.com. شركة DIGZOOM LIMITED LIABILITY COMPANY، وايومنغ، الولايات المتحدة.',
+  } : {
+    home: 'Home', title: 'Privacy Policy', updated: 'Last updated: September 17, 2026',
+    sections: [
+      ['Information we collect', 'We may collect your name, email, phone number, order and download information, plus limited technical data such as browser type, IP address, and security logs. We do not store complete card details.'],
+      ['How we use information', 'We use data to create accounts, process orders, deliver products, provide support, prevent fraud, meet legal obligations, and improve the website.'],
+      ['Data sharing', 'We share only what is necessary with hosting, database, email, analytics, and payment providers when enabled. We do not sell personal data. We may disclose data when legally required.'],
+      ['Security and retention', 'We use HTTPS, access controls, and time-limited download links. We retain information only as needed to provide services, keep business records, and meet legal obligations, then delete or anonymize it.'],
+      ['Your rights', 'You may request access, correction, or deletion of personal data, or object to certain processing, subject to records we must retain by law.'],
+      ['Cookies', 'We use necessary cookies for sign-in, cart, language, and security, and may use limited analytics to improve performance. You can control cookies in your browser settings.'],
+    ],
+    contact: 'Privacy requests', contactText: 'For privacy requests, contact info@digzoom.com. DIGZOOM LIMITED LIABILITY COMPANY, Wyoming, United States.',
+  };
+  const icons = [<Eye />, <Lock />, <Share2 />, <Server />, <Trash2 />, <Shield />];
+  return <div className="min-h-screen bg-[#0a0a0f] pt-20 md:pt-24 pb-16" dir={isAr ? 'rtl' : 'ltr'}><div className="max-w-3xl mx-auto px-4 sm:px-6">
+    <div className="flex items-center gap-2 text-sm text-gray-600 mb-8"><Link to="/" className="hover:text-blue-400">{c.home}</Link><Arrow className="w-3 h-3"/><span className="text-gray-300">{c.title}</span></div>
+    <div className="text-center mb-12"><div className="inline-flex w-16 h-16 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-4"><Shield className="w-8 h-8"/></div><h1 className="text-3xl font-bold text-white mb-3">{c.title}</h1><p className="text-gray-400">{c.updated}</p></div>
+    <div className="space-y-8">{c.sections.map(([title,text], i)=><Section key={title} icon={icons[i]} title={title} text={text}/>)}
+      <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-6"><h2 className="text-white font-semibold mb-3">{c.contact}</h2><p className="text-gray-300 leading-7">{c.contactText}</p></div>
     </div>
-  );
+  </div></div>;
 }
 
-function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-5 md:p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center flex-shrink-0">
-          {icon}
-        </div>
-        <h2 className="text-white font-semibold text-base md:text-lg">{title}</h2>
-      </div>
-      {children}
-    </div>
-  );
-}
+function Section({icon,title,text}:{icon:React.ReactNode;title:string;text:string}) { return <section className="bg-[#151520] rounded-2xl border border-white/[0.04] p-6"><div className="flex items-center gap-3 mb-4"><div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5">{icon}</div><h2 className="text-white font-semibold text-lg">{title}</h2></div><p className="text-gray-300 leading-7">{text}</p></section>; }

@@ -109,7 +109,7 @@
     "summary": "Order Summary",
     "subtotal": "Subtotal",
     "discount": "Discount",
-    "tax": "Tax (15%)",
+    "tax": "Applicable taxes",
     "total": "Total",
     "checkout": "Proceed to Checkout",
     "continueShopping": "Continue Shopping",
