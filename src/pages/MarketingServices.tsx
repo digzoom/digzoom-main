@@ -1,158 +1,1090 @@
 import { useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { Link } from "react-router";
-import { ArrowLeft, ArrowRight, BarChart3, Check, ChevronDown, CircleCheckBig, Gauge, Layers3, Loader2, Megaphone, MousePointerClick, PackageOpen, PenTool, Search, ShieldCheck, Sparkles, Store, Target, TrendingUp, Users, Zap } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  Building2,
+  Check,
+  ChevronDown,
+  ClipboardCheck,
+  FileText,
+  Gauge,
+  Layers3,
+  Loader2,
+  Megaphone,
+  PackageOpen,
+  ShieldCheck,
+  Sparkles,
+  Store,
+  Wrench,
+} from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
-import { productDescription, productTitle } from "@/lib/i18n";
+import { servicePlans } from "@/data/servicePlans";
 
-type Goal = "sales" | "leads" | "launch" | "visibility" | "conversion";
-const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+type Need = "website" | "social" | "complete" | "scale" | "catalog";
+const scrollTo = (id: string) =>
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 export default function MarketingServices() {
   const { lang } = useLanguage();
   const ar = lang === "ar";
   const Arrow = ar ? ArrowLeft : ArrowRight;
-  const [goal, setGoal] = useState<Goal>("sales");
+  const [need, setNeed] = useState<Need>("complete");
   const [faq, setFaq] = useState(0);
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState<{ ok: boolean; text: string }>();
-  const { products, loading } = useSupabaseProducts();
-  const featured = [...products].sort((a, b) => Number(b.is_featured) - Number(a.is_featured)).slice(0, 3);
 
-  const t = ar ? {
-    eyebrow: "حلول رقمية للمنشآت السعودية والخليجية", a: "إدارة المواقع والتسويق", b: "والمنتجات الرقمية.",
-    intro: "ندير موقعك وحضورك على منصات التواصل، وننفذ التسويق الرقمي، ونجهّز منتجاتك الرقمية ونساعدك على بيعها؛ ضمن نطاق عمل واضح يمكن قياس نتائجه.",
-    audit: "اختر الخدمة المناسبة", method: "استعرض الباقات", safe: "توضيح كامل قبل البدء · بلا التزام",
-    preview: "مؤشرات النمو المباشرة", illustrative: "نموذج توضيحي — تُستبدل ببيانات مشروعك بعد ربط التحليلات",
-    metrics: ["المبيعات", "العملاء المحتملون", "تكلفة الاكتساب", "عائد الإعلان"],
-    q: "ما النتيجة التي تريدها الآن؟", qSub: "اختر هدفك، وسنبني التشخيص الأولي حوله.",
-    os: "DIGZOOM GROWTH OS", osTitle: "من أعمال متفرقة إلى منظومة نمو واحدة", osText: "لا نبدأ بقائمة خدمات. نبدأ بمشكلة العمل، ثم نختار القنوات والرسائل والقياس المناسب.",
-    solutions: "حلول مصممة لهدفك", solutionsTitle: "كل ما يحتاجه مشروعك للنمو، مع فريق واحد", solutionsText: "نحدد هدفك أولًا، ثم نختار الخدمات التي توصلك إليه فقط—من الاستراتيجية والإعلانات إلى المحتوى والمتجر والتحليلات. لن تدفع مقابل أعمال لا يحتاجها مشروعك.",
-    clarity: "وضوح قبل الوعود", clarityTitle: "ستعرف ما الذي نفعله وما الذي تغيّر", clarityText: "لا أرقام مصطنعة ولا باقات مبهمة. نحدد نقطة البداية، نطاق العمل، مؤشرات النجاح، وآلية المتابعة قبل التنفيذ.",
-    promises: ["نطاق وتسليمات مكتوبة", "مؤشرات مرتبطة بالهدف", "تقارير عربية أو إنجليزية", "ملكية واضحة للحسابات والبيانات"],
-    tools: "أدوات رقمية", toolsTitle: "حلول جاهزة لمن يريد البدء بنفسه", toolsText: "قوالب ومنتجات رقمية عملية، منفصلة عن خدمات النمو المخصصة.", all: "عرض كل المنتجات",
-    diagnosis: "تشخيص النمو", formTitle: "أخبرنا أين تريد أن تصل", formText: "أجب عن الأسئلة الأساسية. نراجع إجاباتك ونعود إليك بخطوة تالية واضحة تناسب مرحلتك.",
-    business: "نوع النشاط", company: "اسم المنشأة", website: "الموقع أو حساب التواصل (اختياري)", budget: "الميزانية الشهرية المتوقعة", name: "الاسم", phone: "رقم الجوال", email: "البريد الإلكتروني", challenge: "ما أكبر تحدٍ الآن؟ (اختياري)",
-    chooseBusiness: "اختر نوع النشاط", businesses: ["متجر إلكتروني", "شركة خدمات", "عيادة أو مركز", "علامة ناشئة", "أخرى"], chooseBudget: "اختر نطاق الميزانية",
-    submit: "إرسال طلب التشخيص", sending: "جارٍ الإرسال...", privacy: "تُستخدم بياناتك للتواصل بشأن طلبك فقط.", success: "وصل طلبك. سنراجعه ونتواصل معك بالخطوة المناسبة.", error: "تعذر إرسال الطلب الآن. حاول مرة أخرى أو تواصل معنا مباشرة.",
-    faqTag: "أسئلة شائعة", faqTitle: "قبل أن نبدأ", discover: "اكتشف الحل", partnerTag: "لديك منتج رقمي؟", partnerTitle: "حوّل خبرتك إلى منتج يصل إلى عملاء جدد", partnerText: "نستقبل القوالب والكتب والأدلة والدورات والأدوات الرقمية. كل منتج يمر بمراجعة الجودة والحقوق قبل عرضه.", partnerCta: "قدّم كشريك رقمي", review: "مراجعة قبل النشر · حقوق واضحة · حماية للملفات",
-  } : {
-    eyebrow: "Digital solutions for Saudi and Gulf businesses", a: "Website management, marketing", b: "and digital products.",
-    intro: "We manage your website and social presence, execute digital marketing, and prepare your digital products for sale—with a clear scope and measurable results.",
-    audit: "Choose the right service", method: "View plans", safe: "Full clarity before we begin · No commitment",
-    preview: "Live growth indicators", illustrative: "Illustrative model — replaced by your data after analytics setup",
-    metrics: ["Revenue", "Qualified leads", "Acquisition cost", "Ad return"],
-    q: "What result do you need now?", qSub: "Choose a goal and we will shape the initial diagnosis around it.",
-    os: "DIGZOOM GROWTH OS", osTitle: "From scattered activity to one growth system", osText: "We do not begin with a service menu. We begin with the business problem, then select the right channels, messages, and measurement.",
-    solutions: "SOLUTIONS BUILT AROUND YOUR GOAL", solutionsTitle: "Everything your business needs to grow—with one team", solutionsText: "We start with your goal, then select only the services needed to reach it—from strategy and advertising to content, commerce, and analytics. You do not pay for work your business does not need.",
-    clarity: "CLARITY BEFORE PROMISES", clarityTitle: "Know what we do—and what changed", clarityText: "No invented numbers and no vague bundles. We define the starting point, scope, success metrics, and reporting before execution.",
-    promises: ["Written scope and deliverables", "Goal-linked KPIs", "Arabic or English reporting", "Clear ownership of accounts and data"],
-    tools: "DIGITAL TOOLS", toolsTitle: "Ready-made tools for teams starting in-house", toolsText: "Practical templates and digital products, separate from tailored growth services.", all: "View all products",
-    diagnosis: "GROWTH DIAGNOSIS", formTitle: "Tell us where you want to go", formText: "Answer the essentials. We will review your answers and return with a clear next step suited to your stage.",
-    business: "Business type", company: "Company name", website: "Website or social account (optional)", budget: "Expected monthly budget", name: "Name", phone: "Phone", email: "Email", challenge: "Biggest challenge right now (optional)",
-    chooseBusiness: "Select business type", businesses: ["E-commerce", "Service business", "Clinic or center", "Emerging brand", "Other"], chooseBudget: "Select budget range",
-    submit: "Send diagnosis request", sending: "Sending...", privacy: "Your details are only used to discuss your request.", success: "Your request is in. We will contact you with the right next step.", error: "We could not send the request. Please retry or contact us directly.",
-    faqTag: "FAQ", faqTitle: "Before we begin", discover: "Explore solution", partnerTag: "HAVE A DIGITAL PRODUCT?", partnerTitle: "Turn your expertise into a product that reaches new buyers", partnerText: "We welcome templates, books, guides, courses, and digital tools. Every product is reviewed for quality and rights before listing.", partnerCta: "Apply as a digital partner", review: "Reviewed before publishing · Clear rights · Protected delivery",
-  };
+  const pillars = ar
+    ? [
+        {
+          icon: Wrench,
+          title: "إدارة المواقع",
+          text: "صيانة وتحديث المحتوى والمنتجات ومراقبة الأعطال، مع تقرير واضح بما تم.",
+          points: [
+            "تحديثات وصيانة",
+            "إدارة صفحات المنتجات",
+            "نسخ احتياطي ومتابعة",
+          ],
+          href: "/plans/website-stability",
+          cta: "شاهد باقة إدارة الموقع",
+        },
+        {
+          icon: Megaphone,
+          title: "التسويق الرقمي",
+          text: "محتوى وإعلانات وقياس أداء، ضمن خطة شهرية تحدد ما سننشره وما سنقيسه.",
+          points: ["محتوى وتصميم ونشر", "حملات إعلانية", "تحليلات وتقارير"],
+          href: "/plans/social-presence",
+          cta: "شاهد باقات التسويق",
+        },
+        {
+          icon: PackageOpen,
+          title: "المنتجات الرقمية",
+          text: "منتجات جاهزة للشراء، وخدمة تجهيز منتجاتك، وفرصة عرض منتجك كشريك.",
+          points: [
+            "متجر منتجات رقمية",
+            "تجهيز صفحات البيع",
+            "استقبال منتجات الشركاء",
+          ],
+          href: "/shop",
+          cta: "تصفح المنتجات الرقمية",
+        },
+      ]
+    : [
+        {
+          icon: Wrench,
+          title: "Website management",
+          text: "Maintenance, content and product updates, incident monitoring, and a clear work report.",
+          points: [
+            "Updates and maintenance",
+            "Product page management",
+            "Backups and monitoring",
+          ],
+          href: "/plans/website-stability",
+          cta: "View website plan",
+        },
+        {
+          icon: Megaphone,
+          title: "Digital marketing",
+          text: "Content, advertising, and measurement through a monthly plan with clear deliverables.",
+          points: [
+            "Content, design, and publishing",
+            "Paid campaigns",
+            "Analytics and reporting",
+          ],
+          href: "/plans/social-presence",
+          cta: "View marketing plans",
+        },
+        {
+          icon: PackageOpen,
+          title: "Digital products",
+          text: "Ready-to-buy products, product-page preparation, and a partner route for creators.",
+          points: [
+            "Digital product store",
+            "Sales-page preparation",
+            "Creator partnerships",
+          ],
+          href: "/shop",
+          cta: "Browse digital products",
+        },
+      ];
 
-  const goals = ar ? [
-    ["sales", "زيادة المبيعات", "رفع الإيراد من القنوات الرقمية", TrendingUp], ["leads", "عملاء محتملون أفضل", "طلبات جادة وليست أرقامًا فقط", Users], ["launch", "إطلاق أقوى", "منتج أو خدمة برسالة وخطة واضحة", Zap], ["visibility", "ظهور مؤثر", "وصول للباحثين عن خدمتك", Search], ["conversion", "تحسين التحويل", "تحويل الزيارات إلى قرارات شراء", MousePointerClick],
-  ] as const : [
-    ["sales", "More sales", "Increase digital-channel revenue", TrendingUp], ["leads", "Better leads", "Serious opportunities, not vanity numbers", Users], ["launch", "Stronger launch", "A clear message and launch plan", Zap], ["visibility", "Meaningful visibility", "Reach people already searching", Search], ["conversion", "Higher conversion", "Turn visits into buying decisions", MousePointerClick],
-  ] as const;
-  const steps = ar ? [["01", "نشخّص", "نفهم الأرقام والعميل والعرض ونقاط التسرب."], ["02", "نخطط", "نحدد الأولويات والميزانية ومؤشرات النجاح."], ["03", "ننفذ", "نبني الحملات والمحتوى والصفحات المطلوبة."], ["04", "نقيس", "نربط القرارات ببيانات مفهومة، لا بتقارير مبهمة."], ["05", "نتوسع", "نضاعف ما ينجح ونوقف ما لا يصنع أثرًا."]] : [["01", "Diagnose", "Understand the numbers, customer, offer, and leaks."], ["02", "Plan", "Set priorities, budget, and success metrics."], ["03", "Execute", "Build the campaigns, content, and pages needed."], ["04", "Measure", "Connect decisions to clear data, not vague reports."], ["05", "Scale", "Double down on what works and stop what does not."]];
-  const services = ar ? [
-    ["growth-strategy", "استراتيجية النمو", "خريطة قرار تربط الهدف بالسوق والقنوات والمؤشرات.", Target], ["paid-campaigns", "الإعلانات المدفوعة", "حملات تُدار بالتجربة والتحسين وجودة النتيجة.", Megaphone], ["creative-content", "المحتوى الإبداعي", "رسائل وتصاميم تشرح القيمة وتحرّك القرار.", PenTool], ["ecommerce-development", "تطوير المتاجر", "رحلة شراء أسرع وصفحات أوضح وقياس أدق.", Store], ["search-analytics", "البحث والتحليلات", "ظهور أفضل ولوحة قياس تكشف ما يحدث فعلًا.", BarChart3], ["social-presence", "الحضور الاجتماعي", "صوت بصري ومحتوى منظم يخدم العلامة والنمو.", Layers3],
-  ] as const : [
-    ["growth-strategy", "Growth strategy", "A decision map connecting the goal, market, channels, and metrics.", Target], ["paid-campaigns", "Paid acquisition", "Campaigns managed through testing and outcome quality.", Megaphone], ["creative-content", "Creative content", "Messages and creative that explain value and move decisions.", PenTool], ["ecommerce-development", "Commerce development", "A faster journey, clearer pages, and sharper measurement.", Store], ["search-analytics", "Search & analytics", "Better discovery and a dashboard showing what really happens.", BarChart3], ["social-presence", "Social presence", "A consistent visual voice serving brand and growth.", Layers3],
-  ] as const;
-  const monthlyPlans = ar ? [
-    { id: "website-stability", name: "استقرار الموقع", price: "1,490", text: "موقع محدث وآمن دون أن يستهلك وقت فريقك.", fit: "لموقع قائم يحتاج صيانة وتعديلات محدودة", products: "يشمل تجهيز منتجين شهريًا", features: ["مراقبة الأعطال ونسخ احتياطي وفحص أمني", "4 تعديلات بسيطة: نص أو صورة أو سعر أو عرض", "تحديث النظام والإضافات المتوافقة", "لا تشمل تصميم صفحات جديدة أو برمجة", "تقرير شهري واستجابة خلال يوم عمل"] },
-    { id: "social-presence", name: "حضور اجتماعي", price: "2,990", text: "ظهور منتظم بصوت بصري واضح على منصتين.", fit: "لمن يحتاج محتوى ونشرًا منتظمًا دون إدارة الموقع", products: "إضافة المنتجات غير مشمولة", features: ["12 منشورًا مصممًا مع كتابة النصوص", "12 قصة مصممة بالمقاس العمودي", "المواد نفسها تُهيّأ وتُنشر على المنصتين", "جدولة ونشر ومتابعة أساسية للتعليقات", "لا تشمل التصوير أو الفيديو أو ميزانية الإعلان"] },
-    { id: "growth-system", name: "نظام النمو", price: "4,990", text: "الموقع والمحتوى والقياس يعملون ضمن خطة واحدة.", fit: "لمن يريد إدارة الموقع ومنصتين مع فريق واحد", products: "يشمل تجهيز 5 منتجات شهريًا", popular: true, features: ["إدارة الموقع ومنصتين", "12 منشورًا مصممًا و12 قصة مصممة إجمالًا", "مونتاج مقطعين من مواد يقدمها العميل", "5 صفحات منتجات وقياس التحويلات", "اجتماع وتقرير شهري"] },
-    { id: "digital-scale", name: "توسع رقمي", price: "7,990", text: "تنفيذ أكبر للمنشآت الجاهزة للتوسع المنظم.", fit: "لمن لديه عروض وميزانية إعلان وجاهز للتوسع", products: "يشمل تجهيز 10 منتجات شهريًا", features: ["إدارة الموقع و3 منصات", "20 منشورًا مصممًا و20 قصة مصممة إجمالًا", "مونتاج 4 مقاطع من مواد العميل", "صفحة هبوط واحدة أو إدارة حملة واحدة", "اجتماعان شهريًا ودعم بأولوية"] },
-  ] : [
-    { id: "website-stability", name: "Website Stability", price: "1,490", text: "Keep your website current and secure without draining your team.", fit: "For an existing site needing care and limited updates", products: "Includes 2 product listings monthly", features: ["Monitoring, backups, and basic security review", "4 small copy, image, price, or offer updates", "Compatible core and plugin updates", "New pages and development are excluded", "Monthly report and 1-day response"] },
-    { id: "social-presence", name: "Social Presence", price: "2,990", text: "A consistent visual presence across two platforms.", fit: "For consistent content without website management", products: "Product listing not included", features: ["12 designed posts with copy", "12 designed vertical stories", "The same assets are adapted across both platforms", "Scheduling, publishing, and basic comment monitoring", "Filming, video, and ad spend are excluded"] },
-    { id: "growth-system", name: "Growth System", price: "4,990", text: "Website, content, and measurement working as one plan.", fit: "For website and 2-platform management by one team", products: "Includes 5 product listings monthly", popular: true, features: ["Website and 2 selected platforms", "12 designed posts and 12 designed stories total", "2 videos edited from client assets", "5 product pages and conversion tracking", "Monthly call and report"] },
-    { id: "digital-scale", name: "Digital Scale", price: "7,990", text: "More execution for businesses ready to scale with control.", fit: "For a business with ready offers and an ad budget", products: "Includes 10 product listings monthly", features: ["Website and 3 selected platforms", "20 designed posts and 20 designed stories total", "4 videos edited from client assets", "One landing page or one managed campaign", "2 monthly calls and priority support"] },
-  ];
-  const productPacks = ar ? [
-    ["إدخال 10 منتجات", "بيانات وصور جاهزة من العميل", "490"],
-    ["تجهيز 10 منتجات", "وصف أصلي، صور، تصنيف وSEO أساسي", "990"],
-    ["تجهيز 25 منتجًا", "إعداد كامل وجاهز للنشر", "1,990"],
-    ["تجهيز 50 منتجًا", "إعداد كامل للكتالوج", "3,490"],
-  ] : [
-    ["List 10 products", "Client provides ready copy and images", "490"],
-    ["Prepare 10 products", "Original copy, images, categories, and basic SEO", "990"],
-    ["Prepare 25 products", "Complete publish-ready setup", "1,990"],
-    ["Prepare 50 products", "Complete catalog setup", "3,490"],
-  ];
-  const faqs = ar ? [["هل تقدمون باقات ثابتة؟", "نعم. باقات الإدارة الشهرية موضحة بالسعر والتسليمات وحدود العمل. المشاريع غير المعتادة تحصل على عرض مخصص قبل البدء."], ["هل إضافة المنتجات مشمولة؟", "تشمل باقات إدارة الموقع عددًا شهريًا محددًا. أي كمية إضافية تُحسب وفق باقات تجهيز المنتجات، ولا تتراكم الحصة غير المستخدمة."], ["هل يلزم تنفيذ جميع الحلول؟", "لا. نختار أقل مجموعة أعمال تستطيع صنع الأثر المطلوب، ثم نتوسع عندما تدعم البيانات ذلك."], ["هل ميزانية الإعلان ضمن أتعاب الإدارة؟", "لا. ميزانية المنصات تُفصل عن أتعاب الإدارة ويظهر الاثنان بوضوح في العرض."], ["متى تظهر النتائج؟", "يعتمد ذلك على نقطة البداية والهدف والقناة. نوضح مؤشرات مبكرة ونتائج مستهدفة واقعية ضمن خطة كل مشروع."]] : [["Do you offer fixed packages?", "Yes. Monthly plans show the price, deliverables, and scope limits. Unusual projects receive a custom proposal before work begins."], ["Is product listing included?", "Website management plans include a defined monthly quantity. Extra volume uses the product preparation packs, and unused capacity does not roll over."], ["Do we need every solution?", "No. We choose the smallest set of work able to create the desired impact."], ["Is ad spend included?", "No. Platform spend is separate from management fees, and both are shown clearly."], ["When should we expect results?", "It depends on the starting point, goal, and channel. We define realistic early indicators for each project."]];
-  const budgets = [["under-5k", ar ? "أقل من 5,000 ر.س" : "Under SAR 5,000"], ["5k-15k", ar ? "5,000 – 15,000 ر.س" : "SAR 5,000–15,000"], ["15k-50k", ar ? "15,000 – 50,000 ر.س" : "SAR 15,000–50,000"], ["50k-plus", ar ? "أكثر من 50,000 ر.س" : "Over SAR 50,000"], ["unsure", ar ? "غير محددة بعد" : "Not decided yet"]];
+  const needOptions: Array<{ id: Need; label: string; icon: typeof Wrench }> =
+    ar
+      ? [
+          { id: "website", label: "إدارة موقعي", icon: Wrench },
+          { id: "social", label: "إدارة منصات التواصل", icon: Megaphone },
+          { id: "complete", label: "الموقع والتسويق معًا", icon: Layers3 },
+          { id: "scale", label: "تنفيذ أكبر وحملات", icon: BarChart3 },
+          { id: "catalog", label: "تجهيز المنتجات", icon: PackageOpen },
+        ]
+      : [
+          { id: "website", label: "Manage my website", icon: Wrench },
+          { id: "social", label: "Manage social channels", icon: Megaphone },
+          { id: "complete", label: "Website and marketing", icon: Layers3 },
+          { id: "scale", label: "Scale execution and ads", icon: BarChart3 },
+          {
+            id: "catalog",
+            label: "Prepare product listings",
+            icon: PackageOpen,
+          },
+        ];
 
-  const choose = (value: Goal, move = false) => { setGoal(value); if (move) setTimeout(() => go("growth-audit"), 80); };
-  async function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault(); setSending(true); setNotice(undefined); const form = e.currentTarget;
-    try { const res = await fetch("/api/growth-audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), goal, lang }) }); if (!res.ok) throw new Error(); setNotice({ ok: true, text: t.success }); form.reset(); }
-    catch { setNotice({ ok: false, text: t.error }); } finally { setSending(false); }
+  const recommendations = ar
+    ? {
+        website: {
+          title: "باقة استقرار الموقع",
+          text: "الأنسب إذا كان موقعك قائمًا وتحتاج شخصًا يتولى الصيانة والتحديثات البسيطة.",
+          price: "1,490 ر.س شهريًا",
+          href: "/plans/website-stability",
+        },
+        social: {
+          title: "باقة حضور اجتماعي",
+          text: "الأنسب إذا كان موقعك جاهزًا وتحتاج محتوى وتصميمًا ونشرًا منتظمًا على منصتين.",
+          price: "2,990 ر.س شهريًا",
+          href: "/plans/social-presence",
+        },
+        complete: {
+          title: "باقة الإدارة المتكاملة",
+          text: "الأنسب إذا أردت فريقًا واحدًا يدير الموقع ومنصتين والمحتوى وصفحات المنتجات والقياس.",
+          price: "4,990 ر.س شهريًا",
+          href: "/plans/growth-system",
+        },
+        scale: {
+          title: "باقة الإدارة الموسعة",
+          text: "للمنشأة الجاهزة بحملات وعروض وتحتاج حجم تنفيذ أعلى عبر الموقع وثلاث منصات.",
+          price: "7,990 ر.س شهريًا",
+          href: "/plans/digital-scale",
+        },
+        catalog: {
+          title: "خدمة تجهيز المنتجات",
+          text: "إذا كانت مشكلتك في الصور والوصف والتصنيف وإدخال المنتجات، ابدأ بالكتالوج دون اشتراك شهري.",
+          price: "ابتداءً من 490 ر.س",
+          href: "#catalog",
+        },
+      }
+    : {
+        website: {
+          title: "Website Stability",
+          text: "Best when your site is live and needs ongoing care and small content updates.",
+          price: "SAR 1,490/month",
+          href: "/plans/website-stability",
+        },
+        social: {
+          title: "Social Presence",
+          text: "Best when your website is ready and you need consistent content on two platforms.",
+          price: "SAR 2,990/month",
+          href: "/plans/social-presence",
+        },
+        complete: {
+          title: "Integrated Management",
+          text: "Best when one team should manage your website, two channels, content, products, and measurement.",
+          price: "SAR 4,990/month",
+          href: "/plans/growth-system",
+        },
+        scale: {
+          title: "Expanded Management",
+          text: "For a business with ready offers and campaigns that needs higher-volume execution.",
+          price: "SAR 7,990/month",
+          href: "/plans/digital-scale",
+        },
+        catalog: {
+          title: "Product preparation",
+          text: "Start here when product images, copy, categories, and publishing are the main problem.",
+          price: "From SAR 490",
+          href: "#catalog",
+        },
+      };
+  const recommendation = recommendations[need];
+
+  const deliverables = ar
+    ? [
+        {
+          icon: FileText,
+          title: "تقرير إدارة الموقع",
+          text: "التحديثات المنفذة، الأعطال والمخاطر، حالة النسخ الاحتياطي، والأعمال المقترحة للشهر التالي.",
+        },
+        {
+          icon: ClipboardCheck,
+          title: "خطة محتوى قابلة للاعتماد",
+          text: "موضوع كل منشور، النص، التصميم، المنصة، وموعد النشر قبل بدء التنفيذ.",
+        },
+        {
+          icon: Store,
+          title: "صفحة منتج جاهزة للنشر",
+          text: "عنوان ووصف ومواصفات وصور وتصنيف وأساسيات الظهور في البحث.",
+        },
+      ]
+    : [
+        {
+          icon: FileText,
+          title: "Website management report",
+          text: "Completed updates, incidents, risks, backup status, and next-month recommendations.",
+        },
+        {
+          icon: ClipboardCheck,
+          title: "Approval-ready content plan",
+          text: "Topic, copy, design, platform, and publishing date before execution begins.",
+        },
+        {
+          icon: Store,
+          title: "Publish-ready product page",
+          text: "Title, copy, specifications, images, category, and basic search optimization.",
+        },
+      ];
+
+  const productPacks = ar
+    ? [
+        ["إدخال 10 منتجات", "بيانات وصور جاهزة من العميل", "490"],
+        ["تجهيز 10 منتجات", "وصف وصور وتصنيف وSEO أساسي", "990"],
+        ["تجهيز 25 منتجًا", "إعداد كامل وجاهز للنشر", "1,990"],
+        ["تجهيز 50 منتجًا", "إعداد كامل للكتالوج", "3,490"],
+      ]
+    : [
+        ["List 10 products", "Client provides ready copy and images", "490"],
+        [
+          "Prepare 10 products",
+          "Copy, images, categories, and basic SEO",
+          "990",
+        ],
+        ["Prepare 25 products", "Complete publish-ready setup", "1,990"],
+        ["Prepare 50 products", "Complete catalog setup", "3,490"],
+      ];
+
+  const faqs = ar
+    ? [
+        [
+          "هل المنشورات لكل منصة؟",
+          "لا. العدد هو عدد المواد الأصلية خلال الشهر، ثم نهيئ المقاس والنص وننشر المادة على المنصات المشمولة في الباقة.",
+        ],
+        [
+          "هل التصوير وميزانية الإعلان داخل السعر؟",
+          "لا. التصوير الميداني والإنتاج الاحترافي وميزانية المنصات الإعلانية تُحسب منفصلة بعد موافقتك.",
+        ],
+        [
+          "هل أستطيع طلب خدمة واحدة دون اشتراك؟",
+          "نعم. تجهيز المنتجات وبعض المشاريع المحددة تُنفذ بسعر مستقل. الأعمال غير المعتادة تحصل على نطاق وسعر قبل البدء.",
+        ],
+        [
+          "متى يبدأ التنفيذ؟",
+          "بعد استلام الصلاحيات والمواد واعتماد نطاق العمل. نرسل لك جدول التنفيذ والاعتماد قبل النشر.",
+        ],
+        [
+          "هل تضمنون رقم مبيعات؟",
+          "لا نعد برقم لا نتحكم فيه. نحدد ما سننفذه، مؤشرات القياس، وما نستطيع تحسينه بوضوح.",
+        ],
+      ]
+    : [
+        [
+          "Is the post count per platform?",
+          "No. It is the number of original monthly assets, then each asset is adapted and published on the included platforms.",
+        ],
+        [
+          "Are filming and ad spend included?",
+          "No. On-location production and platform media spend are quoted or paid separately after approval.",
+        ],
+        [
+          "Can I order one service without a subscription?",
+          "Yes. Product preparation and defined projects can be purchased separately with a written scope.",
+        ],
+        [
+          "When does work begin?",
+          "After access, assets, and scope approval. You receive the execution and approval schedule before publishing.",
+        ],
+        [
+          "Do you guarantee sales?",
+          "We do not promise numbers outside our control. We define execution, measurement, and optimization clearly.",
+        ],
+      ];
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSending(true);
+    setNotice(undefined);
+    const form = event.currentTarget;
+    const data = Object.fromEntries(new FormData(form));
+    const goalByNeed: Record<Need, string> = {
+      website: "conversion",
+      social: "visibility",
+      complete: "sales",
+      scale: "sales",
+      catalog: "launch",
+    };
+    try {
+      const response = await fetch("/api/growth-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          business_type: data.business_type,
+          website: data.website,
+          company: "",
+          budget: "unsure",
+          goal: goalByNeed[need],
+          challenge: `${ar ? "الخدمة المطلوبة" : "Requested service"}: ${data.service_interest}`,
+          lang,
+        }),
+      });
+      if (!response.ok) throw new Error();
+      setNotice({
+        ok: true,
+        text: ar
+          ? "وصل طلبك. سنراجعه ونتواصل معك لتأكيد الخدمة والنطاق المناسب."
+          : "Your request is in. We will contact you to confirm the right service and scope.",
+      });
+      form.reset();
+    } catch {
+      setNotice({
+        ok: false,
+        text: ar
+          ? "تعذر إرسال الطلب الآن. حاول مرة أخرى أو تواصل عبر البريد."
+          : "We could not send the request. Please retry or contact us by email.",
+      });
+    } finally {
+      setSending(false);
+    }
   }
 
-  return <main className="min-h-screen overflow-hidden bg-[#f5f7fb] text-[#0c1220]">
-    <section className="relative isolate min-h-[760px] bg-[#060a12] pb-20 pt-28 text-white md:pb-28 md:pt-36">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_22%,rgba(37,99,235,.24),transparent_30%),radial-gradient(circle_at_84%_65%,rgba(124,58,237,.18),transparent_32%)]" />
-      <div className="absolute inset-0 -z-10 opacity-[.08] [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:56px_56px]" />
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.06fr_.94fr] lg:px-8"><div>
-        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-200"><Sparkles className="h-4 w-4" />{t.eyebrow}</div>
-        <h1 className="text-[2.75rem] font-black leading-[1.04] tracking-[-.045em] sm:text-6xl lg:text-7xl">{t.a}<span className="mt-2 block bg-gradient-to-r from-[#55a7ff] via-[#737cff] to-[#b165ff] bg-clip-text text-transparent">{t.b}</span></h1>
-        <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">{t.intro}</p>
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => go("growth-audit")} className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-7 font-black shadow-[0_18px_50px_rgba(37,99,235,.3)] hover:bg-blue-500">{t.audit}<Arrow className="h-5 w-5" /></button><button onClick={() => go("monthly-plans")} className="min-h-14 rounded-2xl border border-white/15 bg-white/[.04] px-7 font-bold hover:bg-white/[.08]">{t.method}</button></div>
-        <p className="mt-4 flex items-center gap-2 text-sm text-slate-400"><ShieldCheck className="h-4 w-4 text-emerald-400" />{t.safe}</p>
-      </div><div className="relative mx-auto w-full max-w-xl"><div className="absolute -inset-8 rounded-full bg-blue-500/15 blur-3xl" /><figure className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d1422] p-2 shadow-2xl"><img src="/images/digzoom/growth-hero-live-v3.webp" alt={ar ? "خبيرة نمو سعودية تراجع شاشة المؤشرات مع صاحب مشروع" : "Saudi growth executive reviewing a full analytics monitor with a founder"} fetchPriority="high" className="aspect-[16/12] w-full rounded-[1.55rem] object-cover object-center" /><figcaption className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/15 bg-[#07101e]/90 p-3 shadow-2xl backdrop-blur-xl sm:left-5 sm:right-auto sm:w-[64%]"><div className="mb-2 flex items-center gap-2"><span className="rounded-lg bg-blue-500/20 p-1.5 text-blue-300"><Gauge className="h-4 w-4" /></span><div><p className="text-sm font-black">{t.preview}</p><p className="mt-0.5 text-[9px] text-slate-400">{t.illustrative}</p></div><span className="ms-auto flex items-center gap-1 text-[9px] font-black text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{ar ? "مباشر" : "Live"}</span></div><div className="grid grid-cols-4 gap-1">{t.metrics.map((metric, index) => <div key={metric} className="rounded-md border border-white/[.07] bg-white/[.05] px-1.5 py-1.5"><p className="truncate text-[8px] text-slate-400">{metric}</p><div className="mt-1.5 flex items-center gap-1"><span className={`h-1 flex-1 rounded-full ${index < 2 ? "bg-emerald-400" : "bg-blue-400"}`} /><span className="h-1 w-1 rounded-full bg-white/50" /></div></div>)}</div></figcaption></figure></div></div>
-    </section>
+  return (
+    <main className="min-h-screen overflow-hidden bg-[#f5f7fb] text-[#0c1220]">
+      <section className="relative isolate bg-[#060a12] pb-20 pt-28 text-white md:pb-28 md:pt-36">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_22%,rgba(37,99,235,.24),transparent_30%),radial-gradient(circle_at_84%_65%,rgba(124,58,237,.18),transparent_32%)]" />
+        <div className="absolute inset-0 -z-10 opacity-[.08] [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:56px_56px]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.06fr_.94fr] lg:px-8">
+          <div>
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-200">
+              <Sparkles className="h-4 w-4" />
+              {ar
+                ? "حلول رقمية بنطاق وأسعار واضحة"
+                : "Digital services with clear scope and pricing"}
+            </div>
+            <h1 className="text-[2.7rem] font-black leading-[1.06] tracking-[-.04em] sm:text-6xl lg:text-7xl">
+              {ar ? "إدارة المواقع والتسويق" : "Website management, marketing"}
+              <span className="mt-2 block bg-gradient-to-r from-[#55a7ff] via-[#737cff] to-[#b165ff] bg-clip-text text-transparent">
+                {ar ? "والمنتجات الرقمية." : "and digital products."}
+              </span>
+            </h1>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
+              {ar
+                ? "نحدد الخدمة، وما سنسلّمه، وما نحتاجه منك، والسعر قبل البدء. ثم ندير التنفيذ والنشر والمتابعة دون وعود مبهمة."
+                : "We define the service, deliverables, client inputs, and price before work begins—then manage execution, publishing, and reporting without vague promises."}
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() => scrollTo("services")}
+                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-7 font-black shadow-[0_18px_50px_rgba(37,99,235,.3)] hover:bg-blue-500"
+              >
+                {ar ? "اختر الخدمة المناسبة" : "Choose the right service"}
+                <Arrow className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => scrollTo("plans")}
+                className="min-h-14 rounded-2xl border border-white/15 bg-white/[.04] px-7 font-bold hover:bg-white/[.08]"
+              >
+                {ar ? "استعرض الباقات والأسعار" : "View plans and pricing"}
+              </button>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400">
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                {ar
+                  ? "لا دفع قبل اعتماد النطاق"
+                  : "No payment before scope approval"}
+              </span>
+              <span className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-blue-400" />
+                DigZoom LLC · Wyoming, USA
+              </span>
+            </div>
+          </div>
+          <div className="relative mx-auto w-full max-w-xl">
+            <div className="absolute -inset-8 rounded-full bg-blue-500/15 blur-3xl" />
+            <figure className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d1422] p-2 shadow-2xl">
+              <img
+                src="/images/digzoom/growth-hero-live-v3.webp"
+                alt={
+                  ar
+                    ? "فريق يراجع مؤشرات أداء مشروع رقمي"
+                    : "Team reviewing digital business performance"
+                }
+                fetchPriority="high"
+                className="aspect-[16/12] w-full rounded-[1.55rem] object-cover object-center"
+              />
+              <figcaption className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/15 bg-[#07101e]/90 p-4 shadow-2xl backdrop-blur-xl sm:left-5 sm:right-auto sm:w-[66%]">
+                <div className="flex items-center gap-3">
+                  <span className="rounded-xl bg-blue-500/20 p-2 text-blue-300">
+                    <Gauge className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-black">
+                      {ar
+                        ? "متابعة العمل والنتائج"
+                        : "Work and outcome tracking"}
+                    </p>
+                    <p className="mt-1 text-[10px] leading-5 text-slate-400">
+                      {ar
+                        ? "نموذج توضيحي؛ تظهر بيانات مشروعك بعد ربط أدوات القياس."
+                        : "Illustrative model; your data appears after analytics setup."}
+                    </p>
+                  </div>
+                </div>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
 
-    <section className="relative z-10 mx-auto -mt-8 max-w-7xl px-4 sm:px-6 lg:px-8"><div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl md:p-9"><div className="mb-7 text-center"><h2 className="text-2xl font-black md:text-3xl">{t.q}</h2><p className="mt-2 text-slate-500">{t.qSub}</p></div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{goals.map(([value, title, text, Icon]) => <button key={value} onClick={() => choose(value, true)} className={`rounded-2xl border p-5 text-start transition hover:-translate-y-1 ${goal === value ? "border-blue-500 bg-blue-50" : "border-slate-200"}`}><Icon className={`h-6 w-6 ${goal === value ? "text-blue-600" : "text-slate-400"}`} /><h3 className="mt-4 font-black">{title}</h3><p className="mt-1 text-sm leading-6 text-slate-500">{text}</p></button>)}</div></div></section>
+      <section id="services" className="scroll-mt-20 bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-black tracking-[.18em] text-blue-600">
+              {ar ? "ثلاث خدمات واضحة" : "THREE CLEAR SERVICES"}
+            </p>
+            <h2 className="mt-4 text-4xl font-black md:text-5xl">
+              {ar
+                ? "اختر ما تحتاجه دون شراء أعمال لا تفيدك"
+                : "Choose what you need—without paying for what you do not"}
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-600">
+              {ar
+                ? "يمكنك الاشتراك في إدارة شهرية، طلب تجهيز منتجات فقط، أو شراء منتج رقمي جاهز."
+                : "Use monthly management, order product preparation only, or buy a ready-made digital product."}
+            </p>
+          </div>
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            {pillars.map(({ icon: Icon, title, text, points, href, cta }) => (
+              <article
+                key={title}
+                className="flex flex-col rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-7 transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                <span className="inline-flex w-fit rounded-2xl bg-blue-600 p-3 text-white">
+                  <Icon className="h-6 w-6" />
+                </span>
+                <h3 className="mt-6 text-2xl font-black">{title}</h3>
+                <p className="mt-3 leading-7 text-slate-600">{text}</p>
+                <ul className="mt-6 flex-1 space-y-3">
+                  {points.map((point) => (
+                    <li
+                      key={point}
+                      className="flex gap-2 text-sm text-slate-600"
+                    >
+                      <Check className="h-5 w-5 shrink-0 text-emerald-600" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to={href}
+                  className="mt-7 inline-flex items-center gap-2 font-black text-blue-700"
+                >
+                  {cta}
+                  <Arrow className="h-4 w-4" />
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    <section id="growth-os" className="scroll-mt-24 py-24 md:py-32"><div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[.85fr_1.15fr] lg:px-8"><div><p className="text-sm font-black tracking-[.18em] text-blue-600">{t.os}</p><h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">{t.osTitle}</h2><p className="mt-6 text-lg leading-8 text-slate-600">{t.osText}</p></div><div className="grid gap-3">{steps.map(([n, title, text]) => <div key={n} className="flex gap-5 rounded-2xl border border-slate-200 bg-white p-5"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-sm font-black text-white">{n}</span><div><h3 className="text-lg font-black">{title}</h3><p className="mt-1 leading-7 text-slate-500">{text}</p></div></div>)}</div></div></section>
+      <section className="bg-[#eef3ff] py-16 md:py-20">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.08fr_.92fr] lg:px-8">
+          <div>
+            <p className="text-sm font-black tracking-[.18em] text-blue-700">
+              {ar ? "توصية مباشرة" : "DIRECT RECOMMENDATION"}
+            </p>
+            <h2 className="mt-3 text-3xl font-black md:text-4xl">
+              {ar
+                ? "ما الذي تريد أن نتولاه؟"
+                : "What should we manage for you?"}
+            </h2>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              {needOptions.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setNeed(id)}
+                  className={`flex items-center gap-3 rounded-2xl border p-4 text-start font-bold transition ${need === id ? "border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "border-blue-100 bg-white text-slate-700 hover:border-blue-300"}`}
+                >
+                  <Icon className="h-5 w-5" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col justify-center rounded-[2rem] bg-[#07101e] p-8 text-white">
+            <p className="text-sm font-black text-blue-300">
+              {ar ? "الاختيار الأنسب لك" : "BEST MATCH"}
+            </p>
+            <h3 className="mt-3 text-3xl font-black">{recommendation.title}</h3>
+            <p className="mt-4 leading-8 text-slate-300">
+              {recommendation.text}
+            </p>
+            <p className="mt-5 text-xl font-black text-blue-300">
+              {recommendation.price}
+            </p>
+            {recommendation.href.startsWith("#") ? (
+              <button
+                onClick={() => scrollTo(recommendation.href.slice(1))}
+                className="mt-7 inline-flex min-h-13 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 font-black hover:bg-blue-500"
+              >
+                {ar ? "شاهد التفاصيل" : "View details"}
+                <Arrow className="h-5 w-5" />
+              </button>
+            ) : (
+              <Link
+                to={recommendation.href}
+                className="mt-7 inline-flex min-h-13 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 font-black hover:bg-blue-500"
+              >
+                {ar ? "شاهد التفاصيل" : "View details"}
+                <Arrow className="h-5 w-5" />
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
 
-    <section id="solutions" className="scroll-mt-24 bg-[#0a0f19] py-24 text-white md:py-32"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><div className="max-w-3xl"><p className="text-sm font-black tracking-[.18em] text-blue-400">{t.solutions}</p><h2 className="mt-4 text-4xl font-black md:text-5xl">{t.solutionsTitle}</h2><p className="mt-5 text-lg leading-8 text-slate-400">{t.solutionsText}</p></div><div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{services.map(([slug, title, text, Icon], i) => <Link key={slug} to={`/services/${slug}`} className="group relative rounded-3xl border border-white/[.08] bg-white/[.035] p-7 transition hover:-translate-y-1 hover:border-blue-400/40"><span className="absolute end-5 top-4 text-5xl font-black text-white/[.03]">0{i + 1}</span><span className="inline-flex rounded-2xl bg-blue-500/15 p-3 text-blue-300"><Icon className="h-6 w-6" /></span><h3 className="mt-7 text-xl font-black">{title}</h3><p className="mt-3 leading-7 text-slate-400">{text}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-black text-blue-300">{t.discover}<Arrow className="h-4 w-4" /></span></Link>)}</div></div></section>
+      <section className="bg-[#080d16] py-20 text-white md:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
+            <div>
+              <p className="text-sm font-black tracking-[.18em] text-blue-400">
+                {ar ? "ثقة مبنية على الوضوح" : "TRUST THROUGH CLARITY"}
+              </p>
+              <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
+                {ar
+                  ? "اعرف ما ستستلمه قبل أن تدفع"
+                  : "Know what you will receive before you pay"}
+              </h2>
+              <p className="mt-6 text-lg leading-8 text-slate-400">
+                {ar
+                  ? "لا نعرض نتائج عملاء أو أرقامًا غير موثقة. إلى أن ننشر حالات حقيقية بموافقة أصحابها، نوضح لك شكل التسليمات والنطاق والمسؤوليات."
+                  : "We do not show unverified client results. Until approved case studies are available, we show the deliverables, scope, and responsibilities clearly."}
+              </p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <TrustItem
+                  text={
+                    ar
+                      ? "نطاق وتسليمات مكتوبة"
+                      : "Written scope and deliverables"
+                  }
+                />
+                <TrustItem
+                  text={
+                    ar
+                      ? "الحسابات والبيانات ملك للعميل"
+                      : "Client owns accounts and data"
+                  }
+                />
+                <TrustItem
+                  text={
+                    ar
+                      ? "تقارير عربية أو إنجليزية"
+                      : "Arabic or English reporting"
+                  }
+                />
+                <TrustItem
+                  text={
+                    ar
+                      ? "أي تكلفة إضافية تُعتمد قبل التنفيذ"
+                      : "Extra costs require approval"
+                  }
+                />
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {deliverables.map(({ icon: Icon, title, text }) => (
+                <article
+                  key={title}
+                  className="rounded-3xl border border-white/10 bg-white/[.045] p-6"
+                >
+                  <span className="inline-flex rounded-2xl bg-blue-500/15 p-3 text-blue-300">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <h3 className="mt-6 text-xl font-black">{title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-400">
+                    {text}
+                  </p>
+                  <span className="mt-6 block text-xs font-bold text-slate-600">
+                    {ar ? "نموذج تسليم توضيحي" : "Illustrative deliverable"}
+                  </span>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <section id="monthly-plans" className="scroll-mt-24 bg-white py-24 md:py-32"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl text-center"><p className="text-sm font-black tracking-[.18em] text-blue-600">{ar ? "إدارة شهرية بنطاق واضح" : "CLEAR MONTHLY MANAGEMENT"}</p><h2 className="mt-4 text-4xl font-black md:text-5xl">{ar ? "لا توظف فريقًا كاملًا لتبقي حضورك متماسكًا" : "Keep your digital presence moving without hiring a full team"}</h2><p className="mt-5 text-lg leading-8 text-slate-600">{ar ? "اختر مستوى التنفيذ المناسب. لكل باقة تسليمات وحدود معلنة، وإضافة المنتجات محسوبة بوضوح." : "Choose the right execution level. Every plan has defined deliverables, limits, and clear product-listing capacity."}</p></div>
-      <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">{monthlyPlans.map(plan => <article key={plan.name} className={`relative flex flex-col rounded-[2rem] border p-7 ${plan.popular ? "border-blue-500 bg-[#07101e] text-white shadow-2xl shadow-blue-600/15" : "border-slate-200 bg-[#f8fafc]"}`}>{plan.popular && <span className="absolute -top-3 start-6 rounded-full bg-blue-600 px-4 py-1.5 text-xs font-black text-white">{ar ? "الأكثر قيمة" : "BEST VALUE"}</span>}<h3 className="text-2xl font-black">{plan.name}</h3><p className={`mt-3 min-h-14 leading-7 ${plan.popular ? "text-slate-300" : "text-slate-500"}`}>{plan.text}</p><div className={`mt-4 rounded-xl border px-3 py-2.5 text-xs font-bold leading-5 ${plan.popular ? "border-white/10 bg-white/[.05] text-slate-300" : "border-slate-200 bg-white text-slate-600"}`}><span className="font-black">{ar ? "مناسبة لـ: " : "Best for: "}</span>{plan.fit}</div><div className="mt-6 flex items-end gap-2"><span className="text-4xl font-black">{plan.price}</span><span className={plan.popular ? "text-slate-400" : "text-slate-500"}>{ar ? "ر.س/شهريًا" : "SAR/month"}</span></div><div className={`mt-5 rounded-2xl px-4 py-3 text-sm font-black ${plan.popular ? "bg-blue-500/15 text-blue-200" : "bg-blue-50 text-blue-700"}`}><PackageOpen className="me-2 inline h-4 w-4" />{plan.products}</div><ul className="mt-6 flex-1 space-y-3">{plan.features.map(item => <li key={item} className={`flex gap-2 text-sm leading-6 ${plan.popular ? "text-slate-300" : "text-slate-600"}`}><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />{item}</li>)}</ul><Link to={`/plans/${plan.id}`} className={`mt-8 rounded-xl px-5 py-3.5 text-center font-black ${plan.popular ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-slate-950 text-white hover:bg-slate-800"}`}>{ar ? "عرض الشرح الكامل وطلب الباقة" : "Full details and order"}</Link></article>)}</div>
-      <p className="mt-6 text-center text-sm text-slate-500">{ar ? "الأسعار لا تشمل ضريبة القيمة المضافة أو ميزانية الإعلانات أو التصوير الميداني. المنتجات غير المستخدمة لا تُرحّل للشهر التالي." : "Prices exclude VAT, ad spend, and on-location photography. Unused product capacity does not roll over."}</p>
-    </div></section>
+      <section id="plans" className="scroll-mt-20 bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-black tracking-[.18em] text-blue-600">
+              {ar ? "اشتراكات شهرية" : "MONTHLY MANAGEMENT"}
+            </p>
+            <h2 className="mt-4 text-4xl font-black md:text-5xl">
+              {ar
+                ? "أربع باقات، والفرق بينها واضح"
+                : "Four plans with clear differences"}
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-slate-600">
+              {ar
+                ? "البطاقات تعرض المختصر فقط. صفحة كل باقة تشرح طريقة حساب المنشورات والقصص، وما نحتاجه منك، وما لا يشمله السعر."
+                : "Cards show the essentials. Each plan page explains counting, client inputs, and exclusions."}
+            </p>
+          </div>
+          <div className="mx-auto mt-12 grid max-w-6xl gap-6 lg:grid-cols-2">
+            {servicePlans.map((plan) => {
+              const popular = plan.id === "growth-system";
+              const included = ar ? plan.includedAr : plan.includedEn;
+              return (
+                <article
+                  key={plan.id}
+                  className={`relative flex flex-col rounded-[2rem] border p-7 md:p-8 ${popular ? "border-blue-500 bg-[#07101e] text-white shadow-2xl shadow-blue-600/15" : "border-slate-200 bg-[#f8fafc]"}`}
+                >
+                  {popular && (
+                    <span className="absolute -top-3 start-7 rounded-full bg-blue-600 px-4 py-1.5 text-xs font-black text-white">
+                      {ar ? "الأكثر توازنًا" : "BEST BALANCE"}
+                    </span>
+                  )}
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="text-3xl font-black">
+                        {ar ? plan.nameAr : plan.nameEn}
+                      </h3>
+                      <p
+                        className={`mt-3 max-w-xl leading-7 ${popular ? "text-slate-300" : "text-slate-600"}`}
+                      >
+                        {ar ? plan.summaryAr : plan.summaryEn}
+                      </p>
+                    </div>
+                    <div className="shrink-0 sm:text-end">
+                      <span className="text-4xl font-black">
+                        {plan.price.toLocaleString()}
+                      </span>
+                      <p
+                        className={`mt-1 text-sm ${popular ? "text-slate-400" : "text-slate-500"}`}
+                      >
+                        {ar ? "ر.س / شهريًا" : "SAR / month"}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`mt-5 rounded-xl border px-4 py-3 text-sm leading-6 ${popular ? "border-white/10 bg-white/[.05] text-slate-300" : "border-slate-200 bg-white text-slate-600"}`}
+                  >
+                    <span className="font-black">
+                      {ar ? "مناسبة لـ: " : "Best for: "}
+                    </span>
+                    {ar
+                      ? plan.bestForAr.replace(/^مناسبة /, "")
+                      : plan.bestForEn.replace(/^Best /, "")}
+                  </div>
+                  <div
+                    className={`mt-4 rounded-xl px-4 py-3 text-sm font-black ${popular ? "bg-blue-500/15 text-blue-200" : "bg-blue-50 text-blue-700"}`}
+                  >
+                    <PackageOpen className="me-2 inline h-4 w-4" />
+                    {ar ? plan.productsAr : plan.productsEn}
+                  </div>
+                  <ul className="mt-6 grid flex-1 gap-3 sm:grid-cols-2">
+                    {included.slice(0, 4).map((item) => (
+                      <li
+                        key={item}
+                        className={`flex gap-2 text-sm leading-6 ${popular ? "text-slate-300" : "text-slate-600"}`}
+                      >
+                        <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to={`/plans/${plan.id}`}
+                    className={`mt-7 inline-flex min-h-13 items-center justify-center gap-2 rounded-xl px-6 font-black ${popular ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-slate-950 text-white hover:bg-slate-800"}`}
+                  >
+                    {ar ? "الشرح الكامل وطلب الباقة" : "Full details and order"}
+                    <Arrow className="h-5 w-5" />
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+          <p className="mt-6 text-center text-sm leading-7 text-slate-500">
+            {ar
+              ? "الأسعار لا تشمل ضريبة القيمة المضافة أو ميزانية الإعلانات أو التصوير الميداني. لا تُرحّل الحصص غير المستخدمة للشهر التالي."
+              : "Prices exclude VAT, ad spend, and on-location production. Unused capacity does not roll over."}
+          </p>
+        </div>
+      </section>
 
-    <section className="bg-[#08101d] py-24 text-white md:py-32"><div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-2 shadow-2xl"><img src="/images/digzoom/product-catalog-service-live-v1.webp" alt={ar ? "مختص تجارة إلكترونية يجهز صور وصفحات المنتجات للنشر" : "E-commerce specialist preparing product images and listings"} loading="lazy" className="aspect-[16/11] w-full rounded-[1.55rem] object-cover" /></div>
-      <div><p className="text-sm font-black tracking-[.18em] text-blue-400">{ar ? "تجهيز منتجاتك للبيع" : "PREPARE PRODUCTS TO SELL"}</p><h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">{ar ? "من ملفات وصور متفرقة إلى صفحات منتجات جاهزة" : "From scattered files to publish-ready product pages"}</h2><p className="mt-6 text-lg leading-8 text-slate-400">{ar ? "نكتب الوصف الأصلي، نجهز الصور، ننظم المواصفات والتصنيفات، ونضيف أساسيات الظهور في البحث. إذا كانت بياناتك جاهزة، تدفع أقل." : "We write original copy, prepare images, organize specifications and categories, and add basic search optimization. Ready data costs less."}</p><div className="mt-8 grid gap-3 sm:grid-cols-2">{productPacks.map(([name, text, price]) => <div key={name} className="rounded-2xl border border-white/10 bg-white/[.045] p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-black">{name}</h3><span className="whitespace-nowrap font-black text-blue-300">{price} {ar ? "ر.س" : "SAR"}</span></div><p className="mt-2 text-sm leading-6 text-slate-400">{text}</p></div>)}</div><p className="mt-5 text-sm leading-7 text-slate-400">{ar ? "المتجر ثنائي اللغة: إضافة 40%. البحث الخارجي عن الصور أو البيانات، المنتجات كثيرة المتغيرات، والمراجعة الطبية أو القانونية تُسعّر بعد فحص الملفات." : "Bilingual stores: add 40%. External image/data research, complex variants, and medical or legal review are quoted after file review."}</p><button onClick={() => go("growth-audit")} className="mt-7 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-4 font-black hover:bg-blue-500">{ar ? "أرسل الكتالوج للتقييم" : "Send your catalog for review"}<Arrow className="h-5 w-5" /></button></div>
-    </div></section>
+      <section
+        id="catalog"
+        className="scroll-mt-20 bg-[#08101d] py-20 text-white md:py-28"
+      >
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+          <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-2 shadow-2xl">
+            <img
+              src="/images/digzoom/product-catalog-service-live-v1.webp"
+              alt={
+                ar
+                  ? "مختص يجهز صفحات المنتجات للنشر"
+                  : "Specialist preparing product listings"
+              }
+              loading="lazy"
+              className="aspect-[16/11] w-full rounded-[1.55rem] object-cover"
+            />
+          </div>
+          <div>
+            <p className="text-sm font-black tracking-[.18em] text-blue-400">
+              {ar ? "خدمة مستقلة دون اشتراك" : "STANDALONE SERVICE"}
+            </p>
+            <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
+              {ar
+                ? "نحوّل ملفاتك وصورك إلى صفحات منتجات جاهزة"
+                : "Turn files and images into publish-ready product pages"}
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-slate-400">
+              {ar
+                ? "نرتب البيانات، نكتب الوصف، نجهز الصور، ننظم المواصفات والتصنيفات، ونضيف أساسيات الظهور في البحث."
+                : "We organize data, write copy, prepare images, structure specifications and categories, and add basic search optimization."}
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {productPacks.map(([name, text, price]) => (
+                <div
+                  key={name}
+                  className="rounded-2xl border border-white/10 bg-white/[.045] p-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-black">{name}</h3>
+                    <span className="whitespace-nowrap font-black text-blue-300">
+                      {price} {ar ? "ر.س" : "SAR"}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    {text}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-sm leading-7 text-slate-400">
+              {ar
+                ? "المتجر ثنائي اللغة: إضافة 40%. البحث الخارجي عن الصور أو البيانات والمنتجات كثيرة المتغيرات تُسعّر بعد فحص الملفات."
+                : "Bilingual stores: add 40%. External research and complex variants are quoted after file review."}
+            </p>
+            <button
+              onClick={() => scrollTo("contact")}
+              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-4 font-black hover:bg-blue-500"
+            >
+              {ar ? "أرسل الكتالوج للتقييم" : "Send your catalog for review"}
+              <Arrow className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </section>
 
-    <section className="py-24 md:py-32"><div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8"><div className="rounded-[2rem] bg-gradient-to-br from-blue-600 to-violet-700 p-8 text-white md:p-12"><p className="text-sm font-black tracking-[.18em] text-blue-100">{t.clarity}</p><h2 className="mt-4 text-3xl font-black md:text-4xl">{t.clarityTitle}</h2><p className="mt-5 text-lg leading-8 text-blue-50/80">{t.clarityText}</p></div><div className="grid gap-4 sm:grid-cols-2">{t.promises.map((x, i) => <div key={x} className="rounded-3xl border border-slate-200 bg-white p-6"><CircleCheckBig className="h-6 w-6 text-emerald-600" /><p className="mt-5 font-black leading-7">{x}</p><span className="mt-4 block text-xs font-black text-slate-300">0{i + 1}</span></div>)}</div></div></section>
+      <section
+        id="partners"
+        className="scroll-mt-20 bg-[#f4f7ff] py-20 md:py-28"
+      >
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+          <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <img
+              src="/images/digzoom/digital-products-live.webp"
+              alt={
+                ar
+                  ? "منتجات رقمية عربية على أجهزة متعددة"
+                  : "Arabic digital products on multiple devices"
+              }
+              loading="lazy"
+              className="aspect-[16/9] w-full object-cover"
+            />
+            <div className="p-7 md:p-9">
+              <p className="text-sm font-black text-violet-600">
+                {ar ? "للشراء والاستخدام" : "BUY AND USE"}
+              </p>
+              <h2 className="mt-3 text-3xl font-black">
+                {ar ? "منتجات رقمية جاهزة" : "Ready-made digital products"}
+              </h2>
+              <p className="mt-4 leading-8 text-slate-600">
+                {ar
+                  ? "قوالب وأدلة وأدوات رقمية مع وصف واضح لما ستحصل عليه وشروط الاستخدام."
+                  : "Templates, guides, and tools with clear deliverables and usage terms."}
+              </p>
+              <Link
+                to="/shop"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-4 font-black text-white"
+              >
+                {ar ? "تصفح المتجر" : "Browse store"}
+                <Arrow className="h-5 w-5" />
+              </Link>
+            </div>
+          </article>
+          <article className="overflow-hidden rounded-[2rem] border border-blue-100 bg-white shadow-sm">
+            <img
+              src="/images/digzoom/creator-partner-live.webp"
+              alt={
+                ar
+                  ? "صانع منتجات رقمية يعمل على منتجه"
+                  : "Digital product creator working"
+              }
+              loading="lazy"
+              className="aspect-[16/9] w-full object-cover"
+            />
+            <div className="p-7 md:p-9">
+              <p className="text-sm font-black text-blue-600">
+                {ar ? "لديك منتج رقمي؟" : "HAVE A DIGITAL PRODUCT?"}
+              </p>
+              <h2 className="mt-3 text-3xl font-black">
+                {ar ? "اعرض منتجك كشريك" : "List your product as a partner"}
+              </h2>
+              <p className="mt-4 leading-8 text-slate-600">
+                {ar
+                  ? "نراجع الجودة والحقوق، ونتفق على الشروط قبل النشر. لا نقبل الملفات مجهولة المصدر."
+                  : "We review quality and rights and agree terms before publishing. Unverified files are not accepted."}
+              </p>
+              <Link
+                to="/partners"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-4 font-black text-white"
+              >
+                {ar ? "شروط وتقديم الشراكة" : "Partner terms and application"}
+                <Arrow className="h-5 w-5" />
+              </Link>
+            </div>
+          </article>
+        </div>
+      </section>
 
-    <section className="border-y border-slate-200 bg-white py-20"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><div className="grid items-center gap-8 lg:grid-cols-2"><div className="overflow-hidden rounded-[2rem]"><img src="/images/digzoom/digital-products-live.webp" alt={ar ? "منتجات رقمية عربية على أجهزة متعددة" : "Arabic digital products across multiple devices"} loading="lazy" className="aspect-[16/11] w-full object-cover" /></div><div><p className="text-sm font-black tracking-[.18em] text-violet-600">{t.tools}</p><h2 className="mt-3 text-3xl font-black md:text-5xl">{t.toolsTitle}</h2><p className="mt-4 text-lg leading-8 text-slate-500">{t.toolsText}</p><Link to="/shop" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-4 font-black text-white">{t.all}<Arrow className="h-4 w-4" /></Link></div></div><div className="mt-12 grid gap-5 md:grid-cols-3">{loading ? <Loader2 className="col-span-full mx-auto h-7 w-7 animate-spin text-blue-600" /> : featured.map(product => <Link key={product.id} to={`/product/${product.slug || product.id}`} className="group rounded-3xl border border-slate-200 p-5 hover:shadow-xl"><div className="aspect-[16/10] overflow-hidden rounded-2xl bg-slate-100">{product.image_url ? <img src={product.image_url} alt={productTitle(product, lang)} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" /> : <PackageOpen className="m-auto h-full w-10 text-slate-300" />}</div><h3 className="mt-5 text-lg font-black">{productTitle(product, lang)}</h3><p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{productDescription(product, lang)}</p></Link>)}</div></div></section>
+      <section
+        id="contact"
+        className="scroll-mt-20 bg-[#070b13] py-20 text-white md:py-28"
+      >
+        <div className="mx-auto grid max-w-6xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-8">
+          <div>
+            <p className="text-sm font-black tracking-[.18em] text-blue-400">
+              {ar ? "طلب مبدئي بلا دفع" : "INITIAL REQUEST — NO PAYMENT"}
+            </p>
+            <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
+              {ar
+                ? "أرسل المطلوب وسنؤكد لك الخدمة المناسبة"
+                : "Tell us what you need and we will confirm the right service"}
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-slate-400">
+              {ar
+                ? "هذه ليست صفحة دفع. نراجع موقعك أو حسابك، نثبت النطاق والتسليمات، ثم نرسل لك الخطوة التالية."
+                : "This is not a payment page. We review your site or account, confirm scope and deliverables, then send the next step."}
+            </p>
+            <div className="mt-8 space-y-3">
+              <TrustItem
+                text={
+                  ar
+                    ? "لن نطلب كلمات المرور عبر النموذج"
+                    : "We will not request passwords in this form"
+                }
+              />
+              <TrustItem
+                text={
+                  ar
+                    ? "لن يبدأ أي عمل قبل موافقتك"
+                    : "No work begins before approval"
+                }
+              />
+              <TrustItem
+                text={ar ? "لن تُضاف تكاليف غير معتمدة" : "No unapproved costs"}
+              />
+            </div>
+          </div>
+          <form
+            onSubmit={submit}
+            className="rounded-[2rem] border border-white/10 bg-white/[.045] p-5 sm:p-8"
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label={ar ? "الاسم" : "Name"}>
+                <input
+                  name="name"
+                  required
+                  maxLength={100}
+                  autoComplete="name"
+                />
+              </Field>
+              <Field label={ar ? "رقم الجوال" : "Phone"}>
+                <input
+                  name="phone"
+                  required
+                  maxLength={30}
+                  autoComplete="tel"
+                  dir="ltr"
+                />
+              </Field>
+              <Field label={ar ? "البريد الإلكتروني" : "Email"}>
+                <input
+                  name="email"
+                  required
+                  type="email"
+                  maxLength={160}
+                  autoComplete="email"
+                  dir="ltr"
+                />
+              </Field>
+              <Field label={ar ? "نوع النشاط" : "Business type"}>
+                <select name="business_type" required defaultValue="">
+                  <option value="" disabled>
+                    {ar ? "اختر نوع النشاط" : "Select business type"}
+                  </option>
+                  {(ar
+                    ? [
+                        "متجر إلكتروني",
+                        "شركة خدمات",
+                        "عيادة أو مركز",
+                        "علامة ناشئة",
+                        "أخرى",
+                      ]
+                    : [
+                        "E-commerce",
+                        "Service business",
+                        "Clinic or center",
+                        "Emerging brand",
+                        "Other",
+                      ]
+                  ).map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label={ar ? "الخدمة المطلوبة" : "Service needed"} wide>
+                <select name="service_interest" required defaultValue="">
+                  <option value="" disabled>
+                    {ar ? "اختر الخدمة أو الباقة" : "Select a service or plan"}
+                  </option>
+                  {(ar
+                    ? [
+                        "إدارة الموقع — 1,490 ر.س",
+                        "إدارة منصات التواصل — 2,990 ر.س",
+                        "إدارة متكاملة — 4,990 ر.س",
+                        "إدارة موسعة — 7,990 ر.س",
+                        "تجهيز المنتجات دون اشتراك",
+                        "منتج رقمي أو شراكة",
+                      ]
+                    : [
+                        "Website management — SAR 1,490",
+                        "Social management — SAR 2,990",
+                        "Integrated management — SAR 4,990",
+                        "Expanded management — SAR 7,990",
+                        "Standalone product preparation",
+                        "Digital product or partnership",
+                      ]
+                  ).map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field
+                label={
+                  ar
+                    ? "رابط الموقع أو الحساب (اختياري)"
+                    : "Website or account link (optional)"
+                }
+                wide
+              >
+                <input name="website" maxLength={250} dir="ltr" />
+              </Field>
+            </div>
+            {notice && (
+              <div
+                className={`mt-5 rounded-xl border p-4 text-sm ${notice.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "border-red-500/30 bg-red-500/10 text-red-200"}`}
+              >
+                {notice.text}
+              </div>
+            )}
+            <button
+              disabled={sending}
+              className="mt-6 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 font-black hover:bg-blue-500 disabled:opacity-60"
+            >
+              {sending ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  {ar ? "جارٍ الإرسال..." : "Sending..."}
+                </>
+              ) : (
+                <>
+                  {ar ? "إرسال الطلب للمراجعة" : "Send request for review"}
+                  <Arrow className="h-5 w-5" />
+                </>
+              )}
+            </button>
+            <p className="mt-3 text-center text-xs text-slate-500">
+              {ar
+                ? "نستخدم بياناتك للرد على هذا الطلب فقط."
+                : "We use your details only to respond to this request."}
+            </p>
+          </form>
+        </div>
+      </section>
 
-    <section className="bg-[#eef3ff] py-20 md:py-28"><div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8"><div><p className="text-sm font-black tracking-[.18em] text-blue-600">{t.partnerTag}</p><h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">{t.partnerTitle}</h2><p className="mt-6 text-lg leading-8 text-slate-600">{t.partnerText}</p><p className="mt-5 flex items-center gap-2 text-sm font-bold text-slate-500"><ShieldCheck className="h-5 w-5 text-emerald-600" />{t.review}</p><Link to="/partners" className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-4 font-black text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500">{t.partnerCta}<Arrow className="h-5 w-5" /></Link></div><div className="overflow-hidden rounded-[2rem] border-8 border-white shadow-2xl"><img src="/images/digzoom/creator-partner-live.webp" alt={ar ? "صانعة منتجات رقمية تعمل في استوديو احترافي" : "Digital product creator working in a professional studio"} loading="lazy" className="aspect-[16/11] w-full object-cover" /></div></div></section>
-
-    <section id="growth-audit" className="scroll-mt-24 bg-[#070b13] py-24 text-white md:py-32"><div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[.78fr_1.22fr] lg:px-8"><div><p className="text-sm font-black tracking-[.18em] text-blue-400">{t.diagnosis}</p><h2 className="mt-4 text-4xl font-black md:text-5xl">{t.formTitle}</h2><p className="mt-6 text-lg leading-8 text-slate-400">{t.formText}</p><div className="mt-8 space-y-3">{goals.map(([value, title,, Icon]) => <button key={value} onClick={() => choose(value)} className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-start ${goal === value ? "border-blue-500 bg-blue-500/15" : "border-white/10 text-slate-400"}`}><Icon className="h-5 w-5" /><span className="font-bold">{title}</span>{goal === value && <Check className="ms-auto h-5 w-5 text-emerald-400" />}</button>)}</div></div>
-      <form onSubmit={submit} className="rounded-[2rem] border border-white/10 bg-white/[.045] p-5 sm:p-8"><div className="grid gap-5 sm:grid-cols-2">
-        <Field label={t.business}><select name="business_type" required defaultValue=""><option value="" disabled>{t.chooseBusiness}</option>{t.businesses.map(x => <option key={x}>{x}</option>)}</select></Field>
-        <Field label={t.company}><input name="company" required maxLength={120} /></Field>
-        <Field label={t.website} wide><input name="website" maxLength={250} dir="ltr" /></Field>
-        <Field label={ar ? "الخدمة المطلوبة" : "Service needed"} wide><select name="service_interest" required defaultValue=""><option value="" disabled>{ar ? "اختر الخدمة أو الباقة" : "Select a service or plan"}</option>{(ar ? ["استقرار الموقع — 1,490 ر.س", "حضور اجتماعي — 2,990 ر.س", "نظام النمو — 4,990 ر.س", "توسع رقمي — 7,990 ر.س", "تجهيز المنتجات للبيع", "أحتاج عرضًا مخصصًا"] : ["Website Stability — SAR 1,490", "Social Presence — SAR 2,990", "Growth System — SAR 4,990", "Digital Scale — SAR 7,990", "Product listing preparation", "I need a custom proposal"]).map(x => <option key={x}>{x}</option>)}</select></Field>
-        <Field label={t.budget} wide><select name="budget" required defaultValue=""><option value="" disabled>{t.chooseBudget}</option>{budgets.map(([v, x]) => <option key={v} value={v}>{x}</option>)}</select></Field>
-        <Field label={t.name}><input name="name" required maxLength={100} autoComplete="name" /></Field>
-        <Field label={t.phone}><input name="phone" required maxLength={30} autoComplete="tel" dir="ltr" /></Field>
-        <Field label={t.email} wide><input name="email" required type="email" maxLength={160} autoComplete="email" dir="ltr" /></Field>
-        <Field label={t.challenge} wide><textarea name="challenge" maxLength={1200} rows={4} /></Field>
-      </div>{notice && <div className={`mt-5 rounded-xl border p-4 text-sm ${notice.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "border-red-500/30 bg-red-500/10 text-red-200"}`}>{notice.text}</div>}<button disabled={sending} className="mt-6 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 font-black hover:bg-blue-500 disabled:opacity-60">{sending ? <><Loader2 className="h-5 w-5 animate-spin" />{t.sending}</> : <>{t.submit}<Arrow className="h-5 w-5" /></>}</button><p className="mt-3 text-center text-xs text-slate-500">{t.privacy}</p></form>
-    </div></section>
-
-    <section className="py-24 md:py-32"><div className="mx-auto max-w-4xl px-4"><div className="text-center"><p className="text-sm font-black tracking-[.18em] text-blue-600">{t.faqTag}</p><h2 className="mt-4 text-4xl font-black">{t.faqTitle}</h2></div><div className="mt-10 space-y-3">{faqs.map(([q, a], i) => <div key={q} className="rounded-2xl border border-slate-200 bg-white"><button onClick={() => setFaq(faq === i ? -1 : i)} className="flex w-full items-center justify-between gap-5 p-6 text-start font-black">{q}<ChevronDown className={`h-5 w-5 transition ${faq === i ? "rotate-180" : ""}`} /></button>{faq === i && <p className="px-6 pb-6 leading-8 text-slate-600">{a}</p>}</div>)}</div></div></section>
-  </main>;
+      <section className="bg-[#f5f7fb] py-20 md:py-24">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="text-center">
+            <p className="text-sm font-black tracking-[.18em] text-blue-600">
+              {ar ? "قبل أن تبدأ" : "BEFORE YOU START"}
+            </p>
+            <h2 className="mt-4 text-4xl font-black">
+              {ar
+                ? "أسئلة واضحة وإجابات مباشرة"
+                : "Clear questions, direct answers"}
+            </h2>
+          </div>
+          <div className="mt-10 space-y-3">
+            {faqs.map(([question, answer], index) => (
+              <div
+                key={question}
+                className="rounded-2xl border border-slate-200 bg-white"
+              >
+                <button
+                  onClick={() => setFaq(faq === index ? -1 : index)}
+                  className="flex w-full items-center justify-between gap-5 p-6 text-start font-black"
+                >
+                  {question}
+                  <ChevronDown
+                    className={`h-5 w-5 shrink-0 transition ${faq === index ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {faq === index && (
+                  <p className="px-6 pb-6 leading-8 text-slate-600">{answer}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }
 
-function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) {
-  return <label className={`text-sm font-bold text-slate-300 ${wide ? "sm:col-span-2" : ""}`}><span>{label}</span><div className="mt-2 [&>input]:h-12 [&>input]:w-full [&>input]:rounded-xl [&>input]:border [&>input]:border-white/10 [&>input]:bg-[#111827] [&>input]:px-4 [&>input]:text-white [&>input]:outline-none [&>select]:h-12 [&>select]:w-full [&>select]:rounded-xl [&>select]:border [&>select]:border-white/10 [&>select]:bg-[#111827] [&>select]:px-4 [&>select]:text-white [&>select]:outline-none [&>textarea]:w-full [&>textarea]:rounded-xl [&>textarea]:border [&>textarea]:border-white/10 [&>textarea]:bg-[#111827] [&>textarea]:p-4 [&>textarea]:text-white [&>textarea]:outline-none">{children}</div></label>;
+function TrustItem({ text }: { text: string }) {
+  return (
+    <p className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[.04] px-4 py-3 text-sm font-bold text-slate-300">
+      <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-400" />
+      {text}
+    </p>
+  );
+}
+
+function Field({
+  label,
+  wide,
+  children,
+}: {
+  label: string;
+  wide?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <label
+      className={`text-sm font-bold text-slate-300 ${wide ? "sm:col-span-2" : ""}`}
+    >
+      <span>{label}</span>
+      <div className="mt-2 [&>input]:h-12 [&>input]:w-full [&>input]:rounded-xl [&>input]:border [&>input]:border-white/10 [&>input]:bg-[#111827] [&>input]:px-4 [&>input]:text-white [&>input]:outline-none [&>select]:h-12 [&>select]:w-full [&>select]:rounded-xl [&>select]:border [&>select]:border-white/10 [&>select]:bg-[#111827] [&>select]:px-4 [&>select]:text-white [&>select]:outline-none">
+        {children}
+      </div>
+    </label>
+  );
 }
