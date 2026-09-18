@@ -8,8 +8,8 @@ export default function Footer() {
   const storeLinks = [
     { name: lang === "ar" ? "جميع المنتجات" : "All Products", path: "/shop" },
     {
-      name: lang === "ar" ? "خدمات النمو الرقمي" : "Digital Growth Services",
-      path: "/",
+      name: lang === "ar" ? "الخدمات والباقات" : "Services and Plans",
+      path: "/#plans",
     },
     {
       name: lang === "ar" ? "اطلب عرضاً" : "Request a Proposal",
@@ -57,8 +57,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-12 overflow-hidden rounded-xl ring-1 ring-white/10">
+            <Link
+              to="/"
+              className="mb-6 inline-flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.035] py-2 pe-4 ps-2"
+              aria-label="DigZoom"
+            >
+              <div className="h-10 w-10 overflow-hidden rounded-xl ring-1 ring-blue-400/25">
                 <img
                   src="/images/digzoom-logo-side-new.jpg"
                   alt="DigZoom"
@@ -68,6 +72,12 @@ export default function Footer() {
                   }}
                 />
               </div>
+              <span className="text-xl font-black tracking-tight">
+                <span className="text-white">Dig</span>
+                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Zoom
+                </span>
+              </span>
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">
               {lang === "ar"
