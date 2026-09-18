@@ -21,9 +21,9 @@ export default function MarketingServices() {
   const featured = [...products].sort((a, b) => Number(b.is_featured) - Number(a.is_featured)).slice(0, 3);
 
   const t = ar ? {
-    eyebrow: "شريك نمو للمنشآت السعودية والخليجية", a: "نحوّل التسويق إلى", b: "نظام نمو يمكن قياسه.",
-    intro: "نربط الاستراتيجية والإعلانات والمحتوى والمتجر والتحليلات في خطة واحدة؛ حتى تعرف ماذا ننفذ، ولماذا، وما أثره على نمو مشروعك.",
-    audit: "ابدأ تشخيص النمو المجاني", method: "شاهد طريقة العمل", safe: "تشخيص أولي واضح · بلا التزام",
+    eyebrow: "حلول رقمية للمنشآت السعودية والخليجية", a: "إدارة المواقع والتسويق", b: "والمنتجات الرقمية.",
+    intro: "ندير موقعك وحضورك على منصات التواصل، وننفذ التسويق الرقمي، ونجهّز منتجاتك الرقمية ونساعدك على بيعها؛ ضمن نطاق عمل واضح يمكن قياس نتائجه.",
+    audit: "اختر الخدمة المناسبة", method: "استعرض الباقات", safe: "توضيح كامل قبل البدء · بلا التزام",
     preview: "مؤشرات النمو المباشرة", illustrative: "نموذج توضيحي — تُستبدل ببيانات مشروعك بعد ربط التحليلات",
     metrics: ["المبيعات", "العملاء المحتملون", "تكلفة الاكتساب", "عائد الإعلان"],
     q: "ما النتيجة التي تريدها الآن؟", qSub: "اختر هدفك، وسنبني التشخيص الأولي حوله.",
@@ -38,9 +38,9 @@ export default function MarketingServices() {
     submit: "إرسال طلب التشخيص", sending: "جارٍ الإرسال...", privacy: "تُستخدم بياناتك للتواصل بشأن طلبك فقط.", success: "وصل طلبك. سنراجعه ونتواصل معك بالخطوة المناسبة.", error: "تعذر إرسال الطلب الآن. حاول مرة أخرى أو تواصل معنا مباشرة.",
     faqTag: "أسئلة شائعة", faqTitle: "قبل أن نبدأ", discover: "اكتشف الحل", partnerTag: "لديك منتج رقمي؟", partnerTitle: "حوّل خبرتك إلى منتج يصل إلى عملاء جدد", partnerText: "نستقبل القوالب والكتب والأدلة والدورات والأدوات الرقمية. كل منتج يمر بمراجعة الجودة والحقوق قبل عرضه.", partnerCta: "قدّم كشريك رقمي", review: "مراجعة قبل النشر · حقوق واضحة · حماية للملفات",
   } : {
-    eyebrow: "Growth partner for Saudi and Gulf businesses", a: "Turn marketing into a", b: "measurable growth system.",
-    intro: "We connect strategy, ads, content, commerce, and analytics in one plan—so you know what is being done, why, and how it affects growth.",
-    audit: "Start your free growth diagnosis", method: "See how it works", safe: "Clear initial diagnosis · No commitment",
+    eyebrow: "Digital solutions for Saudi and Gulf businesses", a: "Website management, marketing", b: "and digital products.",
+    intro: "We manage your website and social presence, execute digital marketing, and prepare your digital products for sale—with a clear scope and measurable results.",
+    audit: "Choose the right service", method: "View plans", safe: "Full clarity before we begin · No commitment",
     preview: "Live growth indicators", illustrative: "Illustrative model — replaced by your data after analytics setup",
     metrics: ["Revenue", "Qualified leads", "Acquisition cost", "Ad return"],
     q: "What result do you need now?", qSub: "Choose a goal and we will shape the initial diagnosis around it.",
@@ -107,7 +107,7 @@ export default function MarketingServices() {
         <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-200"><Sparkles className="h-4 w-4" />{t.eyebrow}</div>
         <h1 className="text-[2.75rem] font-black leading-[1.04] tracking-[-.045em] sm:text-6xl lg:text-7xl">{t.a}<span className="mt-2 block bg-gradient-to-r from-[#55a7ff] via-[#737cff] to-[#b165ff] bg-clip-text text-transparent">{t.b}</span></h1>
         <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">{t.intro}</p>
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => go("growth-audit")} className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-7 font-black shadow-[0_18px_50px_rgba(37,99,235,.3)] hover:bg-blue-500">{t.audit}<Arrow className="h-5 w-5" /></button><button onClick={() => go("growth-os")} className="min-h-14 rounded-2xl border border-white/15 bg-white/[.04] px-7 font-bold hover:bg-white/[.08]">{t.method}</button></div>
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => go("growth-audit")} className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-7 font-black shadow-[0_18px_50px_rgba(37,99,235,.3)] hover:bg-blue-500">{t.audit}<Arrow className="h-5 w-5" /></button><button onClick={() => go("monthly-plans")} className="min-h-14 rounded-2xl border border-white/15 bg-white/[.04] px-7 font-bold hover:bg-white/[.08]">{t.method}</button></div>
         <p className="mt-4 flex items-center gap-2 text-sm text-slate-400"><ShieldCheck className="h-4 w-4 text-emerald-400" />{t.safe}</p>
       </div><div className="relative mx-auto w-full max-w-xl"><div className="absolute -inset-8 rounded-full bg-blue-500/15 blur-3xl" /><figure className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d1422] p-2 shadow-2xl"><img src="/images/digzoom/growth-hero-live-v3.webp" alt={ar ? "خبيرة نمو سعودية تراجع شاشة المؤشرات مع صاحب مشروع" : "Saudi growth executive reviewing a full analytics monitor with a founder"} fetchPriority="high" className="aspect-[16/12] w-full rounded-[1.55rem] object-cover object-center" /><figcaption className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/15 bg-[#07101e]/90 p-3 shadow-2xl backdrop-blur-xl sm:left-5 sm:right-auto sm:w-[64%]"><div className="mb-2 flex items-center gap-2"><span className="rounded-lg bg-blue-500/20 p-1.5 text-blue-300"><Gauge className="h-4 w-4" /></span><div><p className="text-sm font-black">{t.preview}</p><p className="mt-0.5 text-[9px] text-slate-400">{t.illustrative}</p></div><span className="ms-auto flex items-center gap-1 text-[9px] font-black text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{ar ? "مباشر" : "Live"}</span></div><div className="grid grid-cols-4 gap-1">{t.metrics.map((metric, index) => <div key={metric} className="rounded-md border border-white/[.07] bg-white/[.05] px-1.5 py-1.5"><p className="truncate text-[8px] text-slate-400">{metric}</p><div className="mt-1.5 flex items-center gap-1"><span className={`h-1 flex-1 rounded-full ${index < 2 ? "bg-emerald-400" : "bg-blue-400"}`} /><span className="h-1 w-1 rounded-full bg-white/50" /></div></div>)}</div></figcaption></figure></div></div>
     </section>
