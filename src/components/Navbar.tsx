@@ -1,21 +1,29 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router';
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router";
 import {
-  ShoppingCart, Menu, X, LogIn, LogOut, ShieldCheck,
-  ChevronDown, Globe, Package, UserCircle
-} from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
-import { useLanguage } from '@/hooks/useLanguage';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+  ShoppingCart,
+  Menu,
+  X,
+  LogIn,
+  LogOut,
+  ShieldCheck,
+  ChevronDown,
+  Globe,
+  Package,
+  UserCircle,
+} from "lucide-react";
+import { useCart } from "@/hooks/useCart";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const getNavLinks = (lang: string) => {
-  const isAr = lang === 'ar';
+  const isAr = lang === "ar";
   return [
-    { name: isAr ? 'الحلول' : 'Solutions', path: '/#solutions' },
-    { name: isAr ? 'طريقة العمل' : 'How it works', path: '/#growth-os' },
-    { name: isAr ? 'المتجر' : 'Shop', path: '/shop' },
-    { name: isAr ? 'الشركاء' : 'Partners', path: '/partners' },
-    { name: isAr ? 'من نحن' : 'About', path: '/about' },
+    { name: isAr ? "الخدمات" : "Services", path: "/#services" },
+    { name: isAr ? "الباقات" : "Plans", path: "/#plans" },
+    { name: isAr ? "المتجر" : "Shop", path: "/shop" },
+    { name: isAr ? "الشركاء" : "Partners", path: "/partners" },
+    { name: isAr ? "من نحن" : "About", path: "/about" },
   ];
 };
 
@@ -28,19 +36,22 @@ export default function Navbar() {
   const { lang, toggleLang } = useLanguage();
   const { user, isAdmin, logout } = useSupabaseAuth();
   const location = useLocation();
-  const isAr = lang === 'ar';
+  const isAr = lang === "ar";
 
   const navLinks = getNavLinks(lang);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
         setUserMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close menus on route change
@@ -51,45 +62,58 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
-          : 'bg-transparent'
+          ? "bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+          : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo — Tiger icon + DigZoom text */}
-          <Link to="/" className="flex items-center gap-2 group shrink-0" aria-label="DigZoom">
+          <Link
+            to="/"
+            className="flex items-center gap-2 group shrink-0"
+            aria-label="DigZoom"
+          >
             <div className="h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 rounded-xl overflow-hidden ring-1 ring-blue-400/25 shadow-[0_0_24px_rgba(59,130,246,.16)] group-hover:ring-blue-400/60 transition-all">
               <img
                 src="/images/digzoom-logo-side-new.jpg"
                 alt="DigZoom"
                 className="h-full w-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
               />
             </div>
             <span className="hidden min-[390px]:inline text-lg sm:text-xl font-black tracking-tight">
               <span className="text-white">Dig</span>
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoom</span>
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Zoom
+              </span>
             </span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map(link => (
-              <a key={link.path} href={link.path}
+            {navLinks.map((link) => (
+              <a
+                key={link.path}
+                href={link.path}
                 className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  location.pathname === link.path.split('?')[0] ? 'text-blue-400' : 'text-gray-400 hover:text-white'
-                }`}>
+                  location.pathname === link.path.split("?")[0]
+                    ? "text-blue-400"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
                 {link.name}
-                {location.pathname === link.path.split('?')[0] && (
+                {location.pathname === link.path.split("?")[0] && (
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-blue-400 rounded-full" />
                 )}
               </a>
@@ -99,15 +123,24 @@ export default function Navbar() {
           {/* Right side */}
           <div className="flex items-center gap-1 sm:gap-2">
             {/* Language Switcher */}
-            <button onClick={toggleLang}
-              className="flex items-center gap-1 px-1.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all hover:bg-white/5">
-              <span className={lang === 'ar' ? 'text-gray-500' : 'text-white'}>EN</span>
+            <button
+              onClick={toggleLang}
+              className="hidden lg:flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5"
+            >
+              <span className={lang === "ar" ? "text-gray-500" : "text-white"}>
+                EN
+              </span>
               <span className="text-gray-600">|</span>
-              <span className={lang === 'ar' ? 'text-white' : 'text-gray-500'}>AR</span>
+              <span className={lang === "ar" ? "text-white" : "text-gray-500"}>
+                AR
+              </span>
             </button>
 
             {/* Cart */}
-            <Link to="/cart" className="relative hidden min-[360px]:block p-2 sm:p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+            <Link
+              to="/cart"
+              className="relative hidden lg:block p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+            >
               <ShoppingCart className="w-5 h-5" />
               {totalItems > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
@@ -118,7 +151,7 @@ export default function Navbar() {
 
             {/* === AUTH: Logged In === */}
             {user ? (
-              <div ref={userMenuRef} className="relative">
+              <div ref={userMenuRef} className="relative hidden lg:block">
                 {/* User Toggle Button */}
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -133,7 +166,7 @@ export default function Navbar() {
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
-                      {(user.name || user.email || '?')[0].toUpperCase()}
+                      {(user.name || user.email || "?")[0].toUpperCase()}
                     </div>
                   )}
                   <span className="hidden sm:block max-w-[80px] lg:max-w-[120px] truncate">
@@ -141,28 +174,38 @@ export default function Navbar() {
                   </span>
                   <ChevronDown
                     className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 ${
-                      userMenuOpen ? 'rotate-180' : ''
+                      userMenuOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
 
                 {/* Dropdown Menu */}
                 {userMenuOpen && (
-                  <div className={`absolute top-full mt-2 w-56 bg-[#151520] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 py-2 z-[100] ${
-                    isAr ? 'left-0' : 'right-0'
-                  }`}>
+                  <div
+                    className={`absolute top-full mt-2 w-56 bg-[#151520] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 py-2 z-[100] ${
+                      isAr ? "left-0" : "right-0"
+                    }`}
+                  >
                     {/* User Info Header */}
                     <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-3">
                       {user.avatar ? (
-                        <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover ring-1 ring-white/10" />
+                        <img
+                          src={user.avatar}
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover ring-1 ring-white/10"
+                        />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
-                          {(user.name || user.email || '?')[0].toUpperCase()}
+                          {(user.name || user.email || "?")[0].toUpperCase()}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm font-medium truncate">{user.name || user.email}</div>
-                        <div className="text-gray-500 text-xs truncate">{user.email}</div>
+                        <div className="text-white text-sm font-medium truncate">
+                          {user.name || user.email}
+                        </div>
+                        <div className="text-gray-500 text-xs truncate">
+                          {user.email}
+                        </div>
                         {isAdmin && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-400 mt-0.5">
                             <ShieldCheck className="w-3 h-3" /> ADMIN
@@ -179,7 +222,7 @@ export default function Navbar() {
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
                       >
                         <UserCircle className="w-4 h-4 text-gray-500" />
-                        {isAr ? 'الملف الشخصي' : 'Profile'}
+                        {isAr ? "الملف الشخصي" : "Profile"}
                       </Link>
                       <Link
                         to="/orders"
@@ -187,7 +230,7 @@ export default function Navbar() {
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
                       >
                         <Package className="w-4 h-4 text-gray-500" />
-                        {isAr ? 'طلباتي' : 'My Orders'}
+                        {isAr ? "طلباتي" : "My Orders"}
                       </Link>
                       {isAdmin && (
                         <Link
@@ -196,7 +239,7 @@ export default function Navbar() {
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-all"
                         >
                           <ShieldCheck className="w-4 h-4" />
-                          {isAr ? 'لوحة التحكم' : 'Admin Dashboard'}
+                          {isAr ? "لوحة التحكم" : "Admin Dashboard"}
                         </Link>
                       )}
                     </div>
@@ -204,11 +247,14 @@ export default function Navbar() {
                     {/* Logout */}
                     <div className="border-t border-white/[0.06] pt-1 mt-1">
                       <button
-                        onClick={() => { setUserMenuOpen(false); logout(); }}
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          logout();
+                        }}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-left"
                       >
                         <LogOut className="w-4 h-4" />
-                        {isAr ? 'تسجيل الخروج' : 'Logout'}
+                        {isAr ? "تسجيل الخروج" : "Logout"}
                       </button>
                     </div>
                   </div>
@@ -221,7 +267,7 @@ export default function Navbar() {
                 className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all text-sm font-bold shadow-lg shadow-blue-500/20"
               >
                 <LogIn className="w-4 h-4" />
-                <span>{isAr ? 'دخول' : 'Login'}</span>
+                <span>{isAr ? "دخول" : "Login"}</span>
               </Link>
             )}
 
@@ -230,7 +276,11 @@ export default function Navbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className="lg:hidden p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -241,20 +291,27 @@ export default function Navbar() {
         <div className="lg:hidden bg-[#0f0f1a]/98 backdrop-blur-xl border-t border-white/[0.06] max-h-[80vh] overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {/* Nav Links */}
-            {navLinks.map(link => (
-              <Link key={link.path} to={link.path}
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
                 className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  location.pathname === link.path.split('?')[0] ? 'text-blue-400 bg-blue-500/10' : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}>
+                  location.pathname === link.path.split("?")[0]
+                    ? "text-blue-400 bg-blue-500/10"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
                 {link.name}
               </Link>
             ))}
 
             {/* Language */}
-            <button onClick={toggleLang}
-              className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+            <button
+              onClick={toggleLang}
+              className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+            >
               <Globe className="w-4 h-4" />
-              {isAr ? 'Switch to English' : 'التبديل للعربية'}
+              {isAr ? "Switch to English" : "التبديل للعربية"}
             </button>
 
             {/* Divider */}
@@ -266,15 +323,23 @@ export default function Navbar() {
                 {/* User Card */}
                 <div className="px-4 py-3 flex items-center gap-3">
                   {user.avatar ? (
-                    <img src={user.avatar} alt="" className="w-12 h-12 rounded-full object-cover ring-1 ring-white/10" />
+                    <img
+                      src={user.avatar}
+                      alt=""
+                      className="w-12 h-12 rounded-full object-cover ring-1 ring-white/10"
+                    />
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white">
-                      {(user.name || user.email || '?')[0].toUpperCase()}
+                      {(user.name || user.email || "?")[0].toUpperCase()}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium truncate">{user.name || user.email}</div>
-                    <div className="text-gray-500 text-xs truncate">{user.email}</div>
+                    <div className="text-white font-medium truncate">
+                      {user.name || user.email}
+                    </div>
+                    <div className="text-gray-500 text-xs truncate">
+                      {user.email}
+                    </div>
                     {isAdmin && (
                       <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-400 mt-0.5">
                         <ShieldCheck className="w-3 h-3" /> ADMIN
@@ -283,30 +348,51 @@ export default function Navbar() {
                   </div>
                 </div>
                 {/* Links */}
-                <Link to="/profile" onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all">
-                  <UserCircle className="w-4 h-4 text-gray-500" /> {isAr ? 'الملف الشخصي' : 'Profile'}
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <UserCircle className="w-4 h-4 text-gray-500" />{" "}
+                  {isAr ? "الملف الشخصي" : "Profile"}
                 </Link>
-                <Link to="/orders" onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all">
-                  <Package className="w-4 h-4 text-gray-500" /> {isAr ? 'طلباتي' : 'My Orders'}
+                <Link
+                  to="/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <Package className="w-4 h-4 text-gray-500" />{" "}
+                  {isAr ? "طلباتي" : "My Orders"}
                 </Link>
                 {isAdmin && (
-                  <Link to="/admin" onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-purple-400 hover:bg-purple-500/10 transition-all">
-                    <ShieldCheck className="w-4 h-4" /> {isAr ? 'لوحة التحكم' : 'Admin Dashboard'}
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-purple-400 hover:bg-purple-500/10 transition-all"
+                  >
+                    <ShieldCheck className="w-4 h-4" />{" "}
+                    {isAr ? "لوحة التحكم" : "Admin Dashboard"}
                   </Link>
                 )}
-                <button onClick={() => { setMobileOpen(false); logout(); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
-                  <LogOut className="w-4 h-4" /> {isAr ? 'تسجيل الخروج' : 'Logout'}
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />{" "}
+                  {isAr ? "تسجيل الخروج" : "Logout"}
                 </button>
               </div>
             ) : (
               /* Mobile: Not Logged In */
-              <Link to="/login" onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl text-sm font-bold">
-                <LogIn className="w-4 h-4" /> {isAr ? 'تسجيل الدخول' : 'Login'}
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl text-sm font-bold"
+              >
+                <LogIn className="w-4 h-4" /> {isAr ? "تسجيل الدخول" : "Login"}
               </Link>
             )}
           </div>
