@@ -46,8 +46,8 @@ export default function DeliveryPolicy() {
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             {isAr
-              ? 'جميع منتجاتنا رقمية — تسليم فوري بعد الدفع'
-              : 'All our products are digital — instant delivery after payment'}
+              ? 'جميع منتجاتنا رقمية — ويبدأ التسليم الآلي عند تفعيل الدفع'
+              : 'All our products are digital — automated delivery starts when payments go live'}
           </p>
           <div className="mt-6 inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full px-4 py-2 text-sm">
             <Package className="w-4 h-4" />
