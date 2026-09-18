@@ -8,10 +8,10 @@ export default function TrustSecurity() {
   const features = [
     {
       icon: <Lock className="w-8 h-8 text-emerald-400" />,
-      title: isAr ? 'تسليم رقمي آمن' : 'Secure Digital Delivery',
+      title: isAr ? 'الدفع والتسليم' : 'Payment & Delivery',
       desc: isAr
-        ? 'جميع المنتجات الرقمية يتم تسليمها عبر روابط تحميل مشفرة وآمنة. بمجرد إتمام الدفع، يصلك المنتج فوراً عبر بريدك الإلكتروني وحسابك الشخصي.'
-        : 'All digital products are delivered via encrypted and secure download links. Once payment is complete, your product is delivered instantly via email and your personal account.',
+        ? 'الدفع غير مفعل حالياً. عند تشغيله، لن نعلن التسليم الآلي إلا بعد اختباره والتحقق من حماية روابط التنزيل.'
+        : 'Payments are not live yet. Automated delivery will only be advertised after the payment flow and protected download links are tested.',
     },
     {
       icon: <Eye className="w-8 h-8 text-blue-400" />,
