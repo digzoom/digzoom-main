@@ -129,6 +129,13 @@ export default function Shop() {
   const getTitle = (p: (typeof products)[0]) => productTitle(p, lang);
   const getDesc = (p: (typeof products)[0]) => productDescription(p, lang);
 
+  // Do not show empty legacy categories. Only categories containing at least
+  // one currently published product belong in the public storefront.
+  const visibleCategories = useMemo(
+    () => categories.filter(category => products.some(product => product.category_id === category.id)),
+    [categories, products]
+  );
+
   useEffect(() => setPage(1), [activeCat, sort, search]);
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const visibleProducts = filtered.slice(
@@ -273,7 +280,7 @@ export default function Shop() {
             >
               {t.shop.showAll}
             </button>
-            {categories.map(cat => (
+            {visibleCategories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => handleCat(cat.slug)}
