@@ -8,8 +8,6 @@ import {
   Building2,
   Check,
   ChevronDown,
-  ClipboardCheck,
-  FileText,
   Gauge,
   Layers3,
   Loader2,
@@ -17,7 +15,6 @@ import {
   PackageOpen,
   ShieldCheck,
   Sparkles,
-  Store,
   Wrench,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -200,39 +197,45 @@ export default function MarketingServices() {
       };
   const recommendation = recommendations[need];
 
-  const deliverables = ar
+  const workSamples = ar
     ? [
         {
-          icon: FileText,
-          title: "تقرير إدارة الموقع",
-          text: "التحديثات المنفذة، الأعطال والمخاطر، حالة النسخ الاحتياطي، والأعمال المقترحة للشهر التالي.",
+          image: "/images/products/content-calendar-90-days-realistic.webp",
+          title: "نظام تخطيط محتوى لمدة 90 يومًا",
+          text: "نموذج فعلي من منتجات DigZoom لتنظيم الأفكار والمنصات والمواعيد وحالة النشر.",
+          tag: "منتج DigZoom",
         },
         {
-          icon: ClipboardCheck,
-          title: "خطة محتوى قابلة للاعتماد",
-          text: "موضوع كل منشور، النص، التصميم، المنصة، وموعد النشر قبل بدء التنفيذ.",
+          image: "/images/products/campaign-performance-realistic.webp",
+          title: "لوحة متابعة أداء الحملات",
+          text: "نموذج قياس منظم للإنفاق والنقرات والتحويلات وتكلفة النتيجة والعائد.",
+          tag: "منتج DigZoom",
         },
         {
-          icon: Store,
-          title: "صفحة منتج جاهزة للنشر",
-          text: "عنوان ووصف ومواصفات وصور وتصنيف وأساسيات الظهور في البحث.",
+          image: "/images/products/marketing-budget-roi-realistic.webp",
+          title: "متتبع الميزانية والعائد",
+          text: "نموذج عملي لمقارنة الميزانية المخططة بالمصروف الفعلي ونتائج كل قناة.",
+          tag: "منتج DigZoom",
         },
       ]
     : [
         {
-          icon: FileText,
-          title: "Website management report",
-          text: "Completed updates, incidents, risks, backup status, and next-month recommendations.",
+          image: "/images/products/content-calendar-90-days-realistic.webp",
+          title: "90-day content planning system",
+          text: "A real DigZoom product for organizing topics, channels, dates, and publishing status.",
+          tag: "DigZoom product",
         },
         {
-          icon: ClipboardCheck,
-          title: "Approval-ready content plan",
-          text: "Topic, copy, design, platform, and publishing date before execution begins.",
+          image: "/images/products/campaign-performance-realistic.webp",
+          title: "Campaign performance dashboard",
+          text: "A structured measurement model for spend, clicks, conversions, cost per result, and return.",
+          tag: "DigZoom product",
         },
         {
-          icon: Store,
-          title: "Publish-ready product page",
-          text: "Title, copy, specifications, images, category, and basic search optimization.",
+          image: "/images/products/marketing-budget-roi-realistic.webp",
+          title: "Budget and ROI tracker",
+          text: "A practical model comparing planned budget, actual spend, and results by channel.",
+          tag: "DigZoom product",
         },
       ];
 
@@ -352,7 +355,7 @@ export default function MarketingServices() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f5f7fb] text-[#0c1220]">
-      <section className="relative isolate bg-[#060a12] pb-20 pt-28 text-white md:pb-28 md:pt-36">
+      <section className="relative isolate bg-[#060a12] pb-16 pt-28 text-white md:pb-20 md:pt-32">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_22%,rgba(37,99,235,.24),transparent_30%),radial-gradient(circle_at_84%_65%,rgba(124,58,237,.18),transparent_32%)]" />
         <div className="absolute inset-0 -z-10 opacity-[.08] [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:56px_56px]" />
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.06fr_.94fr] lg:px-8">
@@ -439,7 +442,7 @@ export default function MarketingServices() {
         </div>
       </section>
 
-      <section id="services" className="scroll-mt-20 bg-white py-20 md:py-28">
+      <section id="services" className="scroll-mt-20 bg-white py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-black tracking-[.18em] text-blue-600">
@@ -547,24 +550,27 @@ export default function MarketingServices() {
         </div>
       </section>
 
-      <section className="bg-[#080d16] py-20 text-white md:py-28">
+      <section
+        id="work"
+        className="scroll-mt-20 bg-[#080d16] py-16 text-white md:py-20"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
-            <div>
+          <div className="grid gap-8 lg:grid-cols-[.78fr_1.22fr]">
+            <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-sm font-black tracking-[.18em] text-blue-400">
-                {ar ? "ثقة مبنية على الوضوح" : "TRUST THROUGH CLARITY"}
+                {ar ? "نماذج من أعمالنا ومنتجاتنا" : "WORK AND PRODUCT SAMPLES"}
               </p>
               <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
                 {ar
-                  ? "اعرف ما ستستلمه قبل أن تدفع"
-                  : "Know what you will receive before you pay"}
+                  ? "شاهد شكل العمل قبل أن تبدأ"
+                  : "See the work before you begin"}
               </h2>
               <p className="mt-6 text-lg leading-8 text-slate-400">
                 {ar
-                  ? "لا نعرض نتائج عملاء أو أرقامًا غير موثقة. إلى أن ننشر حالات حقيقية بموافقة أصحابها، نوضح لك شكل التسليمات والنطاق والمسؤوليات."
-                  : "We do not show unverified client results. Until approved case studies are available, we show the deliverables, scope, and responsibilities clearly."}
+                  ? "هذه نماذج تنفيذية ومنتجات طورتها DigZoom وليست ادعاءات لنتائج عملاء. حالات العملاء تُنشر فقط بعد التوثيق والموافقة."
+                  : "These are DigZoom-built products and execution samples—not claims about client results. Client case studies are published only after verification and approval."}
               </p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                 <TrustItem
                   text={
                     ar
@@ -596,21 +602,27 @@ export default function MarketingServices() {
               </div>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              {deliverables.map(({ icon: Icon, title, text }) => (
+              {workSamples.map(({ image, title, text, tag }) => (
                 <article
                   key={title}
-                  className="rounded-3xl border border-white/10 bg-white/[.045] p-6"
+                  className="overflow-hidden rounded-3xl border border-white/10 bg-white/[.045]"
                 >
-                  <span className="inline-flex rounded-2xl bg-blue-500/15 p-3 text-blue-300">
-                    <Icon className="h-6 w-6" />
-                  </span>
-                  <h3 className="mt-6 text-xl font-black">{title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-400">
-                    {text}
-                  </p>
-                  <span className="mt-6 block text-xs font-bold text-slate-600">
-                    {ar ? "نموذج تسليم توضيحي" : "Illustrative deliverable"}
-                  </span>
+                  <img
+                    src={image}
+                    alt={title}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                  <div className="p-5">
+                    <span className="text-xs font-black text-blue-300">
+                      {tag}
+                    </span>
+                    <h3 className="mt-3 text-xl font-black">{title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-400">
+                      {text}
+                    </p>
+                  </div>
                 </article>
               ))}
             </div>
@@ -618,7 +630,7 @@ export default function MarketingServices() {
         </div>
       </section>
 
-      <section id="plans" className="scroll-mt-20 bg-white py-20 md:py-28">
+      <section id="plans" className="scroll-mt-20 bg-white py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-black tracking-[.18em] text-blue-600">
@@ -714,7 +726,7 @@ export default function MarketingServices() {
 
       <section
         id="catalog"
-        className="scroll-mt-20 bg-[#08101d] py-20 text-white md:py-28"
+        className="scroll-mt-20 bg-[#08101d] py-16 text-white md:py-20"
       >
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-2 shadow-2xl">
@@ -779,7 +791,7 @@ export default function MarketingServices() {
 
       <section
         id="partners"
-        className="scroll-mt-20 bg-[#f4f7ff] py-20 md:py-28"
+        className="scroll-mt-20 bg-[#f4f7ff] py-16 md:py-20"
       >
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
@@ -791,9 +803,9 @@ export default function MarketingServices() {
                   : "Arabic digital products on multiple devices"
               }
               loading="lazy"
-              className="aspect-[16/9] w-full object-cover"
+              className="h-44 w-full object-cover md:h-52"
             />
-            <div className="p-7 md:p-9">
+            <div className="p-6 md:p-7">
               <p className="text-sm font-black text-violet-600">
                 {ar ? "للشراء والاستخدام" : "BUY AND USE"}
               </p>
@@ -823,9 +835,9 @@ export default function MarketingServices() {
                   : "Digital product creator working"
               }
               loading="lazy"
-              className="aspect-[16/9] w-full object-cover"
+              className="h-44 w-full object-cover md:h-52"
             />
-            <div className="p-7 md:p-9">
+            <div className="p-6 md:p-7">
               <p className="text-sm font-black text-blue-600">
                 {ar ? "لديك منتج رقمي؟" : "HAVE A DIGITAL PRODUCT?"}
               </p>
@@ -851,7 +863,7 @@ export default function MarketingServices() {
 
       <section
         id="contact"
-        className="scroll-mt-20 bg-[#070b13] py-20 text-white md:py-28"
+        className="scroll-mt-20 bg-[#070b13] py-16 text-white md:py-20"
       >
         <div className="mx-auto grid max-w-6xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-8">
           <div>
@@ -1015,7 +1027,7 @@ export default function MarketingServices() {
         </div>
       </section>
 
-      <section className="bg-[#f5f7fb] py-20 md:py-24">
+      <section className="bg-[#f5f7fb] py-16 md:py-20">
         <div className="mx-auto max-w-4xl px-4">
           <div className="text-center">
             <p className="text-sm font-black tracking-[.18em] text-blue-600">
