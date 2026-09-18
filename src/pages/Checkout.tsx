@@ -80,8 +80,10 @@ export default function Checkout() {
     return null;
   }
 
-  // If cart is empty, redirect to cart page
-  if (items.length === 0) {
+  // A live checkout should send an empty cart back to the cart page. While
+  // payments are disabled, keep this route visible so visitors get a clear,
+  // honest status message instead of an apparently blank page.
+  if (items.length === 0 && CHECKOUT_ENABLED) {
     navigate('/cart');
     return null;
   }
@@ -182,6 +184,23 @@ export default function Checkout() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {!CHECKOUT_ENABLED && items.length === 0 && (
+          <div className="mb-6 rounded-2xl border border-white/[0.06] bg-[#151520] p-5 text-center">
+            <p className="text-sm leading-6 text-gray-300">
+              {lang === 'ar'
+                ? 'يمكنك تصفح المنتجات الآن، وسيُفتح إتمام الطلب بعد تفعيل بوابة الدفع.'
+                : 'You can browse products now. Checkout will open after the payment gateway is activated.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate('/shop')}
+              className="mt-4 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+            >
+              {lang === 'ar' ? 'تصفح المنتجات' : 'Browse products'}
+            </button>
           </div>
         )}
 
