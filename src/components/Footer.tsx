@@ -6,10 +6,9 @@ export default function Footer() {
   const { lang, t } = useLanguage();
 
   const storeLinks = [
-    { name: t.categories.pdf, path: '/shop?category=pdf' },
-    { name: t.categories.templates, path: '/shop?category=templates' },
-    { name: t.categories.graphics, path: '/shop?category=graphics' },
-    { name: t.categories.videos, path: '/shop?category=videos' },
+    { name: lang === 'ar' ? 'جميع المنتجات' : 'All Products', path: '/shop' },
+    { name: lang === 'ar' ? 'خدمات النمو الرقمي' : 'Digital Growth Services', path: '/' },
+    { name: lang === 'ar' ? 'اطلب عرضاً' : 'Request a Proposal', path: '/contact' },
   ];
   const companyLinks = [
     { name: t.navbar.about, path: '/about' },
@@ -47,7 +46,7 @@ export default function Footer() {
                 : 'DigZoom is an integrated Digital Growth Platform combining digital products and professional marketing services.'}
             </p>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-gray-400 text-sm"><Mail className="w-4 h-4 text-blue-400" /><span>info@digzoom.com</span></div>
+              <a href="mailto:info@digzoom.com" className="flex items-center gap-3 text-gray-400 text-sm hover:text-blue-400 transition-colors"><Mail className="w-4 h-4 text-blue-400" /><span>info@digzoom.com</span></a>
               <div className="flex items-center gap-3 text-gray-400 text-sm" dir="ltr"><Phone className="w-4 h-4 text-purple-400" /><span>+966 56 988 8456</span></div>
               <a href="https://wa.me/00966569888456" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-emerald-400 transition-colors" dir="ltr"><MessageCircle className="w-4 h-4 text-emerald-400" /><span>+966 56 988 8456</span></a>
             </div>
