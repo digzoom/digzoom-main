@@ -20,15 +20,14 @@ const getNavLinks = (lang: string) => {
   const isAr = lang === "ar";
   return [
     { name: isAr ? "الخدمات" : "Services", path: "/#services" },
+    { name: isAr ? "نماذج أعمال" : "Work samples", path: "/#work" },
     { name: isAr ? "الباقات" : "Plans", path: "/#plans" },
     { name: isAr ? "المتجر" : "Shop", path: "/shop" },
     { name: isAr ? "الشركاء" : "Partners", path: "/partners" },
-    { name: isAr ? "من نحن" : "About", path: "/about" },
   ];
 };
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -60,29 +59,17 @@ export default function Navbar() {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
-          : "bg-transparent"
-      }`}
-    >
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.07] bg-[#080b12]/94 shadow-[0_4px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo — Tiger icon + DigZoom text */}
+          {/* One visual lockup: tiger mark + DigZoom wordmark */}
           <Link
             to="/"
-            className="flex items-center gap-2 group shrink-0"
+            className="group flex shrink-0 items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.035] py-1.5 pe-3 ps-1.5 transition hover:border-blue-400/30 hover:bg-white/[0.06]"
             aria-label="DigZoom"
           >
-            <div className="h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 rounded-xl overflow-hidden ring-1 ring-blue-400/25 shadow-[0_0_24px_rgba(59,130,246,.16)] group-hover:ring-blue-400/60 transition-all">
+            <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-[.7rem] ring-1 ring-blue-400/25 shadow-[0_0_18px_rgba(59,130,246,.2)] transition-all group-hover:ring-blue-400/60 sm:h-9 sm:w-9">
               <img
                 src="/images/digzoom-logo-side-new.jpg"
                 alt="DigZoom"
@@ -92,7 +79,7 @@ export default function Navbar() {
                 }}
               />
             </div>
-            <span className="hidden min-[390px]:inline text-lg sm:text-xl font-black tracking-tight">
+            <span className="hidden min-[360px]:inline text-base font-black tracking-tight sm:text-lg">
               <span className="text-white">Dig</span>
               <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Zoom
@@ -125,6 +112,7 @@ export default function Navbar() {
             {/* Language Switcher */}
             <button
               onClick={toggleLang}
+              aria-label={isAr ? "Switch to English" : "التبديل للعربية"}
               className="hidden lg:flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5"
             >
               <span className={lang === "ar" ? "text-gray-500" : "text-white"}>
@@ -139,6 +127,7 @@ export default function Navbar() {
             {/* Cart */}
             <Link
               to="/cart"
+              aria-label={isAr ? "سلة المشتريات" : "Shopping cart"}
               className="relative hidden lg:block p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
             >
               <ShoppingCart className="w-5 h-5" />
@@ -274,6 +263,15 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={
+                mobileOpen
+                  ? isAr
+                    ? "إغلاق القائمة"
+                    : "Close menu"
+                  : isAr
+                    ? "فتح القائمة"
+                    : "Open menu"
+              }
               className="lg:hidden p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
             >
               {mobileOpen ? (
