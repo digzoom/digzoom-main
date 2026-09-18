@@ -158,11 +158,15 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem('sb_access_token', data.session.access_token);
           localStorage.setItem('sb_refresh_token', data.session.refresh_token);
 
-          // Remove ?code= from URL and redirect to HashRouter root
+          // Remove the one-time code immediately. OAuth returns home while
+          // password recovery stays on the reset screen.
           url.searchParams.delete('code');
           url.searchParams.delete('type');
-          window.location.href = url.toString() + '#/';
-          return; // Page will reload
+          window.history.replaceState({}, '', url.pathname + url.search);
+          if (url.pathname === '/auth/callback') {
+            window.location.replace('/');
+            return;
+          }
         }
       }
 
@@ -232,7 +236,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(async (email: string, password: string, name: string) => {
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { data: { full_name: name } },
+      options: { data: { full_name: name }, emailRedirectTo: window.location.origin },
     });
     if (error) return { error: error.message };
     return {};
@@ -258,7 +262,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Password Reset
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     if (error) return { error: error.message };
     return { success: true };
   }, []);
@@ -270,11 +276,8 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Google OAuth — PKCE
-  // redirectTo WITHOUT hash: Supabase backend appends ?code= to origin.
-  // After callback we manually redirect to /#/ for HashRouter.
   const signInWithGoogle = useCallback(async () => {
-    const redirectTo = window.location.origin; // e.g. https://digzoom.com
-    console.log('[AUTH] signInWithOAuth redirectTo:', redirectTo);
+    const redirectTo = window.location.origin;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo },

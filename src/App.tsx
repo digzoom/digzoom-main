@@ -9,6 +9,7 @@ import { SupabaseAuthProvider } from '@/hooks/useSupabaseAuth.tsx';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdminGuard from './components/AdminGuard';
+import Seo from './components/Seo';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -31,28 +32,10 @@ const CompanyInformation = lazy(() => import('./pages/CompanyInformation'));
 const MarketingServices = lazy(() => import('./pages/MarketingServices'));
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
 const TrustSecurity = lazy(() => import('./pages/TrustSecurity'));
-
-/* Placeholder pages for user dropdown links */
-function ProfilePage() {
-  return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center pt-16">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-white mb-4">الملف الشخصي</h1>
-        <p className="text-gray-400">قريباً...</p>
-      </div>
-    </div>
-  );
-}
-function OrdersPage() {
-  return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center pt-16">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-white mb-4">طلباتي</h1>
-        <p className="text-gray-400">قريباً...</p>
-      </div>
-    </div>
-  );
-}
+const ProfilePage = lazy(() => import('./pages/Profile'));
+const OrdersPage = lazy(() => import('./pages/Orders'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 export default function App() {
   const location = useLocation();
@@ -64,6 +47,7 @@ export default function App() {
         <SupabaseAuthProvider>
           <AuthProvider>
             <ScrollToTop />
+            <Seo />
             {!isAdminRoute && <Navbar />}
             <Suspense fallback={<div className="min-h-screen bg-[#08090d] flex items-center justify-center text-gray-500">Loading…</div>}>
             <Routes>
@@ -72,6 +56,9 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Login />} />
               <Route path="/register" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/callback" element={<div className="min-h-screen bg-[#08090d]" />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/shop" element={<Shop />} />

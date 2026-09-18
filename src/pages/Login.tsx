@@ -228,6 +228,7 @@ export default function Login() {
               <p className="text-gray-600 text-xs mt-1">
                 {lang === 'ar' ? '6 أحرف على الأقل' : 'At least 6 characters'}
               </p>
+              {mode === 'login' && <Link to="/forgot-password" className="mt-2 block text-sm text-blue-400 hover:text-blue-300">{lang === 'ar' ? 'نسيت كلمة المرور؟' : 'Forgot password?'}</Link>}
             </div>
             <button
               type="submit"

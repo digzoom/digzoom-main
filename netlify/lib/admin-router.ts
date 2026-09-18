@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRouter, publicQuery, adminQuery } from "./trpc";
+import { createRouter, publicQuery, authedQuery, adminQuery } from "./trpc";
 import { getSupabaseAdmin } from "./supabase-admin";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,7 +97,7 @@ export const adminRouter = createRouter({
         customer_notes: z.string().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       // Fail closed until a verified payment flow is connected. This must be
       // enabled explicitly on the server; hiding the checkout button alone is
       // not sufficient because this public mutation can be called directly.
@@ -152,6 +152,7 @@ export const adminRouter = createRouter({
         .insert({
           id: orderId,
           status: "pending",
+          user_id: ctx.user?.id || null,
           subtotal,
           tax_amount: taxAmount,
           total_amount: totalAmount,
@@ -201,17 +202,17 @@ export const adminRouter = createRouter({
 
   /* Secure digital delivery. Metadata is separate from signed-link creation
      so refreshing the confirmation page does not consume a download. */
-  listOrderDownloads: publicQuery
-    .input(z.object({ order_id: z.string().min(6), email: z.string().email() }))
-    .query(async ({ input }) => {
+  listOrderDownloads: authedQuery
+    .input(z.object({ order_id: z.string().min(6) }))
+    .query(async ({ input, ctx }) => {
       const { data: order, error: orderError } = await admin()
         .from("orders")
-        .select("id,customer_email,status,paid_at")
+        .select("id,user_id,status,paid_at")
         .eq("id", input.order_id)
         .maybeSingle();
 
       const paid = order && (order.status === "paid" || order.status === "completed" || !!order.paid_at);
-      if (orderError || !paid || order.customer_email?.trim().toLowerCase() !== input.email.trim().toLowerCase()) {
+      if (orderError || !paid || order.user_id !== ctx.user.id) {
         throw new Error("Downloads are not available for this order");
       }
 
@@ -245,20 +246,19 @@ export const adminRouter = createRouter({
       });
     }),
 
-  createDownloadLink: publicQuery
+  createDownloadLink: authedQuery
     .input(z.object({
       order_id: z.string().min(6),
       order_item_id: z.number().int().positive(),
-      email: z.string().email(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { data: order } = await admin()
         .from("orders")
         .select("id,customer_email,status,paid_at,user_id")
         .eq("id", input.order_id)
         .maybeSingle();
       const paid = order && (order.status === "paid" || order.status === "completed" || !!order.paid_at);
-      if (!paid || order.customer_email?.trim().toLowerCase() !== input.email.trim().toLowerCase()) {
+      if (!paid || order.user_id !== ctx.user.id) {
         throw new Error("Download authorization failed");
       }
 
@@ -297,7 +297,7 @@ export const adminRouter = createRouter({
       const filename = `${product.title_en || "digzoom-product"}.xlsx`.replace(/[^a-zA-Z0-9._ -]/g, "");
       const { data: signed, error: signedError } = await admin().storage
         .from("digital-products")
-        .createSignedUrl(product.storage_path, 60, { download: filename });
+        .createSignedUrl(product.storage_path, 120, { download: filename });
       if (signedError || !signed?.signedUrl) {
         await admin().from("order_items").update({ download_count: item.download_count }).eq("id", item.id);
         throw new Error("Unable to create secure download link");
@@ -305,10 +305,56 @@ export const adminRouter = createRouter({
 
       await admin().from("download_logs").insert({
         order_item_id: item.id,
-        user_id: order.user_id || null,
+        user_id: ctx.user.id,
+        ip_address: ctx.ipAddress || null,
+        user_agent: ctx.userAgent || null,
       });
-      return { url: signed.signedUrl, expires_in: 60 };
+      return { url: signed.signedUrl, expires_in: 120 };
     }),
+
+  /* ─── Customer account ─── */
+  getMyProfile: authedQuery.query(async ({ ctx }) => {
+    const { data, error } = await admin().from("profiles")
+      .select("id,full_name,avatar_url,phone,created_at,updated_at")
+      .eq("id", ctx.user.id).maybeSingle();
+    if (error) throw new Error("Unable to load profile");
+    return { ...(data || {}), id: ctx.user.id, email: ctx.user.email || "" };
+  }),
+
+  updateMyProfile: authedQuery
+    .input(z.object({
+      full_name: z.string().trim().min(2).max(100),
+      phone: z.string().trim().max(30).optional(),
+      avatar_url: z.union([z.string().url(), z.literal("")]).optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { data, error } = await admin().from("profiles").upsert({
+        id: ctx.user.id,
+        full_name: input.full_name,
+        phone: input.phone || null,
+        avatar_url: input.avatar_url || null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "id" }).select("id,full_name,avatar_url,phone,updated_at").single();
+      if (error) throw new Error("Unable to update profile");
+      return data;
+    }),
+
+  listMyOrders: authedQuery.query(async ({ ctx }) => {
+    const { data: orders, error } = await admin().from("orders")
+      .select("id,status,subtotal,discount_amount,tax_amount,total_amount,paid_at,created_at")
+      .eq("user_id", ctx.user.id).order("created_at", { ascending: false });
+    if (error) throw new Error("Unable to load orders");
+    const ids = (orders || []).map((order: any) => order.id);
+    if (!ids.length) return [];
+    const { data: items, error: itemsError } = await admin().from("order_items")
+      .select("id,order_id,product_id,product_title,quantity,price_at_time,delivery_status,download_count,max_downloads")
+      .in("order_id", ids);
+    if (itemsError) throw new Error("Unable to load order items");
+    return (orders || []).map((order: any) => ({
+      ...order,
+      items: (items || []).filter((item: any) => item.order_id === order.id),
+    }));
+  }),
 
   /* ─── Products ─── */
   listProducts: adminQuery
@@ -587,7 +633,7 @@ export const adminRouter = createRouter({
       let query = admin()
         .from("orders")
         .select(
-          "id,order_number,customer_name,customer_email,total_amount,status,payment_status,created_at"
+          "id,customer_name,customer_email,total_amount,status,payment_method,paid_at,created_at"
         )
         .order("created_at", { ascending: false })
         .limit(input?.limit ?? 100);
@@ -605,7 +651,7 @@ export const adminRouter = createRouter({
         customer_email: o.customer_email,
         total: o.total_amount,
         status: o.status,
-        payment_status: o.payment_status || 'pending',
+        payment_status: o.paid_at || o.status === 'paid' || o.status === 'completed' ? 'paid' : 'pending',
         created_at: o.created_at,
         items: [] as any[],
       })) : [];
@@ -616,13 +662,13 @@ export const adminRouter = createRouter({
           const orderIds = orders.map((o: any) => o.id);
           const { data: itemsData } = await admin()
             .from("order_items")
-            .select("order_id,product_name,quantity,price")
+            .select("order_id,product_title,quantity,price_at_time")
             .in("order_id", orderIds);
           if (itemsData && itemsData.length > 0) {
             for (const o of orders) {
               o.items = itemsData.filter(
                 (item: any) => item.order_id === o.id
-              );
+              ).map((item: any) => ({ ...item, product_name: item.product_title, price: item.price_at_time }));
             }
           }
         } catch (e: any) {
@@ -635,7 +681,7 @@ export const adminRouter = createRouter({
   updateOrderStatus: adminQuery
     .input(
       z.object({
-        id: z.number(),
+        id: z.string().min(6),
         status: z.enum([
           "pending",
           "processing",
@@ -649,8 +695,9 @@ export const adminRouter = createRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const updateData: Record<string, string> = { status: input.status };
-      if (input.paymentStatus) updateData.payment_status = input.paymentStatus;
+      const updateData: Record<string, string | null> = { status: input.status };
+      if (input.paymentStatus === "paid") updateData.paid_at = new Date().toISOString();
+      if (input.paymentStatus && input.paymentStatus !== "paid") updateData.paid_at = null;
       const { data, error } = await admin()
         .from("orders")
         .update(updateData)
@@ -685,10 +732,14 @@ export const adminRouter = createRouter({
         throw new Error("Invalid base64 data: " + e.message);
       }
       if (buffer.length === 0) throw new Error("Empty image data");
+      if (buffer.length > 5 * 1024 * 1024) throw new Error("Image must be 5 MB or smaller");
+      const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+      if (!allowedImageTypes.has(input.contentType)) throw new Error("Unsupported image type");
+      const safeFilename = input.filename.replace(/[^a-zA-Z0-9._-]/g, "-");
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
-        .upload(input.filename, buffer, {
+        .upload(safeFilename, buffer, {
           contentType: input.contentType,
           upsert: true,
         });
@@ -700,13 +751,13 @@ export const adminRouter = createRouter({
 
       const { data: urlData } = supabase.storage
         .from("product-images")
-        .getPublicUrl(input.filename);
+        .getPublicUrl(safeFilename);
 
       logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "upload_image",
-        newValue: { filename: input.filename, url: urlData.publicUrl },
+        newValue: { filename: safeFilename, url: urlData.publicUrl },
       });
 
       return { url: urlData.publicUrl };
@@ -817,10 +868,10 @@ export const adminRouter = createRouter({
     try {
       const { data } = await s
         .from("orders")
-        .select("id,order_number,customer_name,total_amount,status,created_at")
+        .select("id,customer_name,total_amount,status,created_at")
         .order("id", { ascending: false })
         .limit(5);
-      latestOrders = (data ?? []).map((o: any) => ({ ...o, total: o.total_amount }));
+      latestOrders = (data ?? []).map((o: any) => ({ ...o, order_number: o.id, total: o.total_amount }));
     } catch (e: any) {
       console.error("[getStats] latestOrders:", e.message);
     }
@@ -1215,8 +1266,8 @@ export const adminRouter = createRouter({
 
     // Top selling products
     try {
-      const { data: top } = await s.from("order_items").select("product_name,quantity,price,product_id").limit(10);
-      result.topProducts = (top ?? []).slice(0, 5);
+      const { data: top } = await s.from("order_items").select("product_title,quantity,price_at_time,product_id").limit(10);
+      result.topProducts = (top ?? []).slice(0, 5).map((item: any) => ({ ...item, product_name: item.product_title, price: item.price_at_time }));
     } catch {}
 
     // Most viewed

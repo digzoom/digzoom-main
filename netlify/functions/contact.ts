@@ -2,6 +2,8 @@ import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { getSupabaseAdmin } from "../lib/supabase-admin";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+const CONTACT_FROM_EMAIL = process.env.CONTACT_FROM_EMAIL || "DigZoom Contact <contact@digzoom.com>";
+const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || "info@digzoom.com";
 
 interface ContactPayload {
   name: string;
@@ -58,8 +60,8 @@ async function sendEmail(payload: ContactPayload) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "DigZoom Contact <contact@digzoom.com>",
-        to: "info@digzoom.com",
+        from: CONTACT_FROM_EMAIL,
+        to: CONTACT_TO_EMAIL,
         reply_to: payload.email,
         subject: `[DigZoom Contact] ${payload.subject}`,
         html: `
@@ -141,6 +143,12 @@ export const handler: Handler = async (
       body: JSON.stringify({ error: "Invalid email" }),
     };
   }
+  payload = {
+    name: String(payload.name).trim().slice(0, 100),
+    email: String(payload.email).trim().toLowerCase().slice(0, 254),
+    subject: String(payload.subject).trim().slice(0, 160),
+    message: String(payload.message).trim().slice(0, 5000),
+  };
 
   console.log("[contact] Received from:", payload.email, "subject:", payload.subject);
 

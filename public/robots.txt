@@ -3,5 +3,8 @@ Allow: /
 Disallow: /admin/
 Disallow: /checkout/
 Disallow: /thank-you/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /reset-password/
 
 Sitemap: https://digzoom.com/sitemap.xml

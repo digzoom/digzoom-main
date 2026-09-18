@@ -6,6 +6,8 @@ const ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || "";
 
 interface TrpcContext {
   user?: { id: string; role: string; email?: string };
+  ipAddress?: string;
+  userAgent?: string;
 }
 
 // NOTE: superjson transformer removed — both client and server use plain JSON.
@@ -32,7 +34,7 @@ const requireAuth = t.middleware(async (opts) => {
   if (!opts.ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Login required" });
   }
-  return opts.next({ ctx: { user: opts.ctx.user } });
+  return opts.next({ ctx: { ...opts.ctx, user: opts.ctx.user } });
 });
 
 // Admin middleware — requires role === "admin"
@@ -40,7 +42,7 @@ const requireAdmin = t.middleware(async (opts) => {
   if (!opts.ctx.user || opts.ctx.user.role !== "admin") {
     throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
   }
-  return opts.next({ ctx: { user: opts.ctx.user } });
+  return opts.next({ ctx: { ...opts.ctx, user: opts.ctx.user } });
 });
 
 export const authedQuery = t.procedure.use(requireAuth);

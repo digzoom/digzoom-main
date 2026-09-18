@@ -892,7 +892,7 @@ function ProductModal({ productId, title, form, setForm, onSave, onClose, isPend
    ORDERS TAB
    ═══════════════════════════════════════════════════════════ */
 function OrdersTab() {
-  const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [toast, setToast] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { lang, t } = useLanguage();

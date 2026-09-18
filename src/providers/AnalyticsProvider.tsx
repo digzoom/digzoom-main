@@ -69,6 +69,17 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     initGA4();
     initClarity();
+    const report = (message: string, source?: string, stack?: string) => {
+      trackGA4Event('exception', { description: message.slice(0, 150), fatal: false });
+      const body = JSON.stringify({ message, source, stack, page_url: window.location.href });
+      if (navigator.sendBeacon) navigator.sendBeacon('/api/client-error', new Blob([body], { type: 'application/json' }));
+      else void fetch('/api/client-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true });
+    };
+    const onError = (event: ErrorEvent) => report(event.message, event.filename, event.error?.stack);
+    const onRejection = (event: PromiseRejectionEvent) => report(String(event.reason?.message || event.reason || 'Unhandled rejection'), 'promise', event.reason?.stack);
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onRejection);
+    return () => { window.removeEventListener('error', onError); window.removeEventListener('unhandledrejection', onRejection); };
   }, []);
 
   useEffect(() => {

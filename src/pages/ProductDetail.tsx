@@ -77,6 +77,31 @@ export default function ProductDetail() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!product) return;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.dataset.productSchema = 'true';
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: productTitle(product, lang),
+      description: productLongDescription(product, lang),
+      image: product.image_url ? [product.image_url] : undefined,
+      sku: String(product.id),
+      brand: { '@type': 'Brand', name: 'DigZoom' },
+      offers: {
+        '@type': 'Offer',
+        url: `https://digzoom.com/product/${product.id}`,
+        priceCurrency: 'SAR',
+        price: Number(product.price).toFixed(2),
+        availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      },
+    });
+    document.head.appendChild(script);
+    return () => script.remove();
+  }, [product, lang]);
+
   // Loading state
   if (loading) {
     return (

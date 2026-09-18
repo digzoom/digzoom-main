@@ -76,7 +76,11 @@ export const handler = async (event: any, _context: any) => {
       endpoint: "/api",
       req,
       router: appRouter,
-      createContext: async () => ({ user }),
+      createContext: async () => ({
+        user,
+        ipAddress: event.headers?.['x-nf-client-connection-ip'] || event.headers?.['x-forwarded-for']?.split(',')[0]?.trim(),
+        userAgent: event.headers?.['user-agent'],
+      }),
       onError: (opts: any) => {
         console.error(
           "[tRPC error] path:",
@@ -108,7 +112,7 @@ export const handler = async (event: any, _context: any) => {
       body: JSON.stringify({
         error: {
           json: {
-            message: "Internal error: " + (err?.message || "unknown"),
+            message: "Internal server error",
             code: -32000,
           },
         },

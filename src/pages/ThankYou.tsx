@@ -13,10 +13,9 @@ export default function ThankYou() {
     const saved = localStorage.getItem('lastOrderId');
     return saved || '';
   });
-  const [orderEmail] = useState(() => localStorage.getItem('lastOrderEmail') || '');
   const downloads = trpc.listOrderDownloads.useQuery(
-    { order_id: orderId, email: orderEmail },
-    { enabled: Boolean(orderId && orderEmail), retry: false }
+    { order_id: orderId },
+    { enabled: Boolean(orderId), retry: false }
   );
   const createLink = trpc.createDownloadLink.useMutation();
 
@@ -25,7 +24,6 @@ export default function ThankYou() {
       const result = await createLink.mutateAsync({
         order_id: orderId,
         order_item_id: orderItemId,
-        email: orderEmail,
       });
       window.location.assign(result.url);
       void downloads.refetch();
