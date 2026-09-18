@@ -11,10 +11,10 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 const getNavLinks = (lang: string) => {
   const isAr = lang === 'ar';
   return [
-    { name: isAr ? 'خدمات التسويق الرقمي' : 'Digital Marketing', path: '/' },
+    { name: isAr ? 'الحلول' : 'Solutions', path: '/#solutions' },
+    { name: isAr ? 'طريقة العمل' : 'How it works', path: '/#growth-os' },
     { name: isAr ? 'المتجر' : 'Shop', path: '/shop' },
     { name: isAr ? 'من نحن' : 'About', path: '/about' },
-    { name: isAr ? 'اتصل بنا' : 'Contact', path: '/contact' },
   ];
 };
 
@@ -65,8 +65,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo — Tiger icon + DigZoom text */}
-          <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="h-10 w-10 flex-shrink-0 rounded-lg overflow-hidden ring-1 ring-white/10 group-hover:ring-blue-500/50 transition-all">
+          <Link to="/" className="flex items-center gap-2 group shrink-0" aria-label="DigZoom">
+            <div className="h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 rounded-xl overflow-hidden ring-1 ring-blue-400/25 shadow-[0_0_24px_rgba(59,130,246,.16)] group-hover:ring-blue-400/60 transition-all">
               <img
                 src="/images/digzoom-logo-side-new.jpg"
                 alt="DigZoom"
@@ -74,7 +74,7 @@ export default function Navbar() {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             </div>
-            <span className="text-xl font-bold tracking-tight">
+            <span className="hidden min-[390px]:inline text-lg sm:text-xl font-black tracking-tight">
               <span className="text-white">Dig</span>
               <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoom</span>
             </span>
@@ -83,7 +83,7 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map(link => (
-              <Link key={link.path} to={link.path}
+              <a key={link.path} href={link.path}
                 className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                   location.pathname === link.path.split('?')[0] ? 'text-blue-400' : 'text-gray-400 hover:text-white'
                 }`}>
@@ -91,7 +91,7 @@ export default function Navbar() {
                 {location.pathname === link.path.split('?')[0] && (
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-blue-400 rounded-full" />
                 )}
-              </Link>
+              </a>
             ))}
           </div>
 
@@ -99,14 +99,14 @@ export default function Navbar() {
           <div className="flex items-center gap-1 sm:gap-2">
             {/* Language Switcher */}
             <button onClick={toggleLang}
-              className="flex items-center gap-1 px-2 sm:px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5">
+              className="flex items-center gap-1 px-1.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all hover:bg-white/5">
               <span className={lang === 'ar' ? 'text-gray-500' : 'text-white'}>EN</span>
               <span className="text-gray-600">|</span>
               <span className={lang === 'ar' ? 'text-white' : 'text-gray-500'}>AR</span>
             </button>
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 sm:p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+            <Link to="/cart" className="relative hidden min-[360px]:block p-2 sm:p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
               <ShoppingCart className="w-5 h-5" />
               {totalItems > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">

@@ -14,6 +14,11 @@
   to = "/.netlify/functions/client-error"
   status = 200
 
+[[redirects]]
+  from = "/api/growth-audit"
+  to = "/.netlify/functions/growth-audit"
+  status = 200
+
 # tRPC batch endpoint — exact match for /api (no trailing slash)
 [[redirects]]
   from = "/api"
