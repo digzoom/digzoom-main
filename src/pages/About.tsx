@@ -103,13 +103,13 @@ export default function About() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
             {(lang === 'ar' ? [
               { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'شركة أمريكية مسجلة', desc: 'LLC في وايومنغ' },
-              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'تسليم رقمي آمن', desc: 'ملفات خاصة وروابط محمية' },
+              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'الشراء قريباً', desc: 'بوابة الدفع قيد التجهيز' },
               { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'دعم احترافي', desc: 'رد خلال 24 ساعة' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'منتجات رقمية', desc: 'قوالب، كتب، ملفات' },
               { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'ممارسات شفافة', desc: 'أمان وموثوقية' },
             ] : [
               { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'U.S. Registered', desc: 'Wyoming LLC' },
-              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'Secure Delivery', desc: 'Private, protected files' },
+              { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'Purchasing Soon', desc: 'Payment setup in progress' },
               { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'Pro Support', desc: '24-hour response' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'Digital Products', desc: 'Templates, ebooks' },
               { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'Transparent', desc: 'Safe & trusted' },
