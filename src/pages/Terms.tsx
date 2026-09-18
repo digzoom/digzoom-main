@@ -16,7 +16,7 @@ export default function Terms() {
       ['الخدمات الرقمية','قبل بدء أي خدمة، يتم توضيح السعر والنطاق والمخرجات والمدة والمتطلبات. أي تغيير خارج النطاق قد يتطلب عرضًا ومدة إضافيين.'],
       ['الاستخدام المقبول والمسؤولية','يُمنع استخدام الموقع أو منتجاته في نشاط غير قانوني أو محاولة الوصول غير المصرح به. نقدم المنتجات كما وُصفت، وفي حدود ما يسمح به القانون لا نتحمل خسائر غير مباشرة ناشئة عن إساءة الاستخدام.'],
     ],
-    contact:'الجهة القانونية والتواصل', contactText:'DIGZOOM LIMITED LIABILITY COMPANY — Wyoming, United States. للاستفسارات: legal@digzoom.com أو info@digzoom.com.',
+    contact:'الجهة القانونية والتواصل', contactText:'DIGZOOM LIMITED LIABILITY COMPANY — Wyoming, United States. للاستفسارات: info@digzoom.com.',
   }:{
     home:'Home', title:'Terms of Service', updated:'Last updated: September 17, 2026',
     sections:[
@@ -27,7 +27,7 @@ export default function Terms() {
       ['Digital services','Before a service begins, we define the price, scope, deliverables, timeline, and customer requirements. Work outside the agreed scope may require a separate quote and timeline.'],
       ['Acceptable use and liability','You may not use the website or products for unlawful activity or attempt unauthorized access. We provide products as described and, to the extent permitted by law, are not responsible for indirect losses caused by misuse.'],
     ],
-    contact:'Legal entity and contact', contactText:'DIGZOOM LIMITED LIABILITY COMPANY — Wyoming, United States. Contact: legal@digzoom.com or info@digzoom.com.',
+    contact:'Legal entity and contact', contactText:'DIGZOOM LIMITED LIABILITY COMPANY — Wyoming, United States. Contact: info@digzoom.com.',
   };
   const icons=[<UserCheck/>,<ShoppingBag/>,<FileText/>,<Copyright/>,<Briefcase/>,<AlertTriangle/>];
   return <div className="min-h-screen bg-[#0a0a0f] pt-20 md:pt-24 pb-16" dir={isAr?'rtl':'ltr'}><div className="max-w-3xl mx-auto px-4 sm:px-6">
