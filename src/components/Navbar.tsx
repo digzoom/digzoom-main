@@ -14,6 +14,7 @@ const getNavLinks = (lang: string) => {
     { name: isAr ? 'الحلول' : 'Solutions', path: '/#solutions' },
     { name: isAr ? 'طريقة العمل' : 'How it works', path: '/#growth-os' },
     { name: isAr ? 'المتجر' : 'Shop', path: '/shop' },
+    { name: isAr ? 'الشركاء' : 'Partners', path: '/partners' },
     { name: isAr ? 'من نحن' : 'About', path: '/about' },
   ];
 };
