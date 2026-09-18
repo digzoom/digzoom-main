@@ -7,6 +7,7 @@ import { CartProvider } from '@/hooks/useCart.tsx';
 import { AuthProvider } from '@/hooks/useAuth.tsx';
 import { SupabaseAuthProvider } from '@/hooks/useSupabaseAuth.tsx';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import AdminGuard from './components/AdminGuard';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -70,6 +71,7 @@ export default function App() {
               <Route path="/store" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Login />} />
+              <Route path="/register" element={<Login />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/shop" element={<Shop />} />
@@ -94,6 +96,7 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
             </Suspense>
+            {!isAdminRoute && <Footer />}
             <Toaster />
           </AuthProvider>
         </SupabaseAuthProvider>
