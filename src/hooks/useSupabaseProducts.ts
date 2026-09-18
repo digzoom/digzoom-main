@@ -1,12 +1,16 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { Product, Category } from '@/types/database';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import type { Product, Category } from "@/types/database";
+import {
+  readStorefrontCache,
+  writeStorefrontCache,
+} from "@/lib/storefrontCache";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
 const headers = {
-  'apikey': ANON_KEY,
-  'Authorization': `Bearer ${ANON_KEY}`,
+  apikey: ANON_KEY,
+  Authorization: `Bearer ${ANON_KEY}`,
 };
 
 async function apiGet<T>(path: string): Promise<T | null> {
@@ -16,8 +20,10 @@ async function apiGet<T>(path: string): Promise<T | null> {
       signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) return null;
-    return await res.json() as T;
-  } catch { return null; }
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
 }
 
 interface UseSupabaseProductsReturn {
@@ -39,35 +45,46 @@ interface UseSupabaseProductsReturn {
 }
 
 export function useSupabaseProducts(): UseSupabaseProductsReturn {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const initialCache = useMemo(() => readStorefrontCache(), []);
+  const [products, setProducts] = useState<Product[]>(
+    initialCache?.products ?? [],
+  );
+  const [categories, setCategories] = useState<Category[]>(
+    initialCache?.categories ?? [],
+  );
+  const [loading, setLoading] = useState(!initialCache);
   const [error, setError] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchProducts = useCallback(async () => {
-    setLoading(true);
+    if (!readStorefrontCache()) setLoading(true);
     setError(null);
-    const data = await apiGet<Product[]>('/products?select=*&is_active=eq.true&order=id');
-    if (data) setProducts(data);
-    else setError('Failed to load products');
+    const [productData, categoryData] = await Promise.all([
+      apiGet<Product[]>("/products?select=*&is_active=eq.true&order=id"),
+      apiGet<Category[]>(
+        "/categories?select=*&is_active=eq.true&order=sort_order",
+      ),
+    ]);
+    if (productData) {
+      const nextCategories =
+        categoryData ?? readStorefrontCache()?.categories ?? [];
+      setProducts(productData);
+      setCategories(nextCategories);
+      writeStorefrontCache(productData, nextCategories);
+    } else if (!readStorefrontCache()) {
+      setError("Failed to load products");
+    }
     setLoading(false);
-  }, []);
-
-  const fetchCategories = useCallback(async () => {
-    const data = await apiGet<Category[]>('/categories?select=*&is_active=eq.true&order=sort_order');
-    if (data) setCategories(data);
   }, []);
 
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
-  }, [fetchProducts, fetchCategories]);
+  }, [fetchProducts]);
 
   const filterByCategory = useCallback((categoryId: number | null) => {
     setActiveCategory(categoryId);
-    setSearchQuery('');
+    setSearchQuery("");
   }, []);
 
   const searchProducts = useCallback((query: string) => {
@@ -75,41 +92,69 @@ export function useSupabaseProducts(): UseSupabaseProductsReturn {
     setActiveCategory(null);
   }, []);
 
-  const getProductById = useCallback(async (id: number): Promise<Product | null> => {
-    const cached = products.find(p => p.id === id);
-    if (cached) return cached;
-    const data = await apiGet<Product[]>(`/products?select=*&id=eq.${id}&is_active=eq.true&limit=1`);
-    return data?.[0] || null;
-  }, [products]);
+  const getProductById = useCallback(
+    async (id: number): Promise<Product | null> => {
+      const cached = products.find((p) => p.id === id);
+      if (cached) return cached;
+      const data = await apiGet<Product[]>(
+        `/products?select=*&id=eq.${id}&is_active=eq.true&limit=1`,
+      );
+      return data?.[0] || null;
+    },
+    [products],
+  );
 
-  const getProductBySlug = useCallback(async (slug: string): Promise<Product | null> => {
-    const data = await apiGet<Product[]>(`/products?select=*&slug=eq.${slug}&is_active=eq.true&limit=1`);
-    return data?.[0] || null;
-  }, []);
+  const getProductBySlug = useCallback(
+    async (slug: string): Promise<Product | null> => {
+      const data = await apiGet<Product[]>(
+        `/products?select=*&slug=eq.${slug}&is_active=eq.true&limit=1`,
+      );
+      return data?.[0] || null;
+    },
+    [],
+  );
 
   const filteredProducts = useMemo(() => {
     let result = products;
     if (activeCategory !== null) {
-      result = result.filter(p => p.category_id === activeCategory);
+      result = result.filter((p) => p.category_id === activeCategory);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      result = result.filter(p =>
-        p.title.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q),
       );
     }
     return result;
   }, [products, activeCategory, searchQuery]);
 
-  const getFeatured = useCallback(() => products.filter(p => p.is_featured), [products]);
-  const getTrending = useCallback(() => products.filter(p => p.is_trending), [products]);
-  const getRelated = useCallback((productId: number, limit = 4) => {
-    const product = products.find(p => p.id === productId);
-    if (!product?.category_id) return [];
-    return products.filter(p => p.id !== productId && p.category_id === product.category_id).slice(0, limit);
-  }, [products]);
-  const getByCategory = useCallback((categoryId: number) => products.filter(p => p.category_id === categoryId), [products]);
+  const getFeatured = useCallback(
+    () => products.filter((p) => p.is_featured),
+    [products],
+  );
+  const getTrending = useCallback(
+    () => products.filter((p) => p.is_trending),
+    [products],
+  );
+  const getRelated = useCallback(
+    (productId: number, limit = 4) => {
+      const product = products.find((p) => p.id === productId);
+      if (!product?.category_id) return [];
+      return products
+        .filter(
+          (p) => p.id !== productId && p.category_id === product.category_id,
+        )
+        .slice(0, limit);
+    },
+    [products],
+  );
+  const getByCategory = useCallback(
+    (categoryId: number) =>
+      products.filter((p) => p.category_id === categoryId),
+    [products],
+  );
 
   return {
     products: filteredProducts,
