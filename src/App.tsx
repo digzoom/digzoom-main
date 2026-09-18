@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AdminGuard from "./components/AdminGuard";
 import Seo from "./components/Seo";
+import MarketingServices from "./pages/MarketingServices";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -29,7 +30,6 @@ const Refund = lazy(() => import("./pages/Refund"));
 const DeliveryPolicy = lazy(() => import("./pages/DeliveryPolicy"));
 const AcceptableUsePolicy = lazy(() => import("./pages/AcceptableUsePolicy"));
 const CompanyInformation = lazy(() => import("./pages/CompanyInformation"));
-const MarketingServices = lazy(() => import("./pages/MarketingServices"));
 const ServiceDetail = lazy(() => import("./pages/ServiceDetail"));
 const TrustSecurity = lazy(() => import("./pages/TrustSecurity"));
 const ProfilePage = lazy(() => import("./pages/Profile"));
