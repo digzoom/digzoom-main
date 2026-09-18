@@ -17,8 +17,8 @@ export default function TrustSecurity() {
       icon: <Eye className="w-8 h-8 text-blue-400" />,
       title: isAr ? 'الخصوصية وحماية البيانات' : 'Privacy & Data Protection',
       desc: isAr
-        ? 'نحن نلتزم بأعلى معايير حماية البيانات. لا نشارك بياناتك مع أطراف ثالثة. يتم تشفير جميع المعاملات باستخدام SSL/TLS لضمان أمان معلوماتك.'
-        : 'We adhere to the highest data protection standards. We do not share your data with third parties. All transactions are encrypted using SSL/TLS to ensure your information remains secure.',
+        ? 'يعمل الموقع عبر HTTPS، ونشارك الحد الأدنى اللازم من البيانات فقط مع مزودي التشغيل المذكورين في سياسة الخصوصية. لا نبيع بيانات العملاء.'
+        : 'The site uses HTTPS. We share only the minimum data required with operational providers listed in our Privacy Policy, and we do not sell customer data.',
     },
     {
       icon: <Building2 className="w-8 h-8 text-purple-400" />,
@@ -31,8 +31,8 @@ export default function TrustSecurity() {
       icon: <Headphones className="w-8 h-8 text-amber-400" />,
       title: isAr ? 'دعم العملاء' : 'Customer Support',
       desc: isAr
-        ? 'فريق دعم متخصص جاهز لمساعدتك على مدار الساعة. نرد على جميع الاستفسارات خلال 24 ساعة عمل عبر البريد الإلكتروني.'
-        : 'A dedicated support team ready to assist you around the clock. We respond to all inquiries within 24 business hours via email.',
+        ? 'يمكنك التواصل مع فريق الدعم عبر البريد الإلكتروني، ونرد عادة خلال 24 ساعة عمل.'
+        : 'You can contact support by email. We usually reply within 24 business hours.',
     },
     {
       icon: <RotateCcw className="w-8 h-8 text-cyan-400" />,
@@ -45,15 +45,15 @@ export default function TrustSecurity() {
       icon: <CreditCard className="w-8 h-8 text-rose-400" />,
       title: isAr ? 'عملية دفع آمنة' : 'Secure Checkout Process',
       desc: isAr
-        ? 'تتم جميع المدفوعات عبر بوابات دفع مشفرة وموثوقة. لا نقوم بتخزين بيانات بطاقتك الائتمانية على خوادمنا.'
-        : 'All payments are processed through encrypted and trusted payment gateways. We do not store your credit card details on our servers.',
+        ? 'الدفع غير متاح الآن. عند الإطلاق ستُعالج بيانات البطاقة لدى مزود الدفع المعتمد، ولن يخزنها موقع DigZoom.'
+        : 'Checkout is not live yet. At launch, card data will be handled by the approved payment provider and will not be stored by DigZoom.',
     },
   ];
 
   const badges = [
     { icon: <ShieldCheck className="w-5 h-5" />, text: isAr ? 'SSL مفعل' : 'SSL Enabled' },
     { icon: <CheckCircle className="w-5 h-5" />, text: isAr ? 'شركة مسجلة أمريكياً' : 'U.S. Registered' },
-    { icon: <Lock className="w-5 h-5" />, text: isAr ? 'مدفوعات مشفرة' : 'Encrypted Payments' },
+    { icon: <Lock className="w-5 h-5" />, text: isAr ? 'ملفات خاصة' : 'Private Files' },
     { icon: <Eye className="w-5 h-5" />, text: isAr ? 'حماية البيانات' : 'Data Protected' },
   ];
 

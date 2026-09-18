@@ -8,24 +8,24 @@ export default function DeliveryPolicy() {
   const sections = [
     {
       icon: <Download className="w-6 h-6 text-blue-400" />,
-      title: isAr ? 'تسليم فوري' : 'Instant Delivery',
+      title: isAr ? 'تسليم بعد تأكيد الدفع' : 'Delivery after payment confirmation',
       text: isAr
-        ? 'جميع منتجاتنا رقمية 100٪. بمجرد إتمام عملية الدفع بنجاح، يتم إرسال رابط التنزيل إلى بريدك الإلكتروني فوراً. لا توجد منتجات فيزيائية يتم شحنها.'
-        : 'All our products are 100% digital. Upon successful payment, a download link is sent to your email immediately. No physical products are shipped.',
+        ? 'جميع منتجاتنا رقمية 100٪. بعد إطلاق بوابة الدفع وتأكيد العملية بنجاح، يظهر المنتج المؤهل في حسابك للتنزيل الآمن. لا توجد منتجات فيزيائية يتم شحنها.'
+        : 'All products are 100% digital. Once checkout launches and payment is verified, eligible products appear in your account for secure download. No physical goods are shipped.',
     },
     {
       icon: <Clock className="w-6 h-6 text-purple-400" />,
       title: isAr ? 'وقت التسليم' : 'Delivery Time',
       text: isAr
-        ? 'المنتجات الرقمية: فوري — خلال دقائق من الدفع. الخدمات الرقمية: يتم تحديد المدة عند الطلب. الاشتراكات: فورية عند الدفع.'
-        : 'Digital products: Instant — within minutes of payment. Digital services: Duration specified at order. Subscriptions: Instant upon payment.',
+        ? 'المنتجات الرقمية المؤهلة: خلال دقائق من تأكيد الدفع. الخدمات: حسب المدة المكتوبة في الباقة أو العرض المعتمد. لا توجد اشتراكات منتجات مفعّلة حالياً.'
+        : 'Eligible digital products: within minutes of verified payment. Services: according to the plan or approved proposal. Product subscriptions are not currently active.',
     },
     {
       icon: <Package className="w-6 h-6 text-emerald-400" />,
       title: isAr ? 'طريقة التسليم' : 'Delivery Method',
       text: isAr
-        ? 'يتم التسليم عبر: رابط تنزيل مباشر في صفحة تأكيد الطلب — نسخة احتياطية مرسلة إلى البريد الإلكتروني — دخول دائم عبر حسابك في قسم "طلباتي"'
-        : 'Delivery via: Direct download link on order confirmation page — Backup copy sent to your email — Permanent access through your account under "My Orders"',
+        ? 'يتم التسليم من قسم «طلباتي» داخل الحساب. الرابط مؤقت لمدة دقيقتين، ويسمح لكل منتج بخمس محاولات تنزيل ما لم يذكر وصفه خلاف ذلك.'
+        : 'Delivery is available under “My Orders” in your account. Each link expires after two minutes, with five download attempts per product unless its description states otherwise.',
     },
     {
       icon: <Mail className="w-6 h-6 text-amber-400" />,
@@ -75,8 +75,8 @@ export default function DeliveryPolicy() {
           <h3 className="text-blue-400 font-bold mb-2">{isAr ? 'ملاحظة مهمة' : 'Important Note'}</h3>
           <p className="text-gray-400 text-sm leading-relaxed">
             {isAr
-              ? 'DigZoom لا يبيع أي منتجات فيزيائية. جميع المنتجات رقمية وقابلة للتحميل. بمجرد إتمام عملية الدفع، لا يمكن إلغاء الطلب أو استرجاع المبلغ باستثناء الحالات المذكورة في سياسة الاسترجاع. تأكد من صحة بريدك الإلكتروني قبل إتمام عملية الشراء.'
-              : 'DigZoom does not sell any physical products. All products are digital and downloadable. Once payment is complete, orders cannot be cancelled or refunded except in cases outlined in our Refund Policy. Please ensure your email address is correct before completing your purchase.'}
+              ? 'DigZoom لا يبيع منتجات فيزيائية. لا يمكن تنزيل الملف قبل تأكيد الدفع، وتخضع الإلغاءات والاسترجاعات للحالات المكتوبة في سياسة الاسترجاع. يلزم تسجيل الدخول للوصول إلى «طلباتي» وروابط التنزيل المحمية.'
+              : 'DigZoom sells no physical goods. Files cannot be downloaded before payment confirmation, and cancellations or refunds follow the published Refund Policy. Sign-in is required to access “My Orders” and protected download links.'}
           </p>
         </div>
       </div>

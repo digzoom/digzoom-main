@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router";
+import { Navigate, Routes, Route, useLocation } from "react-router";
 import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -12,7 +12,6 @@ import AdminGuard from "./components/AdminGuard";
 import Seo from "./components/Seo";
 import MarketingServices from "./pages/MarketingServices";
 
-const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
@@ -69,7 +68,7 @@ export default function App() {
             >
               <Routes>
                 <Route path="/" element={<MarketingServices />} />
-                <Route path="/store" element={<Home />} />
+                <Route path="/store" element={<Navigate to="/shop" replace />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Login />} />
                 <Route path="/register" element={<Login />} />

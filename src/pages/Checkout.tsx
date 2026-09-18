@@ -26,7 +26,7 @@ const trustItems = [
   { icon: <Shield className="w-4 h-4" />, textAr: 'دفع آمن مشفر', textEn: 'Encrypted Secure Payment' },
   { icon: <Clock className="w-4 h-4" />, textAr: 'توصيل فوري', textEn: 'Instant Delivery' },
   { icon: <Award className="w-4 h-4" />, textAr: 'سياسة استرجاع واضحة', textEn: 'Clear Refund Policy' },
-  { icon: <Headphones className="w-4 h-4" />, textAr: 'دعم فني على مدار الساعة', textEn: '24/7 Support' },
+  { icon: <Headphones className="w-4 h-4" />, textAr: 'رد خلال يوم عمل', textEn: 'Reply within one business day' },
 ];
 
 export default function Checkout() {
