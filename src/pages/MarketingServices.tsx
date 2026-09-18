@@ -662,7 +662,7 @@ export default function MarketingServices() {
                     </div>
                     <div className="shrink-0 sm:text-end">
                       <span className="text-4xl font-black">
-                        {plan.price.toLocaleString()}
+                        {plan.price.toLocaleString(ar ? "ar-SA" : "en-US")}
                       </span>
                       <p
                         className={`mt-1 text-sm ${popular ? "text-slate-400" : "text-slate-500"}`}
@@ -674,12 +674,7 @@ export default function MarketingServices() {
                   <div
                     className={`mt-5 rounded-xl border px-4 py-3 text-sm leading-6 ${popular ? "border-white/10 bg-white/[.05] text-slate-300" : "border-slate-200 bg-white text-slate-600"}`}
                   >
-                    <span className="font-black">
-                      {ar ? "مناسبة لـ: " : "Best for: "}
-                    </span>
-                    {ar
-                      ? plan.bestForAr.replace(/^مناسبة /, "")
-                      : plan.bestForEn.replace(/^Best /, "")}
+                    {ar ? plan.bestForAr : plan.bestForEn}
                   </div>
                   <div
                     className={`mt-4 rounded-xl px-4 py-3 text-sm font-black ${popular ? "bg-blue-500/15 text-blue-200" : "bg-blue-50 text-blue-700"}`}
