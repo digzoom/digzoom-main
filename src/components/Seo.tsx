@@ -2,7 +2,10 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 const descriptions: Record<string, [string, string]> = {
-  '/': ['DigZoom | ديج زوم — منصة النمو الرقمي', 'خدمات تسويق ونمو رقمي احترافية للأفراد والشركات.'],
+  '/': [
+    'DigZoom | إدارة المواقع والتسويق والمنتجات الرقمية',
+    'خدمات إدارة المواقع والتسويق الرقمي، مع متجر للمنتجات الرقمية وحلول عملية تساعد المنشآت والأفراد على بناء حضور رقمي وتحقيق نمو قابل للقياس.',
+  ],
   '/store': ['متجر المنتجات الرقمية | DigZoom', 'منتجات رقمية عملية وآمنة من DigZoom.'],
   '/shop': ['تصفح المنتجات الرقمية | DigZoom', 'تصفح منتجات DigZoom الرقمية المتاحة.'],
   '/about': ['عن DigZoom', 'تعرف على DigZoom وخدمات النمو الرقمي.'],
@@ -17,7 +20,10 @@ export default function Seo() {
   const location = useLocation();
   useEffect(() => {
     const basePath = location.pathname.startsWith('/product/') ? '/shop' : location.pathname;
-    const [title, description] = descriptions[basePath] || ['DigZoom | ديج زوم', 'منصة DigZoom للمنتجات والخدمات الرقمية.'];
+    const [title, description] = descriptions[basePath] || [
+      'DigZoom | إدارة المواقع والتسويق والمنتجات الرقمية',
+      'خدمات إدارة المواقع والتسويق الرقمي ومنتجات رقمية عملية من DigZoom.',
+    ];
     const canonical = `https://digzoom.com${location.pathname === '/' ? '' : location.pathname}`;
     document.title = title;
     setMeta('meta[name="description"]', description);
