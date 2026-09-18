@@ -7,6 +7,7 @@ const sections = [
   { id: 'offer', labelAr: 'ماذا نقدم', labelEn: 'What We Offer' },
   { id: 'identity', labelAr: 'الهوية', labelEn: 'Identity' },
   { id: 'mission', labelAr: 'الرسالة والرؤية', labelEn: 'Mission & Vision' },
+  { id: 'team', labelAr: 'خلف العمل', labelEn: 'Behind the Work' },
   { id: 'values', labelAr: 'القيم', labelEn: 'Values' },
   { id: 'stats', labelAr: 'الإحصائيات', labelEn: 'Stats' },
 ];
@@ -207,6 +208,38 @@ export default function About() {
             </p>
           </div>
         </div>
+
+        {/* Real People Behind the Work */}
+        <section
+          id="team"
+          className="relative mb-20 overflow-hidden rounded-3xl border border-white/[0.06] bg-[#11111a]"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.12),transparent_38%),radial-gradient(circle_at_80%_80%,rgba(139,92,246,0.09),transparent_42%)]" />
+          <div className="relative grid items-center lg:grid-cols-[0.92fr_1.08fr]">
+            <div className="order-2 px-6 py-10 sm:px-10 lg:order-1 lg:px-14 lg:py-16">
+              <span className="mb-4 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-300">
+                {lang === 'ar' ? 'خلف DigZoom' : 'Behind DigZoom'}
+              </span>
+              <h2 className="mb-5 text-3xl font-bold leading-tight text-white sm:text-4xl">
+                {lang === 'ar' ? 'أشخاص حقيقيون خلف العمل' : 'Real people behind the work'}
+              </h2>
+              <p className="max-w-xl text-base leading-8 text-gray-300 sm:text-lg">
+                {lang === 'ar'
+                  ? 'خلف DigZoom فريق يهتم بفهم المشروع قبل تقديم الحل. نعمل بوضوح ومسؤولية، ونربط التنفيذ بأهداف يمكن قياسها ومتابعتها.'
+                  : 'Behind DigZoom is a team that takes time to understand the business before recommending a solution. We work with clarity and accountability, connecting execution to goals that can be measured and followed.'}
+              </p>
+            </div>
+            <div className="order-1 min-h-[380px] lg:order-2 lg:min-h-[560px]">
+              <img
+                src="/images/digzoom/team-real-person-v1.webp"
+                alt={lang === 'ar' ? 'أحد أفراد فريق DigZoom في بيئة عمل رقمية' : 'A DigZoom team member in a digital workspace'}
+                className="h-full min-h-[380px] w-full object-cover object-[center_28%] lg:min-h-[560px]"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </section>
 
         {/* Values */}
         <div className="mb-20" id="values">
