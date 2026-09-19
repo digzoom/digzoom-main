@@ -21,6 +21,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { servicePlans } from "@/data/servicePlans";
 
 type Need = "website" | "social" | "complete" | "scale" | "catalog";
+type PillarKind = "website" | "marketing" | "products";
 const scrollTo = (id: string) =>
   document
     .getElementById(id)
@@ -38,6 +39,7 @@ export default function MarketingServices() {
   const pillars = ar
     ? [
         {
+          visual: "website" as PillarKind,
           icon: Wrench,
           title: "إدارة المواقع",
           text: "صيانة وتحديث المحتوى والمنتجات ومراقبة الأعطال، مع تقرير واضح بما تم.",
@@ -50,6 +52,7 @@ export default function MarketingServices() {
           cta: "شاهد باقة إدارة الموقع",
         },
         {
+          visual: "marketing" as PillarKind,
           icon: Megaphone,
           title: "التسويق الرقمي",
           text: "محتوى وإعلانات وقياس أداء، ضمن خطة شهرية تحدد ما سننشره وما سنقيسه.",
@@ -58,6 +61,7 @@ export default function MarketingServices() {
           cta: "شاهد باقات التسويق",
         },
         {
+          visual: "products" as PillarKind,
           icon: PackageOpen,
           title: "المنتجات الرقمية",
           text: "منتجات جاهزة للشراء، وخدمة تجهيز منتجاتك، وفرصة عرض منتجك كشريك.",
@@ -72,6 +76,7 @@ export default function MarketingServices() {
       ]
     : [
         {
+          visual: "website" as PillarKind,
           icon: Wrench,
           title: "Website management",
           text: "Maintenance, content and product updates, incident monitoring, and a clear work report.",
@@ -84,6 +89,7 @@ export default function MarketingServices() {
           cta: "View website plan",
         },
         {
+          visual: "marketing" as PillarKind,
           icon: Megaphone,
           title: "Digital marketing",
           text: "Content, advertising, and measurement through a monthly plan with clear deliverables.",
@@ -96,6 +102,7 @@ export default function MarketingServices() {
           cta: "View marketing plans",
         },
         {
+          visual: "products" as PillarKind,
           icon: PackageOpen,
           title: "Digital products",
           text: "Ready-to-buy products, product-page preparation, and a partner route for creators.",
@@ -460,36 +467,41 @@ export default function MarketingServices() {
             </p>
           </div>
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            {pillars.map(({ icon: Icon, title, text, points, href, cta }) => (
-              <article
-                key={title}
-                className="flex flex-col rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-7 transition hover:-translate-y-1 hover:shadow-xl"
-              >
-                <span className="inline-flex w-fit rounded-2xl bg-blue-600 p-3 text-white">
-                  <Icon className="h-6 w-6" />
-                </span>
-                <h3 className="mt-6 text-2xl font-black">{title}</h3>
-                <p className="mt-3 leading-7 text-slate-600">{text}</p>
-                <ul className="mt-6 flex-1 space-y-3">
-                  {points.map((point) => (
-                    <li
-                      key={point}
-                      className="flex gap-2 text-sm text-slate-600"
-                    >
-                      <Check className="h-5 w-5 shrink-0 text-emerald-600" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to={href}
-                  className="mt-7 inline-flex items-center gap-2 font-black text-blue-700"
+            {pillars.map(
+              ({ visual, icon: Icon, title, text, points, href, cta }) => (
+                <article
+                  key={title}
+                  className="group flex flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-[#f8fafc] transition hover:-translate-y-1 hover:shadow-xl"
                 >
-                  {cta}
-                  <Arrow className="h-4 w-4" />
-                </Link>
-              </article>
-            ))}
+                  <PillarVisual kind={visual} ar={ar} />
+                  <div className="flex flex-1 flex-col p-7">
+                    <span className="inline-flex w-fit rounded-2xl bg-blue-600 p-3 text-white shadow-lg shadow-blue-600/20">
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <h3 className="mt-5 text-2xl font-black">{title}</h3>
+                    <p className="mt-3 leading-7 text-slate-600">{text}</p>
+                    <ul className="mt-6 flex-1 space-y-3">
+                      {points.map((point) => (
+                        <li
+                          key={point}
+                          className="flex gap-2 text-sm text-slate-600"
+                        >
+                          <Check className="h-5 w-5 shrink-0 text-emerald-600" />
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      to={href}
+                      className="mt-7 inline-flex items-center gap-2 font-black text-blue-700"
+                    >
+                      {cta}
+                      <Arrow className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </article>
+              ),
+            )}
           </div>
         </div>
       </section>
@@ -1063,6 +1075,192 @@ export default function MarketingServices() {
         </div>
       </section>
     </main>
+  );
+}
+
+function PillarVisual({ kind, ar }: { kind: PillarKind; ar: boolean }) {
+  if (kind === "website") {
+    return (
+      <div
+        role="img"
+        aria-label={
+          ar
+            ? "لوحة متابعة وصيانة موقع إلكتروني"
+            : "Website maintenance and monitoring dashboard"
+        }
+        className="relative h-52 overflow-hidden bg-gradient-to-br from-[#06101e] via-[#0b2042] to-[#123b78] p-5 text-white"
+      >
+        <div className="absolute -end-10 -top-12 h-36 w-36 rounded-full bg-blue-400/20 blur-2xl" />
+        <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#07111f]/95 shadow-2xl transition duration-500 group-hover:scale-[1.025]">
+          <div className="flex h-8 items-center gap-1.5 border-b border-white/10 px-3">
+            <span className="h-2 w-2 rounded-full bg-red-400" />
+            <span className="h-2 w-2 rounded-full bg-amber-300" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="ms-auto h-2 w-20 rounded-full bg-white/10" />
+          </div>
+          <div className="grid grid-cols-[1.12fr_.88fr] gap-3 p-3">
+            <div className="rounded-xl bg-white/[.06] p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-300">
+                  {ar ? "حالة الموقع" : "Site status"}
+                </span>
+                <span className="flex items-center gap-1 text-[9px] font-black text-emerald-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  {ar ? "يعمل" : "ONLINE"}
+                </span>
+              </div>
+              <div className="mt-3 flex h-14 items-end gap-1">
+                {[35, 55, 42, 68, 57, 82, 74, 92].map((height, index) => (
+                  <span
+                    key={index}
+                    className="flex-1 rounded-t bg-gradient-to-t from-blue-600 to-cyan-300"
+                    style={{ height: `${height}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              {[
+                ar ? "نسخة احتياطية" : "Backup",
+                ar ? "تحديثات" : "Updates",
+                ar ? "حماية" : "Security",
+              ].map((label, index) => (
+                <div
+                  key={label}
+                  className="rounded-lg bg-white/[.06] px-2.5 py-2"
+                >
+                  <div className="flex items-center justify-between text-[9px] text-slate-300">
+                    <span>{label}</span>
+                    <Check className="h-3 w-3 text-emerald-300" />
+                  </div>
+                  <div className="mt-1.5 h-1 rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-emerald-400"
+                      style={{ width: `${88 - index * 8}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "marketing") {
+    return (
+      <div
+        role="img"
+        aria-label={
+          ar
+            ? "تقويم محتوى ولوحة أداء حملة تسويقية"
+            : "Content calendar and marketing campaign dashboard"
+        }
+        className="relative h-52 overflow-hidden bg-gradient-to-br from-[#100b28] via-[#28145b] to-[#6a29b8] p-5 text-white"
+      >
+        <div className="absolute -start-8 bottom-0 h-32 w-32 rounded-full bg-fuchsia-400/20 blur-2xl" />
+        <div className="relative grid h-full grid-cols-[.85fr_1.15fr] gap-3 transition duration-500 group-hover:scale-[1.025]">
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              "from-cyan-400 to-blue-600",
+              "from-fuchsia-400 to-violet-600",
+              "from-amber-300 to-orange-500",
+              "from-emerald-300 to-teal-600",
+            ].map((gradient) => (
+              <div
+                key={gradient}
+                className="rounded-xl border border-white/15 bg-white/10 p-2 shadow-lg"
+              >
+                <div
+                  className={`aspect-square rounded-lg bg-gradient-to-br ${gradient} opacity-90`}
+                />
+                <div className="mt-2 h-1.5 rounded bg-white/25" />
+                <div className="mt-1 h-1.5 w-2/3 rounded bg-white/15" />
+              </div>
+            ))}
+          </div>
+          <div className="rounded-2xl border border-white/15 bg-[#0b1020]/90 p-3 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-slate-200">
+                {ar ? "أداء الحملة" : "Campaign"}
+              </span>
+              <span className="rounded-full bg-emerald-400/15 px-2 py-1 text-[9px] font-black text-emerald-300">
+                +28%
+              </span>
+            </div>
+            <div className="mt-3 flex h-16 items-end gap-1.5">
+              {[30, 48, 39, 65, 54, 76, 88].map((height, index) => (
+                <span
+                  key={index}
+                  className="flex-1 rounded-t bg-gradient-to-t from-violet-700 to-fuchsia-300"
+                  style={{ height: `${height}%` }}
+                />
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="rounded-lg bg-white/[.06] p-2">
+                <div className="text-[8px] text-slate-400">
+                  {ar ? "العملاء" : "LEADS"}
+                </div>
+                <div className="mt-1 text-sm font-black">184</div>
+              </div>
+              <div className="rounded-lg bg-white/[.06] p-2">
+                <div className="text-[8px] text-slate-400">ROAS</div>
+                <div className="mt-1 text-sm font-black">4.2×</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      role="img"
+      aria-label={
+        ar
+          ? "مجموعة منتجات رقمية جاهزة للبيع والتنزيل"
+          : "Digital products ready for sale and download"
+      }
+      className="relative h-52 overflow-hidden bg-gradient-to-br from-[#071a20] via-[#073d44] to-[#087a75] p-5 text-white"
+    >
+      <div className="absolute -end-6 bottom-0 h-36 w-36 rounded-full bg-emerald-300/20 blur-2xl" />
+      <div className="relative flex h-full items-center justify-center transition duration-500 group-hover:scale-[1.025]">
+        <div className="absolute start-5 top-7 w-28 -rotate-6 rounded-2xl border border-white/20 bg-[#0d1728] p-3 shadow-2xl">
+          <div className="flex h-16 items-end gap-1 rounded-lg bg-emerald-400/10 p-2">
+            {[45, 72, 58, 88].map((height, index) => (
+              <span
+                key={index}
+                className="flex-1 rounded-t bg-emerald-300"
+                style={{ height: `${height}%` }}
+              />
+            ))}
+          </div>
+          <div className="mt-2 text-[9px] font-black">XLSX</div>
+        </div>
+        <div className="z-10 w-32 rounded-2xl border border-white/25 bg-white p-3 text-slate-900 shadow-2xl">
+          <div className="rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 p-3 text-white">
+            <Layers3 className="h-7 w-7" />
+            <div className="mt-5 text-[10px] font-black leading-4">
+              {ar ? "منتج رقمي" : "DIGITAL PRODUCT"}
+            </div>
+          </div>
+          <div className="mt-2 h-1.5 rounded bg-slate-200" />
+          <div className="mt-1 h-1.5 w-2/3 rounded bg-slate-100" />
+        </div>
+        <div className="absolute end-4 top-9 w-28 rotate-6 rounded-2xl border border-white/20 bg-[#11182a] p-3 shadow-2xl">
+          <div className="flex h-16 items-center justify-center rounded-lg bg-blue-400/10">
+            <PackageOpen className="h-8 w-8 text-blue-300" />
+          </div>
+          <div className="mt-2 flex items-center justify-between text-[9px] font-black">
+            <span>PDF</span>
+            <span className="text-emerald-300">↓</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
