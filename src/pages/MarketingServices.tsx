@@ -209,40 +209,40 @@ export default function MarketingServices() {
         {
           image: "/images/products/content-calendar-90-days-realistic.webp",
           title: "نظام تخطيط محتوى لمدة 90 يومًا",
-          text: "نموذج فعلي من منتجات DigZoom لتنظيم الأفكار والمنصات والمواعيد وحالة النشر.",
-          tag: "منتج DigZoom",
+          text: "صورة واقعية لشكل خطة التسليم: تقويم منظم يوضح الموضوع والمنصة وموعد النشر وحالة التنفيذ.",
+          tag: "نموذج تسليم توضيحي",
         },
         {
           image: "/images/products/campaign-performance-realistic.webp",
           title: "لوحة متابعة أداء الحملات",
-          text: "نموذج قياس منظم للإنفاق والنقرات والتحويلات وتكلفة النتيجة والعائد.",
-          tag: "منتج DigZoom",
+          text: "صورة واقعية لشكل التقرير الذي يجمع الإنفاق والنقرات والتحويلات وتكلفة النتيجة والعائد.",
+          tag: "نموذج تسليم توضيحي",
         },
         {
           image: "/images/products/marketing-budget-roi-realistic.webp",
           title: "متتبع الميزانية والعائد",
-          text: "نموذج عملي لمقارنة الميزانية المخططة بالمصروف الفعلي ونتائج كل قناة.",
-          tag: "منتج DigZoom",
+          text: "صورة واقعية لملف متابعة يقارن الميزانية المخططة بالمصروف الفعلي وأداء كل قناة.",
+          tag: "نموذج تسليم توضيحي",
         },
       ]
     : [
         {
           image: "/images/products/content-calendar-90-days-realistic.webp",
           title: "90-day content planning system",
-          text: "A real DigZoom product for organizing topics, channels, dates, and publishing status.",
-          tag: "DigZoom product",
+          text: "A realistic delivery preview showing topics, channels, publishing dates, and execution status.",
+          tag: "Illustrative deliverable",
         },
         {
           image: "/images/products/campaign-performance-realistic.webp",
           title: "Campaign performance dashboard",
-          text: "A structured measurement model for spend, clicks, conversions, cost per result, and return.",
-          tag: "DigZoom product",
+          text: "A realistic report preview combining spend, clicks, conversions, cost per result, and return.",
+          tag: "Illustrative deliverable",
         },
         {
           image: "/images/products/marketing-budget-roi-realistic.webp",
           title: "Budget and ROI tracker",
-          text: "A practical model comparing planned budget, actual spend, and results by channel.",
-          tag: "DigZoom product",
+          text: "A realistic tracking-file preview comparing planned budget, actual spend, and channel performance.",
+          tag: "Illustrative deliverable",
         },
       ];
 
@@ -579,8 +579,8 @@ export default function MarketingServices() {
               </h2>
               <p className="mt-6 text-lg leading-8 text-slate-400">
                 {ar
-                  ? "هذه نماذج تنفيذية ومنتجات طورتها DigZoom وليست ادعاءات لنتائج عملاء. حالات العملاء تُنشر فقط بعد التوثيق والموافقة."
-                  : "These are DigZoom-built products and execution samples—not claims about client results. Client case studies are published only after verification and approval."}
+                  ? "هذه صور واقعية توضح شكل الملفات والتقارير التي يمكن تسليمها، وليست نتائج منسوبة لعملاء. دراسات الحالة الحقيقية تُنشر فقط بعد التوثيق والموافقة."
+                  : "These realistic previews show the files and reports that may be delivered; they are not attributed client results. Real case studies are published only after verification and approval."}
               </p>
               <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                 <TrustItem
