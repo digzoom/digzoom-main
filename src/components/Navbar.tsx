@@ -318,3 +318,90 @@ export default function Navbar() {
               {isAr ? "Switch to English" : "التبديل للعربية"}
             </button>
 
+            {/* Divider */}
+            <div className="border-t border-white/[0.06] pt-2 mt-2" />
+
+            {/* Mobile: Logged In */}
+            {user ? (
+              <div className="space-y-1">
+                {/* User Card */}
+                <div className="px-4 py-3 flex items-center gap-3">
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt=""
+                      className="w-12 h-12 rounded-full object-cover ring-1 ring-white/10"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white">
+                      {(user.name || user.email || "?")[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white font-medium truncate">
+                      {user.name || user.email}
+                    </div>
+                    <div className="text-gray-500 text-xs truncate">
+                      {user.email}
+                    </div>
+                    {isAdmin && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-400 mt-0.5">
+                        <ShieldCheck className="w-3 h-3" /> ADMIN
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {/* Links */}
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <UserCircle className="w-4 h-4 text-gray-500" />{" "}
+                  {isAr ? "الملف الشخصي" : "Profile"}
+                </Link>
+                <Link
+                  to="/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <Package className="w-4 h-4 text-gray-500" />{" "}
+                  {isAr ? "طلباتي" : "My Orders"}
+                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-purple-400 hover:bg-purple-500/10 transition-all"
+                  >
+                    <ShieldCheck className="w-4 h-4" />{" "}
+                    {isAr ? "لوحة التحكم" : "Admin Dashboard"}
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />{" "}
+                  {isAr ? "تسجيل الخروج" : "Logout"}
+                </button>
+              </div>
+            ) : (
+              /* Mobile: Not Logged In */
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl text-sm font-bold"
+              >
+                <LogIn className="w-4 h-4" /> {isAr ? "تسجيل الدخول" : "Login"}
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}
