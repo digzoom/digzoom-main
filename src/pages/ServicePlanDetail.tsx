@@ -181,20 +181,7 @@ export default function ServicePlanDetail() {
                 className="flex gap-2 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600"
               >
                 <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
-                <div className="min-w-0">
-                  <span
-                    className={
-                      descriptions ? "font-bold text-slate-900" : undefined
-                    }
-                  >
-                    {x}
-                  </span>
-                  {descriptions?.[index] && (
-                    <p className="mt-1 text-sm leading-7 text-slate-500">
-                      {descriptions[index]}
-                    </p>
-                  )}
-                </div>
+                {x}
               </p>
             ))}
           </div>
