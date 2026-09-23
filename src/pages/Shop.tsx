@@ -518,3 +518,153 @@ export default function Shop() {
                   <div
                     key={p.id}
                     className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white transition-all hover:shadow-xl hover:shadow-slate-900/5 sm:flex-row ${cartQuantity > 0 ? "border-blue-400 ring-2 ring-blue-500/10" : "border-slate-200 hover:border-blue-300"}`}
+                  >
+                    <Link
+                      to={`/product/${p.id}`}
+                      className="sm:w-56 flex-shrink-0 relative"
+                    >
+                      <div className="aspect-[3/4] sm:aspect-auto sm:h-full overflow-hidden">
+                        <img
+                          src={p.image_url}
+                          alt={getTitle(p)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      {p.original_price && (
+                        <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                          {t.shop.discount}{" "}
+                          {Math.round((1 - p.price / p.original_price) * 100)}%
+                        </div>
+                      )}
+                    </Link>
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        <Link to={`/product/${p.id}`}>
+                          <h3 className="text-slate-950 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors">
+                            {getTitle(p)}
+                          </h3>
+                        </Link>
+                        <p className="text-slate-500 text-sm mb-3 line-clamp-2">
+                          {getDesc(p)}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl font-bold text-slate-950">
+                            {p.price} {t.featured.currency}
+                          </span>
+                          {p.original_price && (
+                            <span className="text-gray-600 line-through">
+                              {p.original_price} {t.featured.currency}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleAdd(p)}
+                          aria-label={
+                            cartQuantity > 0
+                              ? lang === "ar"
+                                ? `الكمية في السلة ${cartQuantity}، اضغط للزيادة`
+                                : `${cartQuantity} in cart, press to add one`
+                              : undefined
+                          }
+                          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:scale-[.98] sm:px-6 ${cartQuantity > 0 ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"}`}
+                        >
+                          {cartQuantity > 0 ? (
+                            <CheckCircle2 className="h-4 w-4" />
+                          ) : (
+                            <ShoppingCart className="h-4 w-4" />
+                          )}
+                          {cartQuantity > 0
+                            ? lang === "ar"
+                              ? `في السلة (${cartQuantity})`
+                              : `In cart (${cartQuantity})`
+                            : t.product.addToCart}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {filtered.length === 0 && (
+            <div className="rounded-[2rem] border border-slate-200 bg-white px-6 py-16 text-center shadow-xl shadow-slate-900/5 md:py-20">
+              <div className="relative mb-8 inline-block">
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 flex items-center justify-center mx-auto">
+                  <PackageOpen className="w-12 h-12 md:w-14 md:h-14 text-blue-500" />
+                </div>
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-slate-950 mb-3">
+                {search.trim()
+                  ? lang === "ar"
+                    ? "لا توجد نتائج"
+                    : "No Results Found"
+                  : t.shop.empty}
+              </h3>
+              <p className="text-slate-500 mb-8 max-w-xl mx-auto text-sm md:text-base leading-7">
+                {search.trim()
+                  ? lang === "ar"
+                    ? `لم نعثر على منتجات تطابق "${search}". جرب كلمة بحث مختلفة.`
+                    : `No products matching "${search}". Try a different search term.`
+                  : lang === "ar"
+                    ? "أوقفنا المنتجات التجريبية، ونعمل حالياً على تجهيز منتجات حقيقية بملفات وتسليم واضح."
+                    : "We removed the demo catalog and are preparing real products with verified files and clear delivery."}
+              </p>
+              {search.trim() ? (
+                <button
+                  onClick={() => {
+                    setActiveCat("all");
+                    handleSearch("");
+                    setSearchParams({});
+                  }}
+                  className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 md:px-8 py-3 rounded-xl text-sm font-semibold transition-all hover:bg-blue-600"
+                >
+                  {t.shop.showAll}
+                </button>
+              ) : (
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 md:px-8 py-3 rounded-xl text-sm font-semibold transition-all hover:bg-blue-600"
+                >
+                  {lang === "ar"
+                    ? "اطلب منتجاً أو خدمة"
+                    : "Request a product or service"}
+                </Link>
+              )}
+            </div>
+          )}
+
+          {filtered.length > pageSize && (
+            <div
+              className="mt-10 flex items-center justify-center gap-3"
+              dir="ltr"
+            >
+              <button
+                aria-label="Previous page"
+                disabled={page === 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-30 hover:bg-slate-50"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm text-slate-500">
+                {page} / {pageCount}
+              </span>
+              <button
+                aria-label="Next page"
+                disabled={page === pageCount}
+                onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+                className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 disabled:opacity-30 hover:bg-slate-50"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+}
