@@ -23,7 +23,6 @@ const getNavLinks = (lang: string) => {
     { name: isAr ? "نماذج أعمال" : "Work samples", path: "/#work" },
     { name: isAr ? "الباقات" : "Plans", path: "/#plans" },
     { name: isAr ? "المتجر" : "Shop", path: "/shop" },
-    { name: isAr ? "الشركاء" : "Partners", path: "/partners" },
   ];
 };
 

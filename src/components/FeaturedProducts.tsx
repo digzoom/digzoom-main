@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Star, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -67,12 +67,6 @@ export default function FeaturedProducts() {
                     {productTitle(product, lang)}
                   </h3>
                 </Link>
-
-                <div className="flex items-center gap-1 mb-3">
-                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  <span className="text-gray-300 text-sm">{product.rating}</span>
-                  <span className="text-gray-500 text-sm">({product.reviews})</span>
-                </div>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

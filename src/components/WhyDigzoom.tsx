@@ -3,7 +3,7 @@ import { Zap, Shield, Headphones, RefreshCw } from 'lucide-react';
 const features = [
   { icon: Zap, titleAr: 'تسليم رقمي محمي', titleEn: 'Protected Digital Delivery', descAr: 'يظهر رابط مؤقت في حسابك بعد تأكيد الدفع عند إطلاق البوابة', descEn: 'A temporary link appears in your account after verified payment once checkout launches' },
   { icon: Shield, titleAr: 'سياسة استرجاع واضحة', titleEn: 'Clear Refund Policy', descAr: 'طلبات الاسترجاع المؤهلة تُراجع وفق السياسة المنشورة', descEn: 'Eligible refund requests are reviewed under our published policy' },
-  { icon: Headphones, titleAr: 'دعم عبر البريد', titleEn: 'Email Support', descAr: 'نرد على رسائل الدعم خلال 24 ساعة عمل', descEn: 'We reply to support messages within 24 business hours' },
+  { icon: Headphones, titleAr: 'دعم عبر البريد', titleEn: 'Email Support', descAr: 'نراجع رسائل الدعم خلال ساعات العمل', descEn: 'We review support messages during business hours' },
   { icon: RefreshCw, titleAr: 'وصف واضح قبل الشراء', titleEn: 'Clear Before You Buy', descAr: 'تعرف محتوى الملف وصيغته وحدود الاستخدام قبل الطلب', descEn: 'Review the file contents, format, and usage terms before ordering' },
 ];
 
