@@ -24,6 +24,12 @@
   to = "/.netlify/functions/partner-application"
   status = 200
 
+# Stripe requires the exact raw request body for signature verification.
+[[redirects]]
+  from = "/api/stripe/webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+
 # tRPC batch endpoint — exact match for /api (no trailing slash)
 [[redirects]]
   from = "/api"

@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { CheckCircle, Download, Home, Package, Clock, ShieldCheck, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
+import { useCart } from '@/hooks/useCart';
 
 export default function ThankYou() {
   const { lang } = useLanguage();
+  const { clearCart } = useCart();
   const [orderDate] = useState(new Date());
   // Read REAL order ID from localStorage (set by Checkout after createOrder)
   const [orderId] = useState(() => {
-    const saved = localStorage.getItem('lastOrderId');
+    const fromUrl = new URLSearchParams(window.location.search).get('order_id');
+    if (fromUrl) localStorage.setItem('lastOrderId', fromUrl);
+    const saved = fromUrl || localStorage.getItem('lastOrderId');
     return saved || '';
   });
   const downloads = trpc.listOrderDownloads.useQuery(
@@ -37,6 +41,10 @@ export default function ThankYou() {
     file_size: string; image_url: string; download_count: number; max_downloads: number; available: boolean;
   }>;
   const verified = downloads.isSuccess;
+
+  useEffect(() => {
+    if (verified) clearCart();
+  }, [verified, clearCart]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pt-24 pb-16">

@@ -30,7 +30,7 @@ const trustItems = [
 ];
 
 export default function Checkout() {
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice } = useCart();
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
   const { user } = useSupabaseAuth();
@@ -38,7 +38,6 @@ export default function Checkout() {
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
   const [loading, setLoading] = useState(false);
-  const [orderCompleted, setOrderCompleted] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -67,12 +66,6 @@ export default function Checkout() {
   // required to do so. Stripe Tax can replace this when payments go live.
   const tax = 0;
   const total = totalPrice + tax;
-
-  // If order was just completed, navigate to thank-you page
-  if (orderCompleted) {
-    navigate('/thank-you');
-    return null;
-  }
 
   // Redirect old success URLs
   if (window.location.hash.includes('/checkout/success')) {
@@ -105,6 +98,12 @@ export default function Checkout() {
       return;
     }
 
+    if (!user) {
+      toast.info(lang === 'ar' ? 'سجّل الدخول أولاً لحماية ملفاتك وطلباتك' : 'Sign in first to protect your files and orders');
+      navigate('/login?redirect=/checkout');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -126,10 +125,8 @@ export default function Checkout() {
       // Store minimal order reference for thank-you page
       localStorage.setItem('lastOrderId', result.orderId);
       localStorage.setItem('lastOrderEmail', finalEmail.trim().toLowerCase());
-
-      setOrderCompleted(true);
-      toast.success(lang === 'ar' ? 'تم إنشاء الطلب بنجاح!' : 'Order created successfully!');
-      clearCart();
+      if (!result.checkoutUrl) throw new Error('Missing secure checkout URL');
+      window.location.assign(result.checkoutUrl);
     } catch (error: any) {
       console.error('Checkout error:', error);
       toast.error(error.message || (lang === 'ar' ? 'فشل في إتمام الطلب' : 'Failed to complete order'));

@@ -5,6 +5,24 @@ import { getSupabaseAdmin } from "./supabase-admin";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function admin(): any { return getSupabaseAdmin(); }
 
+async function createStripeCheckout(params: URLSearchParams) {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) throw new Error("Stripe is not configured");
+  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${secretKey}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params,
+  });
+  const body = await response.json() as { id?: string; url?: string; error?: { message?: string } };
+  if (!response.ok || !body.id || !body.url) {
+    throw new Error(body.error?.message || "Stripe checkout request failed");
+  }
+  return { id: body.id, url: body.url };
+}
+
 // Helper: log admin activity (non-blocking, swallows errors)
 async function logActivity(data: {
   adminEmail: string;
@@ -197,7 +215,35 @@ export const adminRouter = createRouter({
         throw new Error("Failed to create order items: " + itemsError.message);
       }
 
-      return { orderId, status: "pending" };
+      try {
+        const siteUrl = (process.env.SITE_URL || process.env.URL || "https://digzoom.com").replace(/\/$/, "");
+        const stripeParams = new URLSearchParams({
+          mode: "payment",
+          customer_email: input.customer_email.trim().toLowerCase(),
+          "metadata[order_id]": orderId,
+          "payment_intent_data[metadata][order_id]": orderId,
+          success_url: `${siteUrl}/thank-you?order_id=${encodeURIComponent(orderId)}&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${siteUrl}/checkout?payment=cancelled`,
+        });
+        validatedItems.forEach((item, index) => {
+          stripeParams.set(`line_items[${index}][quantity]`, String(item.quantity));
+          stripeParams.set(`line_items[${index}][price_data][currency]`, "sar");
+          stripeParams.set(`line_items[${index}][price_data][unit_amount]`, String(Math.round(item.price * 100)));
+          stripeParams.set(`line_items[${index}][price_data][product_data][name]`, item.title.slice(0, 120));
+        });
+        const session = await createStripeCheckout(stripeParams);
+
+        await admin().from("orders").update({
+          payment_method: "stripe",
+          payment_payload: { checkout_session_id: session.id },
+        }).eq("id", orderId);
+
+        return { orderId, status: "pending", checkoutUrl: session.url };
+      } catch (error: any) {
+        console.error("[createOrder] Stripe session error:", error?.message || error);
+        await admin().from("orders").update({ status: "payment_failed" }).eq("id", orderId);
+        throw new Error("Unable to start secure payment");
+      }
     }),
 
   /* Secure digital delivery. Metadata is separate from signed-link creation
