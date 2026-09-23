@@ -17,8 +17,13 @@ export default function ThankYou() {
     const saved = fromUrl || localStorage.getItem('lastOrderId');
     return saved || '';
   });
+  const [sessionId] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('session_id');
+    if (fromUrl) localStorage.setItem('lastCheckoutSessionId', fromUrl);
+    return fromUrl || localStorage.getItem('lastCheckoutSessionId') || '';
+  });
   const downloads = trpc.listOrderDownloads.useQuery(
-    { order_id: orderId },
+    { order_id: orderId, session_id: sessionId || undefined },
     { enabled: Boolean(orderId), retry: false }
   );
   const createLink = trpc.createDownloadLink.useMutation();
@@ -28,6 +33,7 @@ export default function ThankYou() {
       const result = await createLink.mutateAsync({
         order_id: orderId,
         order_item_id: orderItemId,
+        session_id: sessionId || undefined,
       });
       window.location.assign(result.url);
       void downloads.refetch();
