@@ -715,7 +715,9 @@ export default function MarketingServices() {
                         <div className="min-w-0">
                           <span className="font-bold">{item}</span>
                           {descriptions?.[index] && (
-                            <p className="mt-1 text-xs leading-6 text-slate-400">
+                            <p
+                              className={`mt-1 text-xs leading-6 ${popular ? "text-slate-400" : "text-slate-500"}`}
+                            >
                               {descriptions[index]}
                             </p>
                           )}
