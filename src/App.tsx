@@ -67,7 +67,10 @@ export default function App() {
             >
               <Routes>
                 <Route path="/" element={<MarketingServices />} />
-                <Route path="/store" element={<Navigate to="/shop" replace />} />
+                <Route
+                  path="/store"
+                  element={<Navigate to="/shop" replace />}
+                />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Login />} />
                 <Route path="/register" element={<Login />} />
@@ -105,11 +108,17 @@ export default function App() {
                 <Route path="/company" element={<CompanyInformation />} />
                 <Route path="/trust-security" element={<TrustSecurity />} />
                 <Route path="/marketing" element={<MarketingServices />} />
-                <Route path="/services" element={<Navigate to="/#services" replace />} />
+                <Route
+                  path="/services"
+                  element={<Navigate to="/#services" replace />}
+                />
                 <Route path="/services/:slug" element={<ServiceDetail />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/partners" element={<Navigate to="/shop" replace />} />
+                <Route
+                  path="/partners"
+                  element={<Navigate to="/shop" replace />}
+                />
                 <Route path="/plans/:planId" element={<ServicePlanDetail />} />
                 <Route
                   path="/service-checkout/:planId"
@@ -119,7 +128,14 @@ export default function App() {
               </Routes>
             </Suspense>
             {!isAdminRoute && <Footer />}
-            <Toaster />
+            <Toaster
+              position="top-center"
+              richColors
+              closeButton
+              duration={3500}
+              mobileOffset={{ top: 76, right: 12, left: 12 }}
+              offset={{ top: 88 }}
+            />
           </AuthProvider>
         </SupabaseAuthProvider>
       </CartProvider>
