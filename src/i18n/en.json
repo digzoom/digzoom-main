@@ -11,12 +11,12 @@
     "title1": "DigZoom |",
     "titleHighlight": "Digital Growth",
     "title2": "Platform",
-    "subtitle": "Discover thousands of ready-made digital products — books, templates, courses, and PLR products. Buy once, benefit for life.",
+    "subtitle": "A selected catalog of DigZoom digital products with clear contents, formats, and usage terms before purchase.",
     "btnShop": "Browse Products",
     "btnAbout": "Learn More",
     "feature1": "Instant Download",
-    "feature2": "30-Day Guarantee",
-    "feature3": "Free Updates"
+    "feature2": "Clear Refund Policy",
+    "feature3": "Product-Specific Updates"
   },
   "stats": {
     "products": "Digital Products",
@@ -30,7 +30,7 @@
   },
   "categories": {
     "title": "Browse by Category",
-    "subtitle": "Choose a category and discover hundreds of ready-made digital products",
+    "subtitle": "Choose a category and browse the digital products currently available",
     "pdf": "E-Books",
     "templates": "Templates",
     "fonts": "Fonts",
@@ -43,8 +43,8 @@
     "3d": "3D Models"
   },
   "featured": {
-    "title": "Best Sellers",
-    "subtitle": "Products chosen by thousands of customers",
+    "title": "Selected Digital Products",
+    "subtitle": "Practical tools and templates from DigZoom",
     "viewAll": "View All",
     "currency": "SAR"
   },
@@ -52,13 +52,13 @@
     "title": "Why digzoom?",
     "subtitle": "We offer a seamless shopping experience and exclusive features for all our customers",
     "f1Title": "Instant Download",
-    "f1Desc": "Get your products immediately after payment — no waiting",
-    "f2Title": "Money-Back Guarantee",
-    "f2Desc": "30-day full refund guarantee if you're not satisfied",
-    "f3Title": "24/7 Support",
-    "f3Desc": "Support team available around the clock to help you",
-    "f4Title": "Free Updates",
-    "f4Desc": "Get all new updates without any additional cost"
+    "f1Desc": "Eligible products appear in your account after verified payment once checkout launches",
+    "f2Title": "Clear Refund Terms",
+    "f2Desc": "Eligible requests are reviewed under the published refund policy",
+    "f3Title": "Email Support",
+    "f3Desc": "Support messages are reviewed during business hours",
+    "f4Title": "Clear Product Details",
+    "f4Desc": "Review file contents, format, and usage terms before ordering"
   },
   "subscriptions": {
     "title": "Subscriptions",
@@ -75,7 +75,7 @@
   },
   "cta": {
     "title": "Ready to Start Your Digital Journey?",
-    "subtitle": "Join thousands of happy customers and discover the world of digital products today",
+    "subtitle": "Browse the DigZoom digital products currently available",
     "btn": "Start Shopping Now"
   },
   "shop": {
@@ -83,10 +83,10 @@
     "subtitle": "Browse our complete collection of digital products",
     "searchPlaceholder": "Search for a product...",
     "all": "All",
-    "popular": "Most Popular",
+    "popular": "Default Order",
     "priceLow": "Lowest Price",
     "priceHigh": "Highest Price",
-    "topRated": "Top Rated",
+    "topRated": "Newest",
     "products": "products",
     "discount": "OFF",
     "empty": "No matching products found",
@@ -145,13 +145,13 @@
     "valuesTitle": "Our Values",
     "heroText": "DigZoom is an integrated Digital Growth Platform combining digital products and professional marketing services under one roof.",
     "missionText": "Empowering individuals and businesses to grow digitally through modern digital and marketing solutions that combine innovation with practical results.",
-    "visionText": "To make DigZoom the leading Arabic and global destination for integrated digital solutions and the trusted partner for digital growth.",
+    "visionText": "To build a clear and dependable digital experience that brings practical services and products together.",
     "v1Title": "High Quality",
     "v1Desc": "Every product goes through rigorous review.",
-    "v2Title": "Vibrant Community",
-    "v2Desc": "An active Arab community of creators.",
-    "v3Title": "Global Reach",
-    "v3Desc": "Arab products that compete globally.",
+    "v2Title": "Arabic-First Experience",
+    "v2Desc": "Arabic content and interfaces with English support.",
+    "v3Title": "Bilingual Access",
+    "v3Desc": "Products and services explained in Arabic and English.",
     "v4Title": "Continuous Innovation",
     "v4Desc": "We invest in technology for seamless experience.",
     "stat1": "Professional Products",
@@ -165,12 +165,12 @@
   },
   "contact": {
     "title": "Contact Us",
-    "subtitle": "Our team is ready to help you with any inquiry or suggestion.",
+    "subtitle": "Contact DigZoom for questions and service requests. Messages are reviewed during business hours.",
     "email": "Email",
     "phone": "Phone",
     "whatsapp": "WhatsApp",
-    "location": "Location",
-    "locationValue": "Riyadh, Saudi Arabia",
+    "location": "Registered Company",
+    "locationValue": "DIGZOOM LLC — Wyoming, USA",
     "formName": "Name",
     "formNamePlaceholder": "Your full name",
     "formEmail": "Email",
