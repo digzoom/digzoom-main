@@ -65,11 +65,7 @@ export default function MarketingServices() {
           icon: PackageOpen,
           title: "المنتجات الرقمية",
           text: "منتجات DigZoom الجاهزة للشراء، مع خدمة مستقلة لتجهيز صفحات منتجاتك.",
-          points: [
-            "متجر منتجات رقمية",
-            "تجهيز صفحات البيع",
-            "وصف وتصنيف واضح",
-          ],
+          points: ["متجر منتجات رقمية", "تجهيز صفحات البيع", "وصف وتصنيف واضح"],
           href: "/shop",
           cta: "تصفح المنتجات الرقمية",
         },
@@ -152,8 +148,8 @@ export default function MarketingServices() {
           href: "/plans/social-presence",
         },
         complete: {
-          title: "باقة الإدارة المتكاملة",
-          text: "الأنسب إذا أردت فريقًا واحدًا يدير الموقع ومنصتين والمحتوى وصفحات المنتجات والقياس.",
+          title: "إدارة موقعك وتسويقك بالكامل",
+          text: "فريق واحد يدير موقعك و3 منصات، ويجهز حتى 20 منتجًا، وينشر المحتوى ويتابع حملة إعلانية ونتائجها شهريًا.",
           price: "4,990 ر.س شهريًا",
           href: "/plans/growth-system",
         },
@@ -184,8 +180,8 @@ export default function MarketingServices() {
           href: "/plans/social-presence",
         },
         complete: {
-          title: "Integrated Management",
-          text: "Best when one team should manage your website, two channels, content, products, and measurement.",
+          title: "Website & Marketing Management",
+          text: "One team for your website, 3 platforms, up to 20 listings, regular content, and one managed advertising campaign each month.",
           price: "SAR 4,990/month",
           href: "/plans/growth-system",
         },
@@ -481,7 +477,7 @@ export default function MarketingServices() {
                     <h3 className="mt-5 text-2xl font-black">{title}</h3>
                     <p className="mt-3 leading-7 text-slate-600">{text}</p>
                     <ul className="mt-6 flex-1 space-y-3">
-                      {points.map((point) => (
+                      {points.map(point => (
                         <li
                           key={point}
                           className="flex gap-2 text-sm text-slate-600"
@@ -500,7 +496,7 @@ export default function MarketingServices() {
                     </Link>
                   </div>
                 </article>
-              ),
+              )
             )}
           </div>
         </div>
@@ -660,9 +656,12 @@ export default function MarketingServices() {
             </p>
           </div>
           <div className="mx-auto mt-12 grid max-w-6xl gap-6 lg:grid-cols-2">
-            {servicePlans.map((plan) => {
+            {servicePlans.map(plan => {
               const popular = plan.id === "growth-system";
               const included = ar ? plan.includedAr : plan.includedEn;
+              const descriptions = ar
+                ? plan.includedDescriptionsAr
+                : plan.includedDescriptionsEn;
               return (
                 <article
                   key={plan.id}
@@ -707,13 +706,20 @@ export default function MarketingServices() {
                     {ar ? plan.productsAr : plan.productsEn}
                   </div>
                   <ul className="mt-6 grid flex-1 gap-3 sm:grid-cols-2">
-                    {included.slice(0, 4).map((item) => (
+                    {included.slice(0, popular ? 9 : 4).map((item, index) => (
                       <li
                         key={item}
                         className={`flex gap-2 text-sm leading-6 ${popular ? "text-slate-300" : "text-slate-600"}`}
                       >
                         <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-                        {item}
+                        <div className="min-w-0">
+                          <span className="font-bold">{item}</span>
+                          {descriptions?.[index] && (
+                            <p className="mt-1 text-xs leading-6 text-slate-400">
+                              {descriptions[index]}
+                            </p>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -839,9 +845,7 @@ export default function MarketingServices() {
             <img
               src="/images/digzoom/creator-partner-live.webp"
               alt={
-                ar
-                  ? "تجهيز صفحة منتج رقمي"
-                  : "Preparing a digital product page"
+                ar ? "تجهيز صفحة منتج رقمي" : "Preparing a digital product page"
               }
               loading="lazy"
               className="h-44 w-full object-cover md:h-52"
@@ -961,7 +965,7 @@ export default function MarketingServices() {
                         "Emerging brand",
                         "Other",
                       ]
-                  ).map((item) => (
+                  ).map(item => (
                     <option key={item}>{item}</option>
                   ))}
                 </select>
@@ -975,7 +979,7 @@ export default function MarketingServices() {
                     ? [
                         "إدارة الموقع — 1,490 ر.س",
                         "إدارة منصات التواصل — 2,990 ر.س",
-                        "إدارة متكاملة — 4,990 ر.س",
+                        "إدارة موقعك وتسويقك بالكامل — 4,990 ر.س",
                         "إدارة موسعة — 7,990 ر.س",
                         "تجهيز المنتجات دون اشتراك",
                         "شراء منتج رقمي",
@@ -983,12 +987,12 @@ export default function MarketingServices() {
                     : [
                         "Website management — SAR 1,490",
                         "Social management — SAR 2,990",
-                        "Integrated management — SAR 4,990",
+                        "Website & marketing management — SAR 4,990",
                         "Expanded management — SAR 7,990",
                         "Standalone product preparation",
                         "Purchase a DigZoom digital product",
                       ]
-                  ).map((item) => (
+                  ).map(item => (
                     <option key={item}>{item}</option>
                   ))}
                 </select>
@@ -1164,7 +1168,7 @@ function PillarVisual({ kind, ar }: { kind: PillarKind; ar: boolean }) {
               "from-fuchsia-400 to-violet-600",
               "from-amber-300 to-orange-500",
               "from-emerald-300 to-teal-600",
-            ].map((gradient) => (
+            ].map(gradient => (
               <div
                 key={gradient}
                 className="rounded-xl border border-white/15 bg-white/10 p-2 shadow-lg"
