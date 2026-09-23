@@ -50,7 +50,7 @@ export const handler: Handler = async (event) => {
 
     const { data: order, error } = await supabase
       .from("orders")
-      .select("id,total_amount,status")
+      .select("id,total_amount,status,coupon_id")
       .eq("id", orderId)
       .maybeSingle();
     if (error || !order) return { statusCode: 400, body: "Unknown order" };
@@ -61,7 +61,7 @@ export const handler: Handler = async (event) => {
       return { statusCode: 400, body: "Amount mismatch" };
     }
 
-    await supabase.from("orders").update({
+    const { data: paidOrders, error: paymentUpdateError } = await supabase.from("orders").update({
       status: "paid",
       paid_at: new Date().toISOString(),
       payment_method: "stripe",
@@ -71,7 +71,28 @@ export const handler: Handler = async (event) => {
         amount_total: session.amount_total,
         currency: session.currency,
       },
-    }).eq("id", orderId).neq("status", "paid");
+    }).eq("id", orderId).in("status", ["pending", "payment_failed"]).select("id");
+
+    if (paymentUpdateError) {
+      console.error("[stripe-webhook] order update failed", { orderId, message: paymentUpdateError.message });
+      return { statusCode: 500, body: "Order update failed" };
+    }
+
+    // Stripe can retry webhooks. Count the coupon only on the first confirmed
+    // payment so retries never consume extra uses.
+    if (paidOrders?.length && order.coupon_id) {
+      const { data: coupon } = await supabase
+        .from("coupons")
+        .select("used_count")
+        .eq("id", order.coupon_id)
+        .maybeSingle();
+      if (coupon) {
+        await supabase
+          .from("coupons")
+          .update({ used_count: Number(coupon.used_count || 0) + 1 })
+          .eq("id", order.coupon_id);
+      }
+    }
   }
 
   if (stripeEvent.type === "checkout.session.expired") {

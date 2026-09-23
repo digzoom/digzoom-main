@@ -23,6 +23,73 @@ async function createStripeCheckout(params: URLSearchParams) {
   return { id: body.id, url: body.url };
 }
 
+const couponCartItemSchema = z.object({
+  product_id: z.number(),
+  quantity: z.number().int().min(1).max(100),
+});
+
+async function loadValidatedCart(items: Array<{ product_id: number; quantity: number }>) {
+  const productIds = [...new Set(items.map((item) => item.product_id))];
+  const { data: products, error } = await admin()
+    .from("products")
+    .select("id,title,title_ar,title_en,price,product_type,is_active,in_stock")
+    .in("id", productIds);
+
+  if (error) throw new Error("Unable to validate cart");
+  if (!products || products.length !== productIds.length) {
+    throw new Error("One or more products are unavailable");
+  }
+
+  const productsById = new Map(products.map((product: any) => [product.id, product]));
+  const validatedItems = items.map((item) => {
+    const product: any = productsById.get(item.product_id);
+    if (!product?.is_active || !product?.in_stock) {
+      throw new Error("One or more products are unavailable");
+    }
+    return {
+      product_id: product.id,
+      quantity: item.quantity,
+      price: Number(product.price),
+      title: product.title_ar || product.title || product.title_en,
+      product_type: product.product_type || "digital_download",
+    };
+  });
+
+  const subtotal = validatedItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  return { validatedItems, subtotal };
+}
+
+async function getCouponDiscount(code: string | undefined, subtotal: number) {
+  const normalizedCode = code?.trim().toUpperCase();
+  if (!normalizedCode) {
+    return { couponId: null, code: null, discountPercent: 0, discountAmount: 0, totalAmount: subtotal };
+  }
+
+  const { data, error } = await admin().rpc("validate_coupon", {
+    p_code: normalizedCode,
+    p_order_amount: Math.round(subtotal),
+  });
+  if (error) throw new Error("Unable to validate coupon");
+
+  const result = Array.isArray(data) ? data[0] : data;
+  if (!result?.valid) {
+    throw new Error(result?.message || "Coupon is invalid or expired");
+  }
+
+  const discountPercent = Number(result.discount_percent || 0);
+  const discountAmount = Math.round(subtotal * discountPercent / 100);
+  return {
+    couponId: Number(result.coupon_id),
+    code: normalizedCode,
+    discountPercent,
+    discountAmount,
+    totalAmount: Math.max(0, subtotal - discountAmount),
+  };
+}
+
 // Helper: log admin activity (non-blocking, swallows errors)
 async function logActivity(data: {
   adminEmail: string;
@@ -90,6 +157,26 @@ export const adminRouter = createRouter({
       return { success: true };
     }),
 
+  /* Validate a private coupon without exposing the coupons table. Product
+     prices and the subtotal are always rebuilt on the server. */
+  validateCoupon: authedQuery
+    .input(z.object({
+      code: z.string().trim().min(1).max(64),
+      items: z.array(couponCartItemSchema).min(1).max(100),
+    }))
+    .mutation(async ({ input }) => {
+      const { subtotal } = await loadValidatedCart(input.items);
+      const coupon = await getCouponDiscount(input.code, subtotal);
+      return {
+        valid: true,
+        code: coupon.code,
+        discountPercent: coupon.discountPercent,
+        discountAmount: coupon.discountAmount,
+        subtotal,
+        totalAmount: coupon.totalAmount,
+      };
+    }),
+
   /* ─── Create Order (public — guest checkout, no auth required) ─── */
   createOrder: publicQuery
     .input(
@@ -125,42 +212,13 @@ export const adminRouter = createRouter({
 
       // Never trust prices, titles, product state, or totals supplied by the
       // browser. Rebuild the order from active database products.
-      const productIds = [...new Set(input.items.map((item) => item.product_id))];
-      const { data: products, error: productsError } = await admin()
-        .from("products")
-        .select("id,title,title_ar,title_en,price,product_type,is_active,in_stock")
-        .in("id", productIds);
-
-      if (productsError) throw new Error("Unable to validate cart");
-      if (!products || products.length !== productIds.length) {
-        throw new Error("One or more products are unavailable");
-      }
-
-      const productsById = new Map(products.map((product: any) => [product.id, product]));
-      const validatedItems = input.items.map((item) => {
-        const product: any = productsById.get(item.product_id);
-        if (!product?.is_active || !product?.in_stock) {
-          throw new Error("One or more products are unavailable");
-        }
-        const price = Number(product.price);
-        return {
-          product_id: product.id,
-          quantity: item.quantity,
-          price,
-          title: product.title_ar || product.title || product.title_en,
-          product_type: product.product_type || "digital_download",
-        };
-      });
-
-      const subtotal = validatedItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-      );
+      const { validatedItems, subtotal } = await loadValidatedCart(input.items);
+      const coupon = await getCouponDiscount(input.coupon_code, subtotal);
       // Keep checkout totals consistent with the storefront. VAT must not be
       // collected until the business is registered and the tax flow is
       // explicitly enabled and tested.
       const taxAmount = 0;
-      const totalAmount = subtotal + taxAmount;
+      const totalAmount = coupon.totalAmount + taxAmount;
 
       const orderId = `DZ-${Date.now().toString(36).toUpperCase()}`;
 
@@ -174,13 +232,14 @@ export const adminRouter = createRouter({
           subtotal,
           tax_amount: taxAmount,
           total_amount: totalAmount,
-          discount_amount: 0,
+          discount_amount: coupon.discountAmount,
           payment_method: "pending",
           customer_name: input.customer_name,
           customer_email: input.customer_email,
           customer_phone: input.customer_phone || null,
-          coupon_code: null,
-          coupon_discount: 0,
+          coupon_id: coupon.couponId,
+          coupon_code: coupon.code,
+          coupon_discount: coupon.discountPercent,
           customer_notes: input.customer_notes || null,
           customer_input: {},
           payment_payload: {},
@@ -225,12 +284,20 @@ export const adminRouter = createRouter({
           success_url: `${siteUrl}/thank-you?order_id=${encodeURIComponent(orderId)}&session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${siteUrl}/checkout?payment=cancelled`,
         });
-        validatedItems.forEach((item, index) => {
-          stripeParams.set(`line_items[${index}][quantity]`, String(item.quantity));
-          stripeParams.set(`line_items[${index}][price_data][currency]`, "sar");
-          stripeParams.set(`line_items[${index}][price_data][unit_amount]`, String(Math.round(item.price * 100)));
-          stripeParams.set(`line_items[${index}][price_data][product_data][name]`, item.title.slice(0, 120));
-        });
+        if (coupon.code) {
+          stripeParams.set("line_items[0][quantity]", "1");
+          stripeParams.set("line_items[0][price_data][currency]", "sar");
+          stripeParams.set("line_items[0][price_data][unit_amount]", String(Math.round(totalAmount * 100)));
+          stripeParams.set("line_items[0][price_data][product_data][name]", `DigZoom order ${orderId}`);
+          stripeParams.set("line_items[0][price_data][product_data][description]", `${coupon.code} · ${coupon.discountPercent}% discount`);
+        } else {
+          validatedItems.forEach((item, index) => {
+            stripeParams.set(`line_items[${index}][quantity]`, String(item.quantity));
+            stripeParams.set(`line_items[${index}][price_data][currency]`, "sar");
+            stripeParams.set(`line_items[${index}][price_data][unit_amount]`, String(Math.round(item.price * 100)));
+            stripeParams.set(`line_items[${index}][price_data][product_data][name]`, item.title.slice(0, 120));
+          });
+        }
         const session = await createStripeCheckout(stripeParams);
 
         await admin().from("orders").update({
@@ -1078,8 +1145,11 @@ export const adminRouter = createRouter({
           discount_percent: input.discount_percent,
           max_uses: input.max_uses || null,
           valid_until: input.valid_until || null,
+          min_order_amount: input.min_order_amount || 0,
           used_count: 0,
           is_active: true,
+          is_public: false,
+          created_by: user?.id || null,
         })
         .select()
         .single();
