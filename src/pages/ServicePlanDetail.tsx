@@ -20,6 +20,9 @@ export default function ServicePlanDetail() {
   if (!plan) return <Navigate to="/" replace />;
   const Arrow = ar ? ArrowLeft : ArrowRight;
   const included = ar ? plan.includedAr : plan.includedEn;
+  const includedDescriptions = ar
+    ? plan.includedDescriptionsAr
+    : plan.includedDescriptionsEn;
   const client = ar ? plan.clientAr : plan.clientEn;
   const digzoom = ar ? plan.digzoomAr : plan.digzoomEn;
   const limits = ar ? plan.limitsAr : plan.limitsEn;
@@ -93,6 +96,7 @@ export default function ServicePlanDetail() {
             title={ar ? "ما تشمل الباقة" : "What is included"}
             icon={<Check className="h-6 w-6" />}
             items={included}
+            descriptions={includedDescriptions}
             tone="blue"
           />
           <Info
@@ -103,16 +107,37 @@ export default function ServicePlanDetail() {
                 ? [
                     "استلام الصلاحيات والمواد",
                     "إعداد خطة الشهر وجدول النشر",
-                    "إرسال المواد للاعتماد",
-                    "النشر والتنفيذ بعد الاعتماد",
-                    "المتابعة والتقرير في نهاية الدورة",
+                    "إرسال المحتوى للاعتماد",
+                    "تنفيذ التعديلات ثم النشر",
+                    "متابعة الأداء خلال الشهر",
+                    "تقرير شهري ومراجعة الخطوات التالية",
                   ]
                 : [
                     "Receive access and assets",
                     "Prepare the monthly plan and schedule",
                     "Send work for approval",
                     "Publish after approval",
-                    "Monitor and report at cycle end",
+                    "Monitor performance during the month",
+                    "Monthly report and next steps",
+                  ]
+            }
+            descriptions={
+              ar
+                ? [
+                    "نستلم صلاحيات الموقع أو الحسابات المشمولة، والشعار والصور والمعلومات اللازمة للعمل.",
+                    "نوضح الأعمال وموضوعات المحتوى ومواعيد التنفيذ أو النشر حسب باقتك.",
+                    "نرسل التصاميم والنصوص والتحديثات إليك للمراجعة قبل نشرها.",
+                    "نطبق الملاحظات المتفق عليها، ثم ننفذ العمل وننشر المحتوى المعتمد حسب الجدول.",
+                    "نراجع ما تم تنفيذه والنتائج المتاحة، ونحدد ما يحتاج إلى تحسين.",
+                    "نرسل ملخصًا مفهومًا للأعمال والنتائج وخطوات الشهر التالي؛ الاجتماعات حسب باقتك.",
+                  ]
+                : [
+                    "We receive access to included websites or accounts, your brand assets, and the information needed to start.",
+                    "We agree the tasks, content topics, and delivery or publishing dates for your plan.",
+                    "We send designs, copy, and updates for your review before publishing.",
+                    "We apply agreed feedback, then deliver and publish approved work to the schedule.",
+                    "We review completed work and available results to identify improvements.",
+                    "We send a clear summary of work, results, and next steps; meetings follow your selected plan.",
                   ]
             }
             tone="violet"
@@ -150,7 +175,7 @@ export default function ServicePlanDetail() {
             </h2>
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {limits.map((x) => (
+            {limits.map(x => (
               <p
                 key={x}
                 className="flex gap-2 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600"
@@ -187,11 +212,13 @@ function Info({
   title,
   icon,
   items,
+  descriptions,
   tone,
 }: {
   title: string;
   icon: React.ReactNode;
   items: string[];
+  descriptions?: string[];
   tone: "blue" | "violet" | "amber" | "emerald";
 }) {
   const colors = {
@@ -205,10 +232,23 @@ function Info({
       <div className={`inline-flex rounded-xl p-3 ${colors[tone]}`}>{icon}</div>
       <h2 className="mt-5 text-2xl font-black">{title}</h2>
       <ul className="mt-6 space-y-3">
-        {items.map((x) => (
+        {items.map((x, index) => (
           <li key={x} className="flex gap-3 leading-7 text-slate-600">
             <Check className="mt-1 h-5 w-5 shrink-0 text-emerald-600" />
-            {x}
+            <div className="min-w-0">
+              <span
+                className={
+                  descriptions ? "font-bold text-slate-900" : undefined
+                }
+              >
+                {x}
+              </span>
+              {descriptions?.[index] && (
+                <p className="mt-1 text-sm leading-7 text-slate-500">
+                  {descriptions[index]}
+                </p>
+              )}
+            </div>
           </li>
         ))}
       </ul>
