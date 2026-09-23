@@ -23,6 +23,45 @@ async function createStripeCheckout(params: URLSearchParams) {
   return { id: body.id, url: body.url };
 }
 
+async function retrieveStripeCheckout(sessionId: string) {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) throw new Error("Stripe is not configured");
+  const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+    headers: { Authorization: `Bearer ${secretKey}` },
+  });
+  const body = await response.json() as {
+    id?: string;
+    payment_status?: string;
+    metadata?: { order_id?: string };
+    error?: { message?: string };
+  };
+  if (!response.ok || !body.id) {
+    throw new Error(body.error?.message || "Unable to verify payment");
+  }
+  return body;
+}
+
+async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?: string) {
+  const { data: order, error } = await admin()
+    .from("orders")
+    .select("id,user_id,status,paid_at,payment_payload")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (error || !order) throw new Error("Order not found");
+  const paid = order.status === "paid" || order.status === "completed" || !!order.paid_at;
+  if (userId && order.user_id === userId && paid) return order;
+
+  if (sessionId) {
+    const storedSessionId = order.payment_payload?.checkout_session_id;
+    if (storedSessionId !== sessionId) throw new Error("Download authorization failed");
+    const session = await retrieveStripeCheckout(sessionId);
+    if (session.payment_status === "paid" && session.metadata?.order_id === orderId) return order;
+  }
+
+  throw new Error("Downloads are not available for this order");
+}
+
 const couponCartItemSchema = z.object({
   product_id: z.number(),
   quantity: z.number().int().min(1).max(100),
@@ -159,7 +198,7 @@ export const adminRouter = createRouter({
 
   /* Validate a private coupon without exposing the coupons table. Product
      prices and the subtotal are always rebuilt on the server. */
-  validateCoupon: authedQuery
+  validateCoupon: publicQuery
     .input(z.object({
       code: z.string().trim().min(1).max(64),
       items: z.array(couponCartItemSchema).min(1).max(100),
@@ -315,19 +354,13 @@ export const adminRouter = createRouter({
 
   /* Secure digital delivery. Metadata is separate from signed-link creation
      so refreshing the confirmation page does not consume a download. */
-  listOrderDownloads: authedQuery
-    .input(z.object({ order_id: z.string().min(6) }))
+  listOrderDownloads: publicQuery
+    .input(z.object({
+      order_id: z.string().min(6),
+      session_id: z.string().min(10).max(255).optional(),
+    }))
     .query(async ({ input, ctx }) => {
-      const { data: order, error: orderError } = await admin()
-        .from("orders")
-        .select("id,user_id,status,paid_at")
-        .eq("id", input.order_id)
-        .maybeSingle();
-
-      const paid = order && (order.status === "paid" || order.status === "completed" || !!order.paid_at);
-      if (orderError || !paid || order.user_id !== ctx.user.id) {
-        throw new Error("Downloads are not available for this order");
-      }
+      await authorizeOrderAccess(input.order_id, ctx.user?.id, input.session_id);
 
       const { data: items, error: itemsError } = await admin()
         .from("order_items")
@@ -359,21 +392,14 @@ export const adminRouter = createRouter({
       });
     }),
 
-  createDownloadLink: authedQuery
+  createDownloadLink: publicQuery
     .input(z.object({
       order_id: z.string().min(6),
       order_item_id: z.number().int().positive(),
+      session_id: z.string().min(10).max(255).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const { data: order } = await admin()
-        .from("orders")
-        .select("id,customer_email,status,paid_at,user_id")
-        .eq("id", input.order_id)
-        .maybeSingle();
-      const paid = order && (order.status === "paid" || order.status === "completed" || !!order.paid_at);
-      if (!paid || order.user_id !== ctx.user.id) {
-        throw new Error("Download authorization failed");
-      }
+      await authorizeOrderAccess(input.order_id, ctx.user?.id, input.session_id);
 
       const { data: item } = await admin()
         .from("order_items")
@@ -418,7 +444,7 @@ export const adminRouter = createRouter({
 
       await admin().from("download_logs").insert({
         order_item_id: item.id,
-        user_id: ctx.user.id,
+        user_id: ctx.user?.id || null,
         ip_address: ctx.ipAddress || null,
         user_agent: ctx.userAgent || null,
       });
