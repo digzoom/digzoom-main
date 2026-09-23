@@ -7,7 +7,7 @@ import { trpc } from '@/providers/trpc';
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Tag,
   Receipt, BarChart3, Settings,
-  Plus, Search, Edit3, Trash2, X, Save, ChevronLeft,
+  Plus, Search, Edit3, Trash2, X, Save, Menu, ChevronLeft,
   TrendingUp, DollarSign, ShoppingCart,
   LogOut, Upload, Image, Activity, Star, Eye, CheckCircle,
   XCircle, ImagePlus, Crown
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const { lang, t } = useLanguage();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('dash');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Admin guard: only allow admin users
   useEffect(() => {
@@ -36,6 +36,26 @@ export default function AdminDashboard() {
       navigate('/');
     }
   }, [authLoading, user, navigate]);
+
+  // Keep the mobile drawer from moving the page underneath it and let Escape close it.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      document.body.style.overflow = 'hidden';
+    }
+    document.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [sidebarOpen]);
 
   const SIDEBAR_ITEMS: Array<{ key: Tab; label: string; icon: React.ReactNode }> = [
     { key: 'dash', label: t.admin.dash, icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -58,14 +78,41 @@ export default function AdminDashboard() {
   const isAr = lang === 'ar';
 
   return (
-    <div className="min-h-screen bg-[#0B0E14] text-white" dir={isAr ? 'rtl' : 'ltr'}>
-      <aside className={`fixed top-0 ${isAr ? 'right-0' : 'left-0'} h-full bg-[#131722] border-l border-white/5 z-50 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
-        <div className="h-16 flex items-center px-6 border-b border-white/5">
-          <span className="text-lg font-bold bg-gradient-to-l from-blue-400 to-purple-400 bg-clip-text text-transparent">digzoom</span>
+    <div className="min-h-screen overflow-x-hidden bg-[#0B0E14] text-white" dir={isAr ? 'rtl' : 'ltr'}>
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label={isAr ? 'إغلاق القائمة' : 'Close menu'}
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[1px] lg:hidden"
+        />
+      )}
+
+      <aside
+        aria-label={isAr ? 'قائمة لوحة الإدارة' : 'Admin navigation'}
+        className={`fixed inset-y-0 ${isAr ? 'right-0 border-l' : 'left-0 border-r'} z-50 w-[min(18rem,88vw)] border-white/5 bg-[#131722] transition-transform duration-300 ease-out lg:w-64 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : (isAr ? 'translate-x-full' : '-translate-x-full')}`}
+      >
+        <div className="h-16 flex items-center justify-between gap-3 px-4 sm:px-6 border-b border-white/5">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="text-lg font-bold bg-gradient-to-l from-blue-400 to-purple-400 bg-clip-text text-transparent"
+            aria-label={isAr ? 'العودة إلى الموقع' : 'Back to site'}
+          >
+            digzoom
+          </button>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-white lg:hidden"
+            aria-label={isAr ? 'إغلاق القائمة' : 'Close menu'}
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-        <nav className="p-3 space-y-1">
+        <nav className="h-[calc(100dvh-8rem)] overflow-y-auto p-3 pb-6 space-y-1">
           {SIDEBAR_ITEMS.map((item) => (
-            <button key={item.key} onClick={() => setTab(item.key)}
+            <button key={item.key} onClick={() => { setTab(item.key); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${tab === item.key ? `bg-blue-600/15 text-blue-400 ${isAr ? 'border-r-2' : 'border-l-2'} border-blue-500` : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
               {item.icon}<span className="flex-1 text-right">{item.label}</span>
             </button>
@@ -78,16 +125,23 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      <main className={`transition-all duration-300 ${sidebarOpen ? (isAr ? 'mr-64' : 'ml-64') : ''}`}>
-        <header className="h-16 bg-[#131722]/80 backdrop-blur-xl border-b border-white/5 flex items-center px-6 sticky top-0 z-40">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-white/5 text-gray-400">
-            <ChevronLeft className={`w-5 h-5 transition-transform ${sidebarOpen ? '' : 'rotate-180'}`} />
+      <main className={`min-w-0 transition-all duration-300 ${isAr ? 'lg:mr-64' : 'lg:ml-64'}`}>
+        <header className="h-16 bg-[#131722]/80 backdrop-blur-xl border-b border-white/5 flex items-center gap-2 px-3 sm:px-6 sticky top-0 z-30">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white lg:hidden"
+            aria-label={isAr ? 'فتح القائمة' : 'Open menu'}
+            aria-expanded={sidebarOpen}
+          >
+            <Menu className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-500">{t.admin.dash}</span><span className="text-gray-600">/</span>
-            <span className="text-white font-medium">{SIDEBAR_ITEMS.find((i) => i.key === tab)?.label}</span>
+          <div className="min-w-0 flex items-center gap-2 overflow-hidden text-sm">
+            <button type="button" onClick={() => setTab('dash')} className="shrink-0 text-gray-500 hover:text-gray-300">{t.admin.dash}</button>
+            <span className="shrink-0 text-gray-600">/</span>
+            <span className="truncate text-white font-medium">{SIDEBAR_ITEMS.find((i) => i.key === tab)?.label}</span>
           </div>
-          <div className={`${isAr ? 'mr-auto' : 'ml-auto'} flex items-center gap-4`}>
+          <div className={`${isAr ? 'mr-auto' : 'ml-auto'} shrink-0 flex items-center gap-4`}>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">A</div>
               <span className="text-sm text-gray-300 hidden md:block">{user?.email}</span>
@@ -95,7 +149,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <div className="p-6">
+        <div className="min-w-0 overflow-x-hidden p-3 sm:p-6">
           {tab === 'dash' && <DashTab />}
           {tab === 'products' && <ProductsTab />}
           {tab === 'orders' && <OrdersTab />}
