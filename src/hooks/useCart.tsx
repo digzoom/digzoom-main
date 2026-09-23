@@ -18,6 +18,35 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // v2 intentionally invalidates carts that may still contain the retired demo catalog.
 const CART_STORAGE_KEY = 'digzoom_cart_v2';
 
+type ProductAliases = {
+  image_url?: string;
+  long_description?: string | null;
+  original_price?: number | null;
+  category_id?: number | null;
+  reviews_count?: number;
+  file_type?: string;
+  file_size?: string;
+  in_stock?: boolean;
+  download_url?: string | null;
+};
+
+function normalizeProduct(product: Product): Product {
+  const aliases = product as Product & ProductAliases;
+
+  return {
+    ...product,
+    image: product.image || aliases.image_url || '',
+    longDescription: product.longDescription || aliases.long_description || '',
+    originalPrice: product.originalPrice ?? aliases.original_price ?? undefined,
+    category: product.category || String(aliases.category_id ?? ''),
+    reviews: product.reviews ?? aliases.reviews_count ?? 0,
+    fileType: product.fileType || aliases.file_type || '',
+    fileSize: product.fileSize || aliases.file_size || '',
+    inStock: product.inStock ?? aliases.in_stock ?? true,
+    downloadFile: product.downloadFile || aliases.download_url || undefined,
+  };
+}
+
 /* ── Bundle conflict mapping ──
    Defines which product IDs are bundles that contain other product IDs.
    When a bundle is in cart, individual products within it cannot be added.
@@ -48,7 +77,12 @@ function loadCartFromStorage(): CartItem[] {
     const saved = localStorage.getItem(CART_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => ({
+          ...normalizeProduct(item as Product),
+          quantity: item.quantity,
+        }));
+      }
     }
   } catch { /* ignore invalid data */ }
   return [];
@@ -101,16 +135,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = useCallback((product: Product) => {
     setItems((prev) => {
+      const normalizedProduct = normalizeProduct(product);
       // Check for conflicts first
-      const { hasConflict, message } = checkBundleConflict(product.id, prev);
+      const { hasConflict, message } = checkBundleConflict(normalizedProduct.id, prev);
 
       if (hasConflict) {
         // If product is a bundle, remove conflicting individual items and add bundle
-        const bundleContents = BUNDLE_MAP[product.id];
+        const bundleContents = BUNDLE_MAP[normalizedProduct.id];
         if (bundleContents) {
           const filtered = prev.filter((item) => !bundleContents.includes(item.id));
           toast.success(message || 'تم استبدال المنتجات الفردية بالباقة');
-          return [...filtered, { ...product, quantity: 1 }];
+          return [...filtered, { ...normalizedProduct, quantity: 1 }];
         } else {
           // Product is individual and its parent bundle is in cart — block
           toast.error(message || 'هذا المنتج جزء من باقة موجودة في السلة');
@@ -119,15 +154,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
 
       // No conflict — normal add
-      const existing = prev.find((item) => item.id === product.id);
+      const existing = prev.find((item) => item.id === normalizedProduct.id);
       if (existing) {
-        toast.success(`تم زيادة الكمية: "${product.title}"`);
+        toast.success(`تم زيادة الكمية: "${normalizedProduct.title}"`);
         return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === normalizedProduct.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      toast.success(`تمت إضافة "${product.title}" إلى السلة`);
-      return [...prev, { ...product, quantity: 1 }];
+      toast.success(`تمت إضافة "${normalizedProduct.title}" إلى السلة`);
+      return [...prev, { ...normalizedProduct, quantity: 1 }];
     });
   }, [checkBundleConflict]);
 
