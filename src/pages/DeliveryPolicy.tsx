@@ -31,8 +31,8 @@ export default function DeliveryPolicy() {
       icon: <Mail className="w-6 h-6 text-amber-400" />,
       title: isAr ? 'الدعم والمساعدة' : 'Support & Assistance',
       text: isAr
-        ? 'في حال واجهت أي مشكلة في التنزيل أو الوصول للمنتج، يرجى التواصل معنا على info@digzoom.com — نرد خلال 24 ساعة عمل.'
-        : 'If you encounter any issues downloading or accessing your product, please contact us at info@digzoom.com — we respond within 24 business hours.',
+        ? 'في حال واجهت أي مشكلة في التنزيل أو الوصول للمنتج، يرجى التواصل معنا على info@digzoom.com. تُراجع رسائل الدعم خلال ساعات العمل.'
+        : 'If you encounter any issues downloading or accessing your product, please contact us at info@digzoom.com. Support messages are reviewed during business hours.',
     },
   ];
 

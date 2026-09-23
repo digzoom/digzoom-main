@@ -100,8 +100,9 @@ export default function Contact() {
     },
     {
       icon: <MapPin className="w-5 h-5 text-orange-400" />,
-      title: t.contact.location,
-      value: t.contact.locationValue,
+      title: lang === "ar" ? "بيانات الشركة المسجلة" : "Registered company",
+      value:
+        "DIGZOOM LIMITED LIABILITY COMPANY\n30 N Gould St Ste N\nSheridan, WY 82801\nUnited States",
       color: "orange",
     },
   ];
@@ -135,7 +136,7 @@ export default function Contact() {
                   <h3 className="text-white font-semibold text-sm">
                     {c.title}
                   </h3>
-                  <p className="text-gray-400 text-sm">{c.value}</p>
+                  <p className="whitespace-pre-line text-gray-400 text-sm">{c.value}</p>
                 </div>
               </div>
             ))}
@@ -153,8 +154,8 @@ export default function Contact() {
                 </h3>
                 <p className="text-gray-400 mb-6">
                   {lang === "ar"
-                    ? "شكراً للتواصل. سنرد عليك خلال 24 ساعة عمل على info@digzoom.com"
-                    : "Thank you for reaching out. We will reply within 24 business hours at info@digzoom.com"}
+                    ? "شكراً للتواصل. سنراجع رسالتك خلال ساعات العمل عبر info@digzoom.com"
+                    : "Thank you for reaching out. We will review your message during business hours via info@digzoom.com"}
                 </p>
                 <button
                   onClick={() => setResult("idle")}

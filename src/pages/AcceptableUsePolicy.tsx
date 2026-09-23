@@ -56,8 +56,8 @@ export default function AcceptableUsePolicy() {
           </h1>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             {isAr
-              ? 'تعرف على ما هو مسموح وما هو ممنوع في منصة ديج زوم (DigZoom)'
-              : 'Learn what is permitted and prohibited on the DigZoom platform'}
+              ? 'توضح هذه السياسة المنتجات والخدمات التي تقدمها DigZoom والطلبات التي لا ننفذها'
+              : 'This policy explains the products and services DigZoom provides and the requests we do not fulfill'}
           </p>
         </div>
 
@@ -69,8 +69,8 @@ export default function AcceptableUsePolicy() {
               <h3 className="text-white font-bold text-lg mb-2">{isAr ? 'مقدمة' : 'Introduction'}</h3>
               <p className="text-gray-400 leading-relaxed">
                 {isAr
-                  ? 'تهدف ديج زوم (DigZoom) إلى توفير منصة نمو رقمي آمنة وموثوقة للمنتجات الرقمية والخدمات التسويقية. يجب على جميع المستخدمين والعملاء الالتزام بهذه السياسة لضمان تجربة آمنة للجميع.'
-                  : 'DigZoom aims to provide a safe and trusted digital marketplace for business products, designs, and original digital files. All users and sellers must comply with this policy to ensure a safe experience for everyone.'}
+                  ? 'تبيع DigZoom منتجاتها الرقمية وتقدم خدمات إدارة المواقع والتسويق مباشرة لعملائها. لا نعمل كسوق لبائعين مستقلين ولا نحصّل المدفوعات نيابةً عن أطراف أخرى.'
+                  : 'DigZoom sells its own digital products and provides website-management and marketing services directly to customers. We do not operate a third-party seller marketplace or collect payments on behalf of others.'}
               </p>
             </div>
           </div>
@@ -113,11 +113,11 @@ export default function AcceptableUsePolicy() {
           <div className="flex items-start gap-4">
             <AlertTriangle className="w-6 h-6 text-amber-400 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="text-amber-400 font-bold text-lg mb-2">{isAr ? 'الإنفاذ والعقوبات' : 'Enforcement & Penalties'}</h3>
+              <h3 className="text-amber-400 font-bold text-lg mb-2">{isAr ? 'تطبيق السياسة' : 'Policy Enforcement'}</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
                 {isAr
-                  ? 'في حال اكتشاف أي منتج أو خدمة مخالفة لهذه السياسة، تحتفظ ديج زوم (DigZoom) بالحق في: إزالة المحتوى فوراً — تعليق حساب المستخدم — إلغاء جميع المدفوعات المرتبطة — الإبلاغ عن السلطات المختصة عند الضرورة — حظر المستخدم بشكل دائم من المنصة. إذا كنت غير متأكد مما إذا كان المحتوى مسموحاً به، يرجى التواصل معنا على info@digzoom.com قبل الإدراج.'
-                  : 'If any product or service violating this policy is discovered, DigZoom reserves the right to: Remove the product immediately — Suspend the seller account — Cancel all related payments — Report to relevant authorities when necessary — Permanently ban the user from the platform. If you are unsure whether your product is allowed, please contact us at info@digzoom.com before listing.'}
+                  ? 'ترفض DigZoom أي طلب خدمة يخالف هذه السياسة، وقد تلغي الطلب أو تقيد الحساب أو تعيد المبلغ عندما ينطبق ذلك، مع الاحتفاظ بحق الإبلاغ عن الأنشطة غير القانونية للجهات المختصة. للاستفسار تواصل عبر info@digzoom.com قبل تقديم الطلب.'
+                  : 'DigZoom refuses service requests that violate this policy and may cancel an order, restrict an account, or issue a refund where applicable. Illegal activity may be reported to the relevant authorities. Contact info@digzoom.com before ordering if you are unsure.'}
               </p>
             </div>
           </div>

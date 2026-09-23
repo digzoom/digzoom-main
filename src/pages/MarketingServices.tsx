@@ -64,11 +64,11 @@ export default function MarketingServices() {
           visual: "products" as PillarKind,
           icon: PackageOpen,
           title: "المنتجات الرقمية",
-          text: "منتجات جاهزة للشراء، وخدمة تجهيز منتجاتك، وفرصة عرض منتجك كشريك.",
+          text: "منتجات DigZoom الجاهزة للشراء، مع خدمة مستقلة لتجهيز صفحات منتجاتك.",
           points: [
             "متجر منتجات رقمية",
             "تجهيز صفحات البيع",
-            "استقبال منتجات الشركاء",
+            "وصف وتصنيف واضح",
           ],
           href: "/shop",
           cta: "تصفح المنتجات الرقمية",
@@ -105,11 +105,11 @@ export default function MarketingServices() {
           visual: "products" as PillarKind,
           icon: PackageOpen,
           title: "Digital products",
-          text: "Ready-to-buy products, product-page preparation, and a partner route for creators.",
+          text: "DigZoom products ready to buy, plus a standalone service for preparing your product pages.",
           points: [
             "Digital product store",
             "Sales-page preparation",
-            "Creator partnerships",
+            "Clear copy and categorization",
           ],
           href: "/shop",
           cta: "Browse digital products",
@@ -801,10 +801,7 @@ export default function MarketingServices() {
         </div>
       </section>
 
-      <section
-        id="partners"
-        className="scroll-mt-20 bg-[#f4f7ff] py-16 md:py-20"
-      >
+      <section className="scroll-mt-20 bg-[#f4f7ff] py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
             <img
@@ -843,31 +840,31 @@ export default function MarketingServices() {
               src="/images/digzoom/creator-partner-live.webp"
               alt={
                 ar
-                  ? "صانع منتجات رقمية يعمل على منتجه"
-                  : "Digital product creator working"
+                  ? "تجهيز صفحة منتج رقمي"
+                  : "Preparing a digital product page"
               }
               loading="lazy"
               className="h-44 w-full object-cover md:h-52"
             />
             <div className="p-6 md:p-7">
               <p className="text-sm font-black text-blue-600">
-                {ar ? "لديك منتج رقمي؟" : "HAVE A DIGITAL PRODUCT?"}
+                {ar ? "خدمة مستقلة" : "STANDALONE SERVICE"}
               </p>
               <h2 className="mt-3 text-3xl font-black">
-                {ar ? "اعرض منتجك كشريك" : "List your product as a partner"}
+                {ar ? "جهّز صفحات منتجاتك" : "Prepare your product pages"}
               </h2>
               <p className="mt-4 leading-8 text-slate-600">
                 {ar
-                  ? "نراجع الجودة والحقوق، ونتفق على الشروط قبل النشر. لا نقبل الملفات مجهولة المصدر."
-                  : "We review quality and rights and agree terms before publishing. Unverified files are not accepted."}
+                  ? "نرتب البيانات ونكتب الوصف وننظم الصور والمواصفات والتصنيفات، ثم نسلّمك صفحات جاهزة للنشر."
+                  : "We organize the data, write the copy, prepare images, specifications, and categories, then deliver publish-ready pages."}
               </p>
-              <Link
-                to="/partners"
+              <button
+                onClick={() => scrollTo("catalog")}
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-4 font-black text-white"
               >
-                {ar ? "شروط وتقديم الشراكة" : "Partner terms and application"}
+                {ar ? "شاهد أسعار التجهيز" : "View preparation pricing"}
                 <Arrow className="h-5 w-5" />
-              </Link>
+              </button>
             </div>
           </article>
         </div>
@@ -981,7 +978,7 @@ export default function MarketingServices() {
                         "إدارة متكاملة — 4,990 ر.س",
                         "إدارة موسعة — 7,990 ر.س",
                         "تجهيز المنتجات دون اشتراك",
-                        "منتج رقمي أو شراكة",
+                        "شراء منتج رقمي",
                       ]
                     : [
                         "Website management — SAR 1,490",
@@ -989,7 +986,7 @@ export default function MarketingServices() {
                         "Integrated management — SAR 4,990",
                         "Expanded management — SAR 7,990",
                         "Standalone product preparation",
-                        "Digital product or partnership",
+                        "Purchase a DigZoom digital product",
                       ]
                   ).map((item) => (
                     <option key={item}>{item}</option>
@@ -1186,7 +1183,7 @@ function PillarVisual({ kind, ar }: { kind: PillarKind; ar: boolean }) {
                 {ar ? "أداء الحملة" : "Campaign"}
               </span>
               <span className="rounded-full bg-emerald-400/15 px-2 py-1 text-[9px] font-black text-emerald-300">
-                +28%
+                {ar ? "نموذج" : "SAMPLE"}
               </span>
             </div>
             <div className="mt-3 flex h-16 items-end gap-1.5">
@@ -1201,13 +1198,19 @@ function PillarVisual({ kind, ar }: { kind: PillarKind; ar: boolean }) {
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div className="rounded-lg bg-white/[.06] p-2">
                 <div className="text-[8px] text-slate-400">
-                  {ar ? "العملاء" : "LEADS"}
+                  {ar ? "الإنفاق" : "SPEND"}
                 </div>
-                <div className="mt-1 text-sm font-black">184</div>
+                <div className="mt-1 text-[10px] font-black text-slate-300">
+                  {ar ? "بعد الربط" : "After setup"}
+                </div>
               </div>
               <div className="rounded-lg bg-white/[.06] p-2">
-                <div className="text-[8px] text-slate-400">ROAS</div>
-                <div className="mt-1 text-sm font-black">4.2×</div>
+                <div className="text-[8px] text-slate-400">
+                  {ar ? "النتائج" : "RESULTS"}
+                </div>
+                <div className="mt-1 text-[10px] font-black text-slate-300">
+                  {ar ? "بعد الربط" : "After setup"}
+                </div>
               </div>
             </div>
           </div>

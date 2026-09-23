@@ -81,18 +81,18 @@ export default function About() {
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">{t.about.title}</h1>
           <p className="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed mb-4">
             {lang === 'ar'
-              ? 'ديج زوم (DigZoom) منصة نمو رقمي متكاملة تجمع بين المنتجات الرقمية والخدمات التسويقية الاحترافية تحت سقف واحد.'
-              : 'DigZoom is an integrated Digital Growth Platform combining digital products and professional marketing services under one roof.'}
+              ? 'ديج زوم (DigZoom) شركة أمريكية تقدم منتجات رقمية وخدمات إدارة المواقع والتسويق الرقمي بنطاق واضح.'
+              : 'DigZoom is a U.S. company offering digital products, website management, and digital marketing services with clear scope.'}
           </p>
           <p className="text-gray-400 text-base max-w-3xl mx-auto leading-relaxed mb-4">
             {lang === 'ar'
-              ? 'نساعد الأفراد والشركات على بناء حضور رقمي أقوى وتحقيق نمو مستدام من خلال المنتجات الرقمية، إدارة التسويق الرقمي، الحملات الإعلانية، تحسين محركات البحث (SEO)، تطوير المتاجر الإلكترونية، وصناعة المحتوى.'
-              : 'We help individuals and businesses build a stronger digital presence and achieve sustainable growth through digital products, digital marketing management, advertising campaigns, SEO, e-commerce development, and content creation.'}
+              ? 'نساعد الأفراد والشركات على تنظيم حضورهم الرقمي من خلال المنتجات الرقمية، إدارة التسويق، الحملات الإعلانية، تحسين محركات البحث، تطوير المتاجر وصناعة المحتوى.'
+              : 'We help individuals and businesses organize their digital presence through digital products, marketing management, advertising, SEO, e-commerce development, and content creation.'}
           </p>
           <p className="text-gray-400 text-base max-w-3xl mx-auto leading-relaxed mb-6">
             {lang === 'ar'
-              ? 'نعمل على توفير حلول عملية تساعد عملاءنا على زيادة الظهور الرقمي وتحقيق نتائج قابلة للقياس من خلال استراتيجيات واضحة وتنفيذ احترافي ومتابعة مستمرة.'
-              : 'We provide practical solutions that help our clients increase their digital visibility and achieve measurable results through clear strategies, professional execution, and continuous follow-up.'}
+              ? 'نحدد نطاق العمل والتسليمات وطريقة القياس قبل البدء، ثم نوثّق التنفيذ والمتابعة في تقارير واضحة.'
+              : 'We define scope, deliverables, and measurement before work begins, then document execution and follow-up in clear reports.'}
           </p>
           <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full px-4 py-2 text-sm">
             <Mail className="w-4 h-4" /> info@digzoom.com
@@ -105,13 +105,13 @@ export default function About() {
             {(lang === 'ar' ? [
               { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'شركة أمريكية مسجلة', desc: 'LLC في وايومنغ' },
               { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'الشراء قريباً', desc: 'بوابة الدفع قيد التجهيز' },
-              { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'دعم احترافي', desc: 'رد خلال 24 ساعة' },
+              { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'دعم عبر البريد', desc: 'خلال ساعات العمل' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'منتجات رقمية', desc: 'قوالب، كتب، ملفات' },
               { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'ممارسات شفافة', desc: 'أمان وموثوقية' },
             ] : [
               { icon: <Building2 className="w-6 h-6 text-blue-400" />, title: 'U.S. Registered', desc: 'Wyoming LLC' },
               { icon: <Download className="w-6 h-6 text-emerald-400" />, title: 'Purchasing Soon', desc: 'Payment setup in progress' },
-              { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'Pro Support', desc: '24-hour response' },
+              { icon: <Headphones className="w-6 h-6 text-purple-400" />, title: 'Email Support', desc: 'During business hours' },
               { icon: <Layers className="w-6 h-6 text-cyan-400" />, title: 'Digital Products', desc: 'Templates, ebooks' },
               { icon: <ShieldCheck className="w-6 h-6 text-amber-400" />, title: 'Transparent', desc: 'Safe & trusted' },
             ]).map((item, i) => (
@@ -203,13 +203,13 @@ export default function About() {
             <h2 className="text-2xl font-bold text-white mb-4">{lang === 'ar' ? 'رؤيتنا' : 'Our Vision'}</h2>
             <p className="text-gray-400 leading-relaxed">
               {lang === 'ar'
-                ? 'أن تصبح DigZoom الوجهة العربية والعالمية الرائدة للحلول الرقمية المتكاملة والشريك الموثوق للنمو الرقمي.'
-                : 'To make DigZoom the leading Arabic and global destination for integrated digital solutions and the trusted partner for digital growth.'}
+                ? 'بناء تجربة رقمية واضحة وموثوقة تجمع الخدمات والمنتجات العملية في مكان واحد.'
+                : 'To build a clear and dependable digital experience that brings practical services and products together.'}
             </p>
           </div>
         </div>
 
-        {/* Real People Behind the Work */}
+        {/* How We Work */}
         <section
           id="team"
           className="relative mb-20 overflow-hidden rounded-3xl border border-white/[0.06] bg-[#11111a]"
@@ -218,21 +218,21 @@ export default function About() {
           <div className="relative grid items-center lg:grid-cols-[0.92fr_1.08fr]">
             <div className="order-2 px-6 py-10 sm:px-10 lg:order-1 lg:px-14 lg:py-16">
               <span className="mb-4 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-300">
-                {lang === 'ar' ? 'خلف DigZoom' : 'Behind DigZoom'}
+                {lang === 'ar' ? 'طريقة عمل DigZoom' : 'How DigZoom Works'}
               </span>
               <h2 className="mb-5 text-3xl font-bold leading-tight text-white sm:text-4xl">
-                {lang === 'ar' ? 'أشخاص حقيقيون خلف العمل' : 'Real people behind the work'}
+                {lang === 'ar' ? 'نفهم المطلوب قبل أن نبدأ' : 'We clarify the work before we start'}
               </h2>
               <p className="max-w-xl text-base leading-8 text-gray-300 sm:text-lg">
                 {lang === 'ar'
-                  ? 'خلف DigZoom فريق يهتم بفهم المشروع قبل تقديم الحل. نعمل بوضوح ومسؤولية، ونربط التنفيذ بأهداف يمكن قياسها ومتابعتها.'
-                  : 'Behind DigZoom is a team that takes time to understand the business before recommending a solution. We work with clarity and accountability, connecting execution to goals that can be measured and followed.'}
+                  ? 'نراجع احتياج المشروع، ونحدد النطاق والتسليمات والمتطلبات والسعر قبل بدء التنفيذ. ثم نتابع العمل بمؤشرات وتقارير متفق عليها.'
+                  : 'We review the project need and define scope, deliverables, requirements, and price before execution. Work is then tracked using agreed measures and reports.'}
               </p>
             </div>
             <div className="order-1 min-h-[380px] lg:order-2 lg:min-h-[560px]">
               <img
                 src="/images/digzoom/team-real-person-v1.webp"
-                alt={lang === 'ar' ? 'أحد أفراد فريق DigZoom في بيئة عمل رقمية' : 'A DigZoom team member in a digital workspace'}
+                alt={lang === 'ar' ? 'صورة توضيحية لبيئة عمل رقمية' : 'Illustrative digital workspace'}
                 className="h-full min-h-[380px] w-full object-cover object-[center_28%] lg:min-h-[560px]"
                 loading="lazy"
                 decoding="async"

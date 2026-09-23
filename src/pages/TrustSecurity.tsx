@@ -31,8 +31,8 @@ export default function TrustSecurity() {
       icon: <Headphones className="w-8 h-8 text-amber-400" />,
       title: isAr ? 'دعم العملاء' : 'Customer Support',
       desc: isAr
-        ? 'يمكنك التواصل مع فريق الدعم عبر البريد الإلكتروني، ونرد عادة خلال 24 ساعة عمل.'
-        : 'You can contact support by email. We usually reply within 24 business hours.',
+        ? 'يمكنك التواصل مع الدعم عبر البريد الإلكتروني، وتُراجع الرسائل خلال ساعات العمل.'
+        : 'You can contact support by email. Messages are reviewed during business hours.',
     },
     {
       icon: <RotateCcw className="w-8 h-8 text-cyan-400" />,

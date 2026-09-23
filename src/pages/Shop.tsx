@@ -23,7 +23,7 @@ export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const urlCat = searchParams.get("category") || "all";
   const [activeCat, setActiveCat] = useState(urlCat);
-  const [sort, setSort] = useState("popular");
+  const [sort, setSort] = useState("default");
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [segment, setSegment] = useState<
@@ -141,8 +141,6 @@ export default function Shop() {
       const sorted = [...res];
       if (sort === "price-low") sorted.sort((a, b) => a.price - b.price);
       else if (sort === "price-high") sorted.sort((a, b) => b.price - a.price);
-      else if (sort === "rating") sorted.sort((a, b) => b.rating - a.rating);
-      else sorted.sort((a, b) => b.reviews_count - a.reviews_count);
       return sorted;
     }
 
@@ -180,10 +178,12 @@ export default function Shop() {
   };
 
   const sortOptions = [
-    { value: "popular", label: t.shop.popular },
+    {
+      value: "default",
+      label: lang === "ar" ? "الترتيب الافتراضي" : "Default order",
+    },
     { value: "price-low", label: t.shop.priceLow },
     { value: "price-high", label: t.shop.priceHigh },
-    { value: "rating", label: t.shop.topRated },
   ];
 
   const segments = [
