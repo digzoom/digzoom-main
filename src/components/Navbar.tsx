@@ -73,7 +73,7 @@ export default function Navbar() {
                 src="/images/digzoom-logo-side-new.jpg"
                 alt="DigZoom"
                 className="h-full w-full object-cover"
-                onError={(e) => {
+                onError={e => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
@@ -88,7 +88,7 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <a
                 key={link.path}
                 href={link.path}
@@ -126,13 +126,20 @@ export default function Navbar() {
             {/* Cart */}
             <Link
               to="/cart"
-              aria-label={isAr ? "سلة المشتريات" : "Shopping cart"}
-              className="relative hidden lg:block p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+              aria-label={
+                isAr
+                  ? `سلة المشتريات، ${totalItems} منتج`
+                  : `Shopping cart, ${totalItems} items`
+              }
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-gray-300 transition-all hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
             >
               <ShoppingCart className="w-5 h-5" />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
-                  {totalItems}
+                <span
+                  className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-1 text-[10px] font-black leading-none text-white shadow-[0_0_0_2px_rgba(8,11,18,.95)]"
+                  aria-hidden="true"
+                >
+                  {totalItems > 99 ? "99+" : totalItems}
                 </span>
               )}
             </Link>
@@ -288,7 +295,7 @@ export default function Navbar() {
         <div className="lg:hidden bg-[#0f0f1a]/98 backdrop-blur-xl border-t border-white/[0.06] max-h-[80vh] overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {/* Nav Links */}
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <Link
                 key={link.path}
                 to={link.path}
@@ -311,90 +318,3 @@ export default function Navbar() {
               {isAr ? "Switch to English" : "التبديل للعربية"}
             </button>
 
-            {/* Divider */}
-            <div className="border-t border-white/[0.06] pt-2 mt-2" />
-
-            {/* Mobile: Logged In */}
-            {user ? (
-              <div className="space-y-1">
-                {/* User Card */}
-                <div className="px-4 py-3 flex items-center gap-3">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt=""
-                      className="w-12 h-12 rounded-full object-cover ring-1 ring-white/10"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white">
-                      {(user.name || user.email || "?")[0].toUpperCase()}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium truncate">
-                      {user.name || user.email}
-                    </div>
-                    <div className="text-gray-500 text-xs truncate">
-                      {user.email}
-                    </div>
-                    {isAdmin && (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-400 mt-0.5">
-                        <ShieldCheck className="w-3 h-3" /> ADMIN
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {/* Links */}
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                >
-                  <UserCircle className="w-4 h-4 text-gray-500" />{" "}
-                  {isAr ? "الملف الشخصي" : "Profile"}
-                </Link>
-                <Link
-                  to="/orders"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                >
-                  <Package className="w-4 h-4 text-gray-500" />{" "}
-                  {isAr ? "طلباتي" : "My Orders"}
-                </Link>
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-purple-400 hover:bg-purple-500/10 transition-all"
-                  >
-                    <ShieldCheck className="w-4 h-4" />{" "}
-                    {isAr ? "لوحة التحكم" : "Admin Dashboard"}
-                  </Link>
-                )}
-                <button
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
-                >
-                  <LogOut className="w-4 h-4" />{" "}
-                  {isAr ? "تسجيل الخروج" : "Logout"}
-                </button>
-              </div>
-            ) : (
-              /* Mobile: Not Logged In */
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl text-sm font-bold"
-              >
-                <LogIn className="w-4 h-4" /> {isAr ? "تسجيل الدخول" : "Login"}
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
-    </nav>
-  );
-}
