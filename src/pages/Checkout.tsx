@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import {
   CreditCard, ShieldCheck, Lock, ArrowLeft, ArrowRight,
   Loader2, Shield, Clock, Headphones, Award, CheckCircle,
-  Smartphone, Globe
+  Smartphone, Globe, Tag, X
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -38,6 +38,14 @@ export default function Checkout() {
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
   const [loading, setLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<null | {
+    code: string;
+    discountPercent: number;
+    discountAmount: number;
+    totalAmount: number;
+    subtotal: number;
+  }>(null);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -62,10 +70,55 @@ export default function Checkout() {
     },
   });
 
+  const validateCoupon = trpc.validateCoupon.useMutation({
+    onError: (error) => {
+      setAppliedCoupon(null);
+      toast.error(lang === 'ar' ? 'الكوبون غير صالح أو منتهي' : 'Coupon is invalid or expired');
+      console.error('Coupon validation error:', error.message);
+    },
+  });
+
   // Do not collect Saudi VAT unless the business is registered and legally
   // required to do so. Stripe Tax can replace this when payments go live.
   const tax = 0;
-  const total = totalPrice + tax;
+  const discount = appliedCoupon?.discountAmount || 0;
+  const total = Math.max(0, totalPrice - discount + tax);
+
+  useEffect(() => {
+    if (appliedCoupon && appliedCoupon.subtotal !== totalPrice) {
+      setAppliedCoupon(null);
+    }
+  }, [totalPrice, appliedCoupon]);
+
+  const handleApplyCoupon = async () => {
+    if (!user) {
+      toast.info(lang === 'ar' ? 'سجّل الدخول أولاً لاستخدام كوبون الخصم' : 'Sign in first to use a coupon');
+      navigate('/login?redirect=/checkout');
+      return;
+    }
+    const code = couponCode.trim().toUpperCase();
+    if (!code) {
+      toast.error(lang === 'ar' ? 'أدخل كود الخصم' : 'Enter a coupon code');
+      return;
+    }
+    try {
+      const result = await validateCoupon.mutateAsync({
+        code,
+        items: items.map(item => ({ product_id: item.id, quantity: item.quantity })),
+      });
+      setCouponCode(result.code || code);
+      setAppliedCoupon({
+        code: result.code || code,
+        discountPercent: result.discountPercent,
+        discountAmount: result.discountAmount,
+        totalAmount: result.totalAmount,
+        subtotal: result.subtotal,
+      });
+      toast.success(lang === 'ar' ? `تم تطبيق خصم ${result.discountPercent}%` : `${result.discountPercent}% discount applied`);
+    } catch {
+      // Error feedback is handled by the mutation callback.
+    }
+  };
 
   // Redirect old success URLs
   if (window.location.hash.includes('/checkout/success')) {
@@ -120,6 +173,9 @@ export default function Checkout() {
         subtotal: totalPrice,
         tax_amount: tax,
         total_amount: total,
+        discount_amount: discount,
+        coupon_code: appliedCoupon?.code,
+        coupon_discount: appliedCoupon?.discountPercent || 0,
       });
 
       // Store minimal order reference for thank-you page
@@ -374,6 +430,63 @@ export default function Checkout() {
                 })}
               </div>
               <div className="space-y-2 md:space-y-3 border-t border-white/[0.06] pt-3 md:pt-4">
+                <div>
+                  <label className="mb-2 block text-xs text-gray-500">
+                    {lang === 'ar' ? 'كود الخصم' : 'Coupon code'}
+                  </label>
+                  <div className="flex gap-2" dir="ltr">
+                    <div className="relative min-w-0 flex-1">
+                      <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-600" />
+                      <input
+                        value={couponCode}
+                        onChange={(event) => {
+                          setCouponCode(event.target.value.toUpperCase());
+                          if (appliedCoupon) setAppliedCoupon(null);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault();
+                            void handleApplyCoupon();
+                          }
+                        }}
+                        placeholder={lang === 'ar' ? 'أدخل الكود' : 'Enter code'}
+                        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] py-2.5 pl-9 pr-3 text-sm uppercase text-white outline-none transition focus:border-blue-500/50"
+                      />
+                    </div>
+                    {appliedCoupon ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAppliedCoupon(null);
+                          setCouponCode('');
+                        }}
+                        className="rounded-xl border border-white/[0.08] px-3 text-gray-400 transition hover:text-white"
+                        aria-label={lang === 'ar' ? 'إزالة الكوبون' : 'Remove coupon'}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={validateCoupon.isPending || items.length === 0}
+                        className="rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                      >
+                        {validateCoupon.isPending
+                          ? (lang === 'ar' ? 'جاري...' : 'Applying...')
+                          : (lang === 'ar' ? 'تطبيق' : 'Apply')}
+                      </button>
+                    )}
+                  </div>
+                  {appliedCoupon && (
+                    <p className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400">
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      {lang === 'ar'
+                        ? `تم تطبيق ${appliedCoupon.code} — خصم ${appliedCoupon.discountPercent}%`
+                        : `${appliedCoupon.code} applied — ${appliedCoupon.discountPercent}% off`}
+                    </p>
+                  )}
+                </div>
                 <div className="flex justify-between text-gray-400 text-xs md:text-sm">
                   <span>{t.cart.subtotal}</span>
                   <span>{totalPrice} {t.cart.currency}</span>
@@ -382,6 +495,12 @@ export default function Checkout() {
                   <span>{t.cart.tax}</span>
                   <span>{tax} {t.cart.currency}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-emerald-400 text-xs md:text-sm">
+                    <span>{lang === 'ar' ? `الخصم (${appliedCoupon.discountPercent}%)` : `Discount (${appliedCoupon.discountPercent}%)`}</span>
+                    <span>-{discount} {t.cart.currency}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-white font-bold border-t border-white/[0.06] pt-2 md:pt-3">
                   <span className="text-sm md:text-base">{t.cart.total}</span>
                   <span className="text-lg md:text-xl">{total} {t.cart.currency}</span>
