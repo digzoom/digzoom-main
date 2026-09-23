@@ -35,7 +35,6 @@ const ProfilePage = lazy(() => import("./pages/Profile"));
 const OrdersPage = lazy(() => import("./pages/Orders"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Partners = lazy(() => import("./pages/Partners"));
 const ServicePlanDetail = lazy(() => import("./pages/ServicePlanDetail"));
 const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
 
@@ -106,10 +105,11 @@ export default function App() {
                 <Route path="/company" element={<CompanyInformation />} />
                 <Route path="/trust-security" element={<TrustSecurity />} />
                 <Route path="/marketing" element={<MarketingServices />} />
+                <Route path="/services" element={<Navigate to="/#services" replace />} />
                 <Route path="/services/:slug" element={<ServiceDetail />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/partners" element={<Partners />} />
+                <Route path="/partners" element={<Navigate to="/shop" replace />} />
                 <Route path="/plans/:planId" element={<ServicePlanDetail />} />
                 <Route
                   path="/service-checkout/:planId"
