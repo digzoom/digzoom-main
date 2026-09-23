@@ -13,7 +13,9 @@ export default function Cart() {
   const { lang, t } = useLanguage();
   const isRTL = lang === 'ar';
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
-  const tax = totalPrice - totalPrice / 1.15;
+  // Do not present or collect VAT until the business is registered and the
+  // production tax flow has been configured and verified.
+  const tax = 0;
   const total = totalPrice;
 
   /* ── Empty State ── */
@@ -181,7 +183,7 @@ export default function Cart() {
             {/* Trust mini badges */}
             <div className="grid grid-cols-2 gap-2">
               {[
-                { icon: <Tag className="w-3.5 h-3.5" />, textAr: 'الضريبة مشمولة', textEn: 'VAT included' },
+                { icon: <Tag className="w-3.5 h-3.5" />, textAr: 'لا رسوم مخفية', textEn: 'No hidden fees' },
                 { icon: <MessageCircle className="w-3.5 h-3.5" />, textAr: 'دعم قبل الشراء', textEn: 'Pre-sale support' },
               ].map((badge, i) => (
                 <div
