@@ -31,32 +31,34 @@ export const servicePlans: ServicePlan[] = [
     nameAr: "استقرار الموقع",
     nameEn: "Website Stability",
     price: 1490,
-    summaryAr: "إدارة تشغيلية تحافظ على موقعك محدثًا وآمنًا وواضحًا.",
+    summaryAr:
+      "موقعك تحت المتابعة: نرصد الأعطال، نحدّث عروضك ومعلوماتك، ونجهز منتجين كل شهر.",
     summaryEn:
-      "Operational care that keeps your website current, secure, and clear.",
-    resultAr: "موقع يعمل باستقرار دون أن تستهلك التحديثات والأعطال وقت فريقك.",
+      "We monitor your site, refresh key offers and details, and prepare two listings each month.",
+    resultAr:
+      "موقع مرتب ومعلومات حديثة، مع تنبيه سريع إذا ظهر عطل بدل اكتشافه من العميل.",
     resultEn:
       "A stable website without updates and incidents draining your team.",
     bestForAr:
-      "مناسبة لمن لديه موقع قائم ويحتاج صيانة مستمرة وتعديلات بسيطة، دون إدارة منصات التواصل.",
+      "مناسبة لمن لديه موقع قائم ويريد متابعة الأعطال وتحديث الأسعار والعروض والمعلومات المهمة كل شهر.",
     bestForEn:
       "Best for an existing website that needs ongoing care and small updates, without social media management.",
     productsAr: "يشمل تجهيز منتجين شهريًا",
     productsEn: "Includes 2 product listings monthly",
     countingAr: [
-      "التحديث الواحد تعديل بسيط في صفحة قائمة، مثل تغيير نص أو صورة أو سعر أو عرض.",
+      "كل تحديث من الأربعة يخص عنصرًا واحدًا في صفحة قائمة، مثل سعر أو صورة أو نص أو عرض؛ وتحدد التحديثات في خطة الشهر.",
       "صفحة المنتج تشمل إدخال البيانات والصور التي يزودنا بها العميل وتنسيقها للنشر.",
       "إنشاء صفحة جديدة أو تغيير التصميم أو إضافة برمجة لا يُحسب كتحديث محتوى ويُسعّر منفصلًا.",
     ],
     countingEn: [
-      "One update is a small change to an existing page, such as copy, image, price, or offer.",
+      "Each of the four updates changes one item on an existing page, such as a price, image, line of copy, or offer, agreed in the monthly plan.",
       "A product listing uses client-supplied information and images and formats them for publishing.",
       "New pages, redesigns, and development are outside content updates and quoted separately.",
     ],
     includedAr: [
       "مراقبة عمل الموقع والتنبيه عند وجود عطل",
       "نسخ احتياطي وفحص أمني أساسي",
-      "4 تعديلات محتوى بسيطة شهريًا",
+      "إبقاء أسعارك وعروضك ومعلومات موقعك محدثة",
       "تحديث النظام والإضافات المتوافقة",
       "تجهيز صفحتي منتج من بيانات وصور العميل",
       "تقرير شهري واستجابة خلال يوم عمل",
@@ -64,10 +66,26 @@ export const servicePlans: ServicePlan[] = [
     includedEn: [
       "Uptime monitoring and incident alerts",
       "Backups and basic security review",
-      "4 small content updates monthly",
+      "Keep key prices, offers, and website details current",
       "Compatible core and plugin updates",
       "2 product pages using client-supplied assets",
       "Monthly report and 1-business-day response",
+    ],
+    includedDescriptionsAr: [
+      "نراقب توفر الموقع وننبهك عند رصد عطل حتى يمكن التعامل معه بسرعة.",
+      "نراجع وجود النسخ الاحتياطية والإعدادات الأمنية الأساسية للموقع.",
+      "نحدّث سعرًا أو صورة أو عرضًا أو نصًا مهمًا في صفحة قائمة، حتى 4 عناصر متفق عليها خلال الشهر.",
+      "نراجع تحديثات نظام الموقع والإضافات المتوافقة ونطبق المناسب منها.",
+      "نرتب بيانات وصور منتجين تزودنا بها ونجهز صفحتيهما للنشر بعد اعتمادك.",
+      "نرسل ملخصًا بما نُفذ وما يحتاج انتباهًا، ونرد خلال يوم عمل على طلبات الباقة.",
+    ],
+    includedDescriptionsEn: [
+      "We monitor site availability and alert you when an issue is detected.",
+      "We review backups and basic website security settings.",
+      "We update one price, image, offer, or key text item on an existing page, up to 4 agreed items per month.",
+      "We review core and compatible plugin updates and apply appropriate ones.",
+      "We use your product data and images to prepare two approved listings for publishing.",
+      "We summarize completed work and issues to review, and reply to plan requests within one business day.",
     ],
     clientAr: [
       "توفير صلاحية الموقع والاستضافة",
@@ -109,11 +127,12 @@ export const servicePlans: ServicePlan[] = [
     nameAr: "حضور اجتماعي",
     nameEn: "Social Presence",
     price: 2990,
-    summaryAr: "محتوى منظم يحافظ على حضور علامتك عبر منصتين.",
+    summaryAr:
+      "حساباتك نشطة بمحتوى مفهوم: 12 منشورًا و12 قصة تُنشر على منصتين تختارهما.",
     summaryEn:
-      "Structured content that keeps your brand active across two platforms.",
+      "Keep two selected channels active with 12 posts and 12 stories each month.",
     resultAr:
-      "حضور احترافي منتظم بدل النشر المتقطع والقرارات اليومية العشوائية.",
+      "حسابان يظهران بمحتوى منتظم يشرح خدماتك ويعرض منتجاتك ويحفز التواصل معك.",
     resultEn: "A professional, consistent presence instead of random posting.",
     bestForAr:
       "مناسبة للمنشأة التي لديها موقع أو متجر جاهز وتحتاج حضورًا منتظمًا على منصتين، دون إدارة الموقع.",
@@ -122,8 +141,8 @@ export const servicePlans: ServicePlan[] = [
     productsAr: "إضافة المنتجات غير مشمولة",
     productsEn: "Product listing is not included",
     countingAr: [
-      "12 منشورًا تعني 12 تصميمًا مستقلًا خلال الشهر، مع كتابة النص والتعليق المصاحب.",
-      "12 قصة تعني 12 تصميمًا عموديًا مستقلًا للقصص.",
+      "12 منشورًا تعني 12 تصميمًا أصليًا خلال الشهر تشمل عروض منتجات أو خدمات، معلومات مفيدة، أسئلة تفاعلية، ومحتوى ثقة حسب نشاطك، مع النص والتعليق المصاحب.",
+      "12 قصة تعني 12 تصميمًا عموديًا مستقلًا للعروض والمنتجات والأسئلة والكواليس.",
       "تُنشر المواد نفسها على المنصتين بعد تهيئة المقاس والنص؛ العدد ليس 12 منشورًا لكل منصة.",
       "لا تشمل الباقة تصويرًا ميدانيًا أو مقاطع فيديو أو حملات إعلانية مدفوعة.",
     ],
@@ -150,6 +169,24 @@ export const servicePlans: ServicePlan[] = [
       "Adaptation, scheduling, and publishing on both platforms",
       "Comment monitoring and alerts for important inquiries",
       "Monthly report and next-month recommendations",
+    ],
+    includedDescriptionsAr: [
+      "تختار حسابين مثل Instagram أو TikTok أو X أو LinkedIn، وننسق المحتوى الملائم لهما.",
+      "نحدد موضوع كل مادة، هدفها، والمنصة وموعد النشر قبل بدء الشهر.",
+      "نجهز صورًا وتصاميم لمنتجاتك وخدماتك، ومعلومات مفيدة وأسئلة ومحتوى يبني الثقة، مع النصوص المصاحبة.",
+      "نصمم قصصًا عمودية للعروض والمنتجات والكواليس والأسئلة والتفاعل مع الجمهور.",
+      "نضبط المقاس والنص المناسبين لكل حساب، ثم ننشر المواد المعتمدة حسب الجدول.",
+      "نراجع التعليقات الظاهرة ونبلغك بالاستفسارات التي تحتاج ردًا متخصصًا منك.",
+      "نلخص ما نُشر والتفاعل المتاح، ونقترح ما يمكن تحسينه في الشهر التالي.",
+    ],
+    includedDescriptionsEn: [
+      "Choose two accounts, such as Instagram, TikTok, X, or LinkedIn. We adapt suitable content for both.",
+      "We agree each asset's topic, purpose, platform, and publishing date before the month begins.",
+      "We design posts for products, services, useful tips, audience questions, and trust-building, with captions.",
+      "We design vertical stories for offers, products, behind-the-scenes content, and audience interaction.",
+      "We adapt size and copy for each account and publish approved assets to schedule.",
+      "We check visible comments and alert you to inquiries requiring your specialist response.",
+      "We summarize published work and available engagement, with suggestions for the next month.",
     ],
     clientAr: [
       "توفير صلاحيات الحسابات",
@@ -334,29 +371,29 @@ export const servicePlans: ServicePlan[] = [
     nameEn: "Expanded Management",
     price: 7990,
     summaryAr:
-      "إدارة الموقع وثلاث منصات مع حجم محتوى أكبر وحملة أو صفحة هبوط كل شهر.",
+      "موقعك و3 منصات بمحتوى أكثر، حتى 25 منتجًا، مع حملة إعلانية وصفحة عرض مخصصة شهريًا.",
     summaryEn:
-      "Website and three-platform management with more content and a campaign or landing page.",
+      "More content for your website and 3 channels, up to 25 listings, plus one campaign and one landing page monthly.",
     resultAr:
-      "تنفيذ شهري أكبر للمنشأة التي لديها عروض جاهزة وميزانية إعلانية ومسؤول اعتماد سريع.",
+      "محتوى وعروض أكثر، مع صفحة تجمع طلبات العملاء وحملة تقودهم إليها، وتقارير واجتماعين للمتابعة.",
     resultEn:
       "Higher monthly execution for a business with ready offers, ad budget, and a fast approver.",
     bestForAr:
       "مناسبة للمنشأة التي لديها عروض جاهزة وميزانية إعلانية وتحتاج تنفيذًا مكثفًا عبر الموقع وثلاث منصات.",
     bestForEn:
       "Best for a business with ready offers and ad budget that needs higher-volume execution across its website and three platforms.",
-    productsAr: "يشمل تجهيز 10 منتجات شهريًا",
-    productsEn: "Includes 10 product listings monthly",
+    productsAr: "يشمل تجهيز حتى 25 منتجًا أو خدمة شهريًا",
+    productsEn: "Includes up to 25 product or service listings monthly",
     countingAr: [
       "20 منشورًا و20 قصة هي مواد إجمالية تُهيّأ للمنصات الثلاث، وليست 20 لكل منصة.",
       "المقاطع الأربعة تشمل المونتاج من مواد يقدمها العميل؛ التصوير والإنتاج الميداني منفصلان.",
-      "يشمل الشهر صفحة هبوط واحدة أو إدارة حملة إعلانية واحدة، وليس الاثنين معًا.",
+      "يشمل الشهر إدارة حملة إعلانية واحدة وصفحة عرض واحدة على الموقع لشرح العرض وجمع الطلبات، عند توفر المواد والصلاحيات اللازمة.",
       "ميزانية الإعلان تُدفع للمنصة مباشرة ولا تدخل في سعر الباقة.",
     ],
     countingEn: [
       "20 posts and 20 stories are total assets adapted across three platforms, not 20 per platform.",
       "The 4 short videos are edited from client-supplied assets; filming and production are separate.",
-      "Each month includes either one landing page or management of one campaign, not both.",
+      "Each month includes one managed campaign and one on-site landing page for the offer and inquiries, when the required assets and access are provided.",
       "Ad spend is paid directly to the platform and is not included in the plan price.",
     ],
     includedAr: [
@@ -364,8 +401,8 @@ export const servicePlans: ServicePlan[] = [
       "20 منشورًا مصممًا و20 قصة مصممة",
       "كتابة المحتوى والجدولة والنشر",
       "مونتاج 4 مقاطع قصيرة من مواد العميل",
-      "تجهيز 10 صفحات منتجات جاهزة للنشر",
-      "صفحة هبوط واحدة أو إدارة حملة شهرية واحدة",
+      "إضافة وتجهيز حتى 25 منتجًا أو خدمة شهريًا",
+      "صفحة عرض مخصصة وإدارة حملة إعلانية واحدة شهريًا",
       "اجتماعان شهريًا ودعم بأولوية",
     ],
     includedEn: [
@@ -373,9 +410,27 @@ export const servicePlans: ServicePlan[] = [
       "20 designed posts and 20 designed stories",
       "Copywriting, scheduling, and publishing",
       "Editing 4 short videos from client assets",
-      "10 publish-ready product pages",
-      "One landing page or one managed campaign monthly",
+      "Add and prepare up to 25 products or services monthly",
+      "One offer landing page and one managed campaign monthly",
       "2 monthly calls and priority support",
+    ],
+    includedDescriptionsAr: [
+      "نحدّث صفحات موقعك الحالية وندير 3 حسابات تختارها، بخطة موحدة للمحتوى والعروض.",
+      "نجهز 20 تصميمًا للحساب و20 قصة عمودية للعروض والمعلومات والتفاعل، بأعداد إجمالية للمنصات الثلاث.",
+      "نكتب العناوين والنصوص المصاحبة ونرتب موعد النشر، ثم ننشر المواد بعد اعتمادها.",
+      "نحوّل صورك ومقاطعك إلى 4 فيديوهات قصيرة للنشر؛ التصوير الميداني منفصل.",
+      "نجهز الاسم والوصف والصور والسعر والتصنيف والمواصفات، ونضيف حتى 25 صفحة منتج أو خدمة بعد اعتمادها.",
+      "نجهز صفحة على موقعك تشرح العرض وتتيح التواصل أو الطلب، وندير حملة واحدة تقود العملاء إلى العرض. ميزانية الإعلان منفصلة.",
+      "نجتمع مرتين لمراجعة التنفيذ والنتائج، ونعطي طلباتك أولوية في المتابعة خلال ساعات العمل.",
+    ],
+    includedDescriptionsEn: [
+      "We update existing website pages and manage 3 selected accounts using one content and offer plan.",
+      "We prepare 20 feed designs and 20 vertical stories for offers, information, and engagement, counted across all three platforms.",
+      "We write headlines and captions, schedule content, and publish after approval.",
+      "We edit 4 short videos from your photos and footage; on-location filming is separate.",
+      "We prepare name, copy, images, price, category, and details, then add up to 25 approved listings.",
+      "We build one page on your site explaining the offer and collecting inquiries, and manage one campaign driving traffic to it. Ad spend is separate.",
+      "We meet twice to review work and results, and prioritize plan requests during business hours.",
     ],
     clientAr: [
       "توفير الصلاحيات والميزانية الإعلانية",
