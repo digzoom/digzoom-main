@@ -75,8 +75,8 @@ export default function DeliveryPolicy() {
           <h3 className="text-blue-400 font-bold mb-2">{isAr ? 'ملاحظة مهمة' : 'Important Note'}</h3>
           <p className="text-gray-400 text-sm leading-relaxed">
             {isAr
-              ? 'DigZoom لا يبيع منتجات فيزيائية. لا يمكن تنزيل الملف قبل تأكيد الدفع، وتخضع الإلغاءات والاسترجاعات للحالات المكتوبة في سياسة الاسترجاع. يلزم تسجيل الدخول للوصول إلى «طلباتي» وروابط التنزيل المحمية.'
-              : 'DigZoom sells no physical goods. Files cannot be downloaded before payment confirmation, and cancellations or refunds follow the published Refund Policy. Sign-in is required to access “My Orders” and protected download links.'}
+              ? 'DigZoom لا يبيع منتجات فيزيائية. لا يمكن تنزيل الملف قبل تأكيد الدفع، وتخضع الإلغاءات والاسترجاعات للحالات المكتوبة في سياسة الاسترجاع. يمكن للضيف تنزيل ملفاته بأمان من صفحة تأكيد الدفع، بينما يلزم تسجيل الدخول فقط للوصول لاحقًا إلى «طلباتي».'
+              : 'DigZoom sells no physical goods. Files cannot be downloaded before payment confirmation, and cancellations or refunds follow the published Refund Policy. Guests can securely download from the payment-confirmation page; sign-in is only required for later access through “My Orders”.'}
           </p>
         </div>
       </div>
