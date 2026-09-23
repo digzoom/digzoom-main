@@ -91,11 +91,6 @@ export default function Checkout() {
   }, [totalPrice, appliedCoupon]);
 
   const handleApplyCoupon = async () => {
-    if (!user) {
-      toast.info(lang === 'ar' ? 'سجّل الدخول أولاً لاستخدام كوبون الخصم' : 'Sign in first to use a coupon');
-      navigate('/login?redirect=/checkout');
-      return;
-    }
     const code = couponCode.trim().toUpperCase();
     if (!code) {
       toast.error(lang === 'ar' ? 'أدخل كود الخصم' : 'Enter a coupon code');
@@ -146,14 +141,9 @@ export default function Checkout() {
 
     const finalName = form.name || user?.name || '';
     const finalEmail = form.email || user?.email || '';
-    if (!finalEmail || !finalName) {
-      toast.error(lang === 'ar' ? 'يرجى ملء الاسم والبريد الإلكتروني' : 'Please fill in name and email');
-      return;
-    }
-
-    if (!user) {
-      toast.info(lang === 'ar' ? 'سجّل الدخول أولاً لحماية ملفاتك وطلباتك' : 'Sign in first to protect your files and orders');
-      navigate('/login?redirect=/checkout');
+    const finalPhone = form.phone.trim();
+    if (!finalEmail.trim() || !finalName.trim() || !finalPhone) {
+      toast.error(lang === 'ar' ? 'يرجى ملء الاسم والبريد الإلكتروني ورقم الجوال' : 'Please fill in name, email, and phone');
       return;
     }
 
@@ -161,9 +151,9 @@ export default function Checkout() {
 
     try {
       const result = await createOrder.mutateAsync({
-        customer_name: finalName,
-        customer_email: finalEmail,
-        customer_phone: form.phone || undefined,
+        customer_name: finalName.trim(),
+        customer_email: finalEmail.trim().toLowerCase(),
+        customer_phone: finalPhone,
         items: items.map(item => ({
           product_id: item.id,
           quantity: item.quantity,
@@ -303,6 +293,7 @@ export default function Checkout() {
                   <label className="block text-gray-500 text-xs md:text-sm mb-1.5 md:mb-2">{t.checkout.phone}</label>
                   <input
                     type="tel"
+                    required
                     value={form.phone}
                     onChange={e => setForm({ ...form, phone: e.target.value })}
                     className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/40 transition-colors placeholder:text-gray-700"
