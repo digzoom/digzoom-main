@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createRouter, publicQuery, authedQuery, adminQuery } from "./trpc";
 import { getSupabaseAdmin } from "./supabase-admin";
+import { confirmPaidOrder } from "./order-confirmation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function admin(): any { return getSupabaseAdmin(); }
@@ -32,13 +33,16 @@ async function retrieveStripeCheckout(sessionId: string) {
   const body = await response.json() as {
     id?: string;
     payment_status?: string;
+    amount_total?: number;
+    currency?: string;
+    payment_intent?: string | null;
     metadata?: { order_id?: string };
     error?: { message?: string };
   };
   if (!response.ok || !body.id) {
     throw new Error(body.error?.message || "Unable to verify payment");
   }
-  return body;
+  return body as typeof body & { id: string };
 }
 
 async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?: string) {
@@ -56,7 +60,10 @@ async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?
     const storedSessionId = order.payment_payload?.checkout_session_id;
     if (storedSessionId !== sessionId) throw new Error("Download authorization failed");
     const session = await retrieveStripeCheckout(sessionId);
-    if (session.payment_status === "paid" && session.metadata?.order_id === orderId) return order;
+    if (session.payment_status === "paid" && session.metadata?.order_id === orderId) {
+      await confirmPaidOrder(session);
+      return order;
+    }
   }
 
   throw new Error("Downloads are not available for this order");
@@ -347,7 +354,7 @@ export const adminRouter = createRouter({
         return { orderId, status: "pending", checkoutUrl: session.url };
       } catch (error: any) {
         console.error("[createOrder] Stripe session error:", error?.message || error);
-        await admin().from("orders").update({ status: "payment_failed" }).eq("id", orderId);
+        await admin().from("orders").update({ status: "cancelled" }).eq("id", orderId);
         throw new Error("Unable to start secure payment");
       }
     }),
@@ -759,6 +766,29 @@ export const adminRouter = createRouter({
     }),
 
   /* ─── Orders (defensive — no embedded foreign table query) ─── */
+  reconcileStripeOrders: adminQuery.mutation(async () => {
+    const { data: pending, error } = await admin().from("orders")
+      .select("id,payment_payload").eq("status", "pending").eq("payment_method", "stripe")
+      .order("created_at", { ascending: false }).limit(25);
+    if (error) throw new Error("Unable to check pending orders");
+    let confirmed = 0;
+    let checked = 0;
+    for (const order of pending || []) {
+      const sessionId = order.payment_payload?.checkout_session_id;
+      if (!sessionId) continue;
+      checked++;
+      try {
+        const session = await retrieveStripeCheckout(sessionId);
+        if (session.payment_status === "paid" && session.metadata?.order_id === order.id) {
+          if (await confirmPaidOrder(session)) confirmed++;
+        }
+      } catch (error) {
+        console.error("[reconcileStripeOrders] failed", order.id, error);
+      }
+    }
+    return { checked, confirmed };
+  }),
+
   listOrders: adminQuery
     .input(
       z
@@ -772,7 +802,7 @@ export const adminRouter = createRouter({
       let query = admin()
         .from("orders")
         .select(
-          "id,customer_name,customer_email,total_amount,status,payment_method,paid_at,created_at"
+          "id,customer_name,customer_email,customer_phone,total_amount,status,payment_method,paid_at,created_at"
         )
         .order("created_at", { ascending: false })
         .limit(input?.limit ?? 100);
@@ -780,7 +810,7 @@ export const adminRouter = createRouter({
       const { data, error } = await query;
       if (error) {
         console.error("[listOrders] DB error:", error.message);
-        return [];
+        throw new Error("Unable to load orders");
       }
 
       const orders = Array.isArray(data) ? data.map((o: any) => ({
@@ -788,9 +818,10 @@ export const adminRouter = createRouter({
         order_number: o.id,           // orders table uses "id" as the order number
         customer_name: o.customer_name,
         customer_email: o.customer_email,
+        customer_phone: o.customer_phone,
         total: o.total_amount,
         status: o.status,
-        payment_status: o.paid_at || o.status === 'paid' || o.status === 'completed' ? 'paid' : 'pending',
+        payment_status: o.paid_at || o.status === 'paid' ? 'paid' : 'pending',
         created_at: o.created_at,
         items: [] as any[],
       })) : [];
@@ -823,6 +854,7 @@ export const adminRouter = createRouter({
         id: z.string().min(6),
         status: z.enum([
           "pending",
+          "paid",
           "processing",
           "completed",
           "cancelled",
@@ -834,9 +866,16 @@ export const adminRouter = createRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const updateData: Record<string, string | null> = { status: input.status };
-      if (input.paymentStatus === "paid") updateData.paid_at = new Date().toISOString();
-      if (input.paymentStatus && input.paymentStatus !== "paid") updateData.paid_at = null;
+      // Fulfilment status must never manufacture or erase a Stripe payment.
+      if (input.paymentStatus) throw new Error("Payment status is controlled by Stripe");
+      const { data: existing, error: readError } = await admin().from("orders")
+        .select("status,paid_at").eq("id", input.id).single();
+      if (readError || !existing) throw new Error("Order not found");
+      if (input.status === "paid") throw new Error("Only Stripe can mark an order paid");
+      if (!existing.paid_at && !["pending", "cancelled"].includes(input.status)) {
+        throw new Error("Confirm payment before processing this order");
+      }
+      const updateData = { status: input.status };
       const { data, error } = await admin()
         .from("orders")
         .update(updateData)
@@ -986,7 +1025,8 @@ export const adminRouter = createRouter({
       const { data: salesData } = await s
         .from("orders")
         .select("total_amount")
-        .eq("status", "completed");
+        .not("paid_at", "is", null)
+        .neq("status", "refunded");
       totalSales = (salesData ?? []).reduce(
         (sum: number, o: any) => sum + (o.total_amount || 0),
         0
@@ -1008,7 +1048,7 @@ export const adminRouter = createRouter({
       const { data } = await s
         .from("orders")
         .select("id,customer_name,total_amount,status,created_at")
-        .order("id", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(5);
       latestOrders = (data ?? []).map((o: any) => ({ ...o, order_number: o.id, total: o.total_amount }));
     } catch (e: any) {
