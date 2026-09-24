@@ -17,6 +17,8 @@ export const handler: Handler = async event => {
   let input: Record<string, unknown>;
   try { input = JSON.parse(event.body || "{}"); }
   catch { return reply(400, { error: "Invalid request" }); }
+  if (!input || typeof input !== "object" || Array.isArray(input))
+    return reply(400, { error: "Invalid request" });
 
   const value = (key: string, max: number) => String(input[key] ?? "").trim().slice(0, max);
   const plan = getServicePlan(value("plan_id", 80));
@@ -85,7 +87,12 @@ export const handler: Handler = async event => {
     const { error: saveError } = await database.from("orders")
       .update({ payment_method: "stripe", payment_payload: { checkout_session_id: session.id } })
       .eq("id", orderId).eq("status", "pending");
-    if (saveError) throw saveError;
+    if (saveError) {
+      await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(session.id)}/expire`, {
+        method: "POST", headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+      }).catch(expireError => console.error("[service-checkout] session expiry failed", expireError));
+      throw saveError;
+    }
     return reply(200, { orderId, checkoutUrl: session.url });
   } catch (error) {
     console.error("[service-checkout] session failed", error);
