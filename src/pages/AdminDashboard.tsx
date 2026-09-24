@@ -951,14 +951,22 @@ function OrdersTab() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { lang, t } = useLanguage();
   const utils = trpc.useUtils();
-  const { data: orders, isLoading, error: ordersError } = trpc.listOrders.useQuery({ limit: 100 });
+  const { data: orders, isLoading, error: ordersError, refetch, isFetching } = trpc.listOrders.useQuery({ limit: 100 }, { refetchInterval: 30000 });
+  const reconcilePayments = trpc.reconcileStripeOrders.useMutation({
+    onSuccess: ({ checked, confirmed }) => {
+      setToast(lang === 'ar' ? `تم فحص ${checked} طلبات وتأكيد ${confirmed} دفعات` : `Checked ${checked} orders; confirmed ${confirmed} payments`);
+      void utils.listOrders.invalidate();
+      void utils.getStats.invalidate();
+    },
+    onError: (error) => setToast(error.message),
+  });
   const updateStatusMutation = trpc.updateOrderStatus?.useMutation?.({
     onSuccess: () => { setToast(t.admin.updated); utils.listOrders?.invalidate?.(); },
     onError: (e: any) => setToast(e.message),
   }) ?? { isPending: false, mutate: () => {} };
 
-  const statusColors: Record<string, string> = { pending: 'bg-amber-500/15 text-amber-400', processing: 'bg-blue-500/15 text-blue-400', completed: 'bg-emerald-500/15 text-emerald-400', cancelled: 'bg-red-500/15 text-red-400', refunded: 'bg-gray-500/15 text-gray-400' };
-  const statusLabels: Record<string, string> = { all: lang === 'ar' ? 'الكل' : 'All', pending: t.admin.pending, processing: t.admin.processing, completed: t.admin.completed, cancelled: t.admin.cancelled, refunded: t.admin.refunded };
+  const statusColors: Record<string, string> = { pending: 'bg-amber-500/15 text-amber-400', paid: 'bg-emerald-500/15 text-emerald-400', processing: 'bg-blue-500/15 text-blue-400', completed: 'bg-emerald-500/15 text-emerald-400', cancelled: 'bg-red-500/15 text-red-400', refunded: 'bg-gray-500/15 text-gray-400' };
+  const statusLabels: Record<string, string> = { all: lang === 'ar' ? 'الكل' : 'All', pending: t.admin.pending, paid: lang === 'ar' ? 'مدفوع' : 'Paid', processing: t.admin.processing, completed: t.admin.completed, cancelled: t.admin.cancelled, refunded: t.admin.refunded };
   const orderList = Array.isArray(orders) ? orders : [];
   const filteredOrders = statusFilter === 'all' ? orderList : orderList.filter((order: any) => order.status === statusFilter);
 
@@ -985,10 +993,11 @@ function OrdersTab() {
       {toast && <div className="px-4 py-3 rounded-xl text-sm font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">{toast}</div>}
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-bold text-white">{t.admin.orders}</h2>
-        <span className="text-sm text-gray-500">{orderList.length} {lang === 'ar' ? 'طلب' : 'orders'}</span>
+        <div className="flex flex-wrap items-center gap-3"><span className="text-sm text-gray-500">{orderList.length} {lang === 'ar' ? 'طلب' : 'orders'}</span><button type="button" onClick={() => reconcilePayments.mutate()} disabled={reconcilePayments.isPending} className="rounded-lg border border-emerald-500/30 px-3 py-2 text-sm text-emerald-300 disabled:opacity-50">{lang === 'ar' ? 'التحقق من الدفعات' : 'Verify payments'}</button><button type="button" onClick={() => refetch()} disabled={isFetching} className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white disabled:opacity-50">{lang === 'ar' ? 'تحديث' : 'Refresh'}</button></div>
       </div>
+      <p className="text-sm text-gray-400">{lang === 'ar' ? 'يظهر الطلب عند بدء الدفع، وتصبح حالته مدفوع بعد تأكيد Stripe. تتحدث القائمة تلقائيًا كل 30 ثانية.' : 'Orders appear when checkout starts and become paid after Stripe confirms payment. The list refreshes every 30 seconds.'}</p>
       <div className="flex flex-wrap gap-2">
-        {['all', 'pending', 'processing', 'completed', 'cancelled', 'refunded'].map((status) => (
+        {['all', 'pending', 'paid', 'processing', 'completed', 'cancelled', 'refunded'].map((status) => (
           <button key={status} type="button" onClick={() => setStatusFilter(status)} className={`rounded-xl border px-4 py-2 text-sm transition-colors ${statusFilter === status ? 'border-white/20 bg-white/10 text-white' : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'}`}>
             {statusLabels[status]}
             {status !== 'all' && <span className="ms-1 text-gray-500">{orderList.filter((order: any) => order.status === status).length}</span>}
@@ -1000,7 +1009,7 @@ function OrdersTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-white/5 text-gray-400 text-xs">
-                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.orderNo}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.email}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
+                <th className={`px-4 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.admin.orderNo}</th><th className="px-4 py-3">{t.admin.customer}</th><th className="px-4 py-3">{t.admin.email}</th><th className="px-4 py-3">{t.admin.amount}</th><th className="px-4 py-3">{t.admin.status}</th><th className="px-4 py-3">{lang === 'ar' ? 'الدفع' : 'Payment'}</th><th className="px-4 py-3">{t.admin.date}</th><th className="px-4 py-3"></th>
               </tr></thead>
               <tbody className="divide-y divide-white/[0.03]">
                 {filteredOrders.map((o: any) => (
@@ -1010,15 +1019,16 @@ function OrdersTab() {
                       <td className="px-4 py-3"><span className="text-white text-sm">{o.customer_name}</span></td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{o.customer_email}</td>
                       <td className="px-4 py-3 text-center text-emerald-400 font-bold">{o.total} {t.admin.currency}</td>
-                      <td className="px-4 py-3 text-center"><select value={o.status} onChange={(e) => { e.stopPropagation(); updateStatusMutation.mutate({ id: o.id, status: e.target.value as any }); }} className={`text-xs px-3 py-1 rounded-full font-bold bg-transparent ${statusColors[o.status] || ''}`}>{['pending', 'processing', 'completed', 'cancelled', 'refunded'].map((s) => <option key={s} value={s}>{statusLabels[s]}</option>)}</select></td>
-                      <td className="px-4 py-3 text-center"><span className={`text-xs px-3 py-1 rounded-full font-bold ${o.payment_status === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'}`}>{o.payment_status}</span></td>
+                      <td className="px-4 py-3 text-center"><select value={o.status} disabled={updateStatusMutation.isPending} onClick={(e) => e.stopPropagation()} onChange={(e) => { e.stopPropagation(); updateStatusMutation.mutate({ id: o.id, status: e.target.value as any }); }} className={`text-xs px-3 py-1 rounded-full font-bold bg-transparent ${statusColors[o.status] || ''}`}><option value="paid" disabled>{statusLabels.paid}</option>{['pending', 'processing', 'completed', 'cancelled', 'refunded'].map((s) => <option key={s} value={s}>{statusLabels[s]}</option>)}</select></td>
+                      <td className="px-4 py-3 text-center"><span className={`text-xs px-3 py-1 rounded-full font-bold ${o.payment_status === 'paid' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'}`}>{o.payment_status === 'paid' ? (lang === 'ar' ? 'مدفوع' : 'Paid') : (lang === 'ar' ? 'بانتظار الدفع' : 'Awaiting payment')}</span></td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{new Date(o.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US')}</td>
                       <td className="px-4 py-3 text-center"><button className="text-gray-500 hover:text-white"><ChevronLeft className={`w-4 h-4 transition-transform ${expandedOrder === o.id ? '-rotate-90' : ''}`} /></button></td>
                     </tr>
                     {expandedOrder === o.id && (
-                      <tr><td colSpan={7} className="px-4 py-3 bg-white/[0.02]">
+                      <tr><td colSpan={8} className="px-4 py-3 bg-white/[0.02]">
                         <div className="space-y-2 text-sm">
                           <div className="text-gray-400"><strong className="text-white">{t.admin.customer}:</strong> {o.customer_name} ({o.customer_email})</div>
+                          {o.customer_phone && <div className="text-gray-400"><strong className="text-white">{lang === 'ar' ? 'الجوال' : 'Phone'}:</strong> {o.customer_phone}</div>}
                           {Array.isArray(o.items) && o.items.length > 0 && <div className="space-y-2"><div className="text-gray-400 text-xs font-bold">{t.admin.items}:</div>{o.items.map((item: any, i: number) => (<div key={i} className="flex justify-between text-gray-300 text-sm"><span>{item.product_name} × {item.quantity}</span><span className="text-emerald-400">{item.price} {t.admin.currency}</span></div>))}</div>}
                         </div>
                       </td></tr>
