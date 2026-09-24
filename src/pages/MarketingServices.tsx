@@ -379,16 +379,16 @@ export default function MarketingServices() {
             </div>
             <h1 className="text-[2.7rem] font-black leading-[1.06] tracking-[-.04em] sm:text-6xl lg:text-7xl">
               {ar
-                ? "موقع يشرح عملك بوضوح."
-                : "A website that explains your business."}
+                ? "ندير موقعك وحساباتك،"
+                : "We manage your website and social accounts,"}
               <span className="mt-2 block bg-gradient-to-r from-[#55a7ff] via-[#737cff] to-[#b165ff] bg-clip-text text-transparent">
-                {ar ? "وحسابات تبقى نشطة." : "Accounts that stay active."}
+                {ar ? "ونجهّز محتوى يعرّف الناس بعملك." : "and create content that introduces your business."}
               </span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
               {ar
-                ? "نحدّث موقعك وأسعارك وعروضك، نعرض منتجاتك وخدماتك بطريقة واضحة، ونجهز منشورات لحساباتك. وإذا احتجت إعلانًا، نديره ضمن الباقة المناسبة."
-                : "We update your website, prices, and offers, present your products or services clearly, and create posts for your accounts. If you need ads, we can manage them in a suitable plan."}
+                ? "نحدّث موقعك ومنتجاتك وعروضك، ونصمّم وننشر محتوى حساباتك بخطة واضحة كل شهر."
+                : "We update your website, products, and offers, then design and publish content for your accounts with a clear monthly plan."}
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <button
