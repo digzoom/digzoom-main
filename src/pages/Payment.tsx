@@ -16,12 +16,12 @@ export default function Payment() {
           {isAr ? 'حالة الدفع' : 'Payment status'}
         </p>
         <h1 className="mt-3 text-3xl font-black sm:text-4xl">
-          {isAr ? 'الدفع الإلكتروني غير مفعّل بعد' : 'Online payment is not live yet'}
+          {isAr ? 'هذا رابط دفع قديم' : 'This payment link is outdated'}
         </h1>
         <p className="mt-5 leading-8 text-slate-300">
           {isAr
-            ? 'لن نطلب بيانات بطاقتك ولن نخصم أي مبلغ قبل ربط بوابة الدفع المعتمدة واختبار تأكيد الطلب والتسليم الآمن بالكامل.'
-            : 'We will not request card details or charge you until the approved gateway, order confirmation, and secure delivery flow are fully tested.'}
+            ? 'لا يمكن الدفع من رابط يحتوي على مبلغ مكتوب يدويًا. اختر الباقة من الموقع وأكمل بيانات الطلب لفتح صفحة الدفع الآمن بالسعر المعتمد.'
+            : 'A link with a manually entered amount cannot start a payment. Select a plan on the site and complete the order details to open secure checkout at the verified price.'}
         </p>
 
         <div className="mt-7 rounded-2xl border border-white/10 bg-white/[.03] p-5 text-start">
@@ -29,16 +29,16 @@ export default function Payment() {
             <CreditCard className="mt-1 h-5 w-5 shrink-0 text-blue-400" />
             <p className="text-sm leading-7 text-slate-400">
               {isAr
-                ? 'أي صفحة أو رابط يطلب الدفع باسم DigZoom قبل إعلان التفعيل الرسمي لا يمثل مسار الدفع المعتمد لدينا.'
-                : 'Any page or link requesting payment on behalf of DigZoom before our official launch notice is not an approved checkout route.'}
+                ? 'لم تُنشأ عملية دفع من هذا الرابط، ولم يُخصم أي مبلغ.'
+                : 'No payment was created from this link and nothing was charged.'}
             </p>
           </div>
         </div>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          <Link to="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 font-bold hover:bg-blue-500">
+          <Link to="/#plans" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 font-bold hover:bg-blue-500">
             <Store className="h-4 w-4" />
-            {isAr ? 'تصفح المنتجات' : 'Browse products'}
+            {isAr ? 'شاهد الباقات' : 'See plans'}
           </Link>
           <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 px-5 font-bold hover:bg-white/5">
             <Mail className="h-4 w-4" />
