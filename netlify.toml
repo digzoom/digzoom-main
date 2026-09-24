@@ -20,6 +20,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/service-checkout"
+  to = "/.netlify/functions/service-checkout"
+  status = 200
+
+[[redirects]]
   from = "/api/partner-application"
   to = "/.netlify/functions/partner-application"
   status = 200

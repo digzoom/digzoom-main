@@ -376,6 +376,8 @@ export const adminRouter = createRouter({
       if (itemsError) throw new Error("Unable to load order downloads");
 
       const productIds = (items ?? []).map((item: any) => item.product_id).filter(Boolean);
+      // Service orders have no downloadable product; authorization above still verifies Stripe.
+      if (productIds.length === 0) return [];
       const { data: products, error: productsError } = await admin()
         .from("products")
         .select("id,title_ar,title_en,file_type,file_size,image_url,storage_path")
