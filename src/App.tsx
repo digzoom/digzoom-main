@@ -37,6 +37,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ServicePlanDetail = lazy(() => import("./pages/ServicePlanDetail"));
 const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
+const ServicePaymentSuccess = lazy(() => import("./pages/ServicePaymentSuccess"));
 
 export default function App() {
   const location = useLocation();
@@ -89,6 +90,7 @@ export default function App() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/thank-you" element={<ThankYou />} />
                 <Route path="/payment" element={<Payment />} />
+                <Route path="/service-payment-success" element={<ServicePaymentSuccess />} />
                 <Route
                   path="/admin"
                   element={
