@@ -29,6 +29,12 @@ export const handler: Handler = async event => {
 
   const orderId = `DZ-SRV-${randomUUID()}`;
   const database = getSupabaseAdmin();
+  const { count, error: limitError } = await database.from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("customer_email", email)
+    .gte("created_at", new Date(Date.now() - 60 * 60 * 1000).toISOString());
+  if (limitError) return reply(503, { error: "Unable to check order availability" });
+  if ((count || 0) >= 5) return reply(429, { error: "Too many checkout attempts. Try again later" });
   const { error: orderError } = await database.from("orders").insert({
     id: orderId, status: "pending", subtotal: plan.price, tax_amount: 0,
     total_amount: plan.price, discount_amount: 0, payment_method: "pending",
