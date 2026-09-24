@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createRouter, publicQuery, authedQuery, adminQuery } from "./trpc";
 import { getSupabaseAdmin } from "./supabase-admin";
-import { confirmPaidOrder } from "./order-confirmation";
+import { confirmPaidOrder, sendOrderEmail } from "./order-confirmation";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function admin(): any { return getSupabaseAdmin(); }
@@ -766,6 +766,24 @@ export const adminRouter = createRouter({
     }),
 
   /* ─── Orders (defensive — no embedded foreign table query) ─── */
+  orderAlertReadiness: adminQuery.query(() => ({
+    email: Boolean(process.env.RESEND_API_KEY),
+    whatsapp: Boolean(process.env.WHATSAPP_ACCESS_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID &&
+      process.env.ORDER_WHATSAPP_TO && process.env.ORDER_WHATSAPP_TEMPLATE),
+  })),
+
+  resendPaidOrderEmail: adminQuery.input(z.object({ id: z.string().min(6) }))
+    .mutation(async ({ input }) => {
+      const { data: order, error } = await admin().from("orders")
+        .select("id,total_amount,customer_name,customer_email,customer_phone,paid_at")
+        .eq("id", input.id).single();
+      if (error || !order?.paid_at) throw new Error("Order payment is not confirmed");
+      const { data: items } = await admin().from("order_items")
+        .select("product_title,quantity").eq("order_id", input.id);
+      await sendOrderEmail(order, items || []);
+      return { sent: true };
+    }),
+
   reconcileStripeOrders: adminQuery.mutation(async () => {
     const { data: pending, error } = await admin().from("orders")
       .select("id,payment_payload").eq("status", "pending").eq("payment_method", "stripe")

@@ -952,6 +952,11 @@ function OrdersTab() {
   const { lang, t } = useLanguage();
   const utils = trpc.useUtils();
   const { data: orders, isLoading, error: ordersError, refetch, isFetching } = trpc.listOrders.useQuery({ limit: 100 }, { refetchInterval: 30000 });
+  const { data: alertReadiness } = trpc.orderAlertReadiness.useQuery();
+  const resendEmail = trpc.resendPaidOrderEmail.useMutation({
+    onSuccess: () => setToast(lang === 'ar' ? 'قُبل إرسال تنبيه البريد' : 'Email alert accepted'),
+    onError: (error) => setToast(error.message),
+  });
   const reconcilePayments = trpc.reconcileStripeOrders.useMutation({
     onSuccess: ({ checked, confirmed }) => {
       setToast(lang === 'ar' ? `تم فحص ${checked} طلبات وتأكيد ${confirmed} دفعات` : `Checked ${checked} orders; confirmed ${confirmed} payments`);
@@ -996,6 +1001,9 @@ function OrdersTab() {
         <div className="flex flex-wrap items-center gap-3"><span className="text-sm text-gray-500">{orderList.length} {lang === 'ar' ? 'طلب' : 'orders'}</span><button type="button" onClick={() => reconcilePayments.mutate()} disabled={reconcilePayments.isPending} className="rounded-lg border border-emerald-500/30 px-3 py-2 text-sm text-emerald-300 disabled:opacity-50">{lang === 'ar' ? 'التحقق من الدفعات' : 'Verify payments'}</button><button type="button" onClick={() => refetch()} disabled={isFetching} className="rounded-lg border border-white/15 px-3 py-2 text-sm text-white disabled:opacity-50">{lang === 'ar' ? 'تحديث' : 'Refresh'}</button></div>
       </div>
       <p className="text-sm text-gray-400">{lang === 'ar' ? 'يظهر الطلب عند بدء الدفع، وتصبح حالته مدفوع بعد تأكيد Stripe. تتحدث القائمة تلقائيًا كل 30 ثانية.' : 'Orders appear when checkout starts and become paid after Stripe confirms payment. The list refreshes every 30 seconds.'}</p>
+      {alertReadiness && (!alertReadiness.email || !alertReadiness.whatsapp) && <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+        {lang === 'ar' ? `تنبيهات الطلبات: البريد ${alertReadiness.email ? 'مهيأ' : 'غير مهيأ'}، واتساب ${alertReadiness.whatsapp ? 'مهيأ' : 'غير مهيأ'}.` : `Order alerts: email ${alertReadiness.email ? 'configured' : 'not configured'}; WhatsApp ${alertReadiness.whatsapp ? 'configured' : 'not configured'}.`}
+      </div>}
       <div className="flex flex-wrap gap-2">
         {['all', 'pending', 'paid', 'processing', 'completed', 'cancelled', 'refunded'].map((status) => (
           <button key={status} type="button" onClick={() => setStatusFilter(status)} className={`rounded-xl border px-4 py-2 text-sm transition-colors ${statusFilter === status ? 'border-white/20 bg-white/10 text-white' : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'}`}>
@@ -1029,6 +1037,7 @@ function OrdersTab() {
                         <div className="space-y-2 text-sm">
                           <div className="text-gray-400"><strong className="text-white">{t.admin.customer}:</strong> {o.customer_name} ({o.customer_email})</div>
                           {o.customer_phone && <div className="text-gray-400"><strong className="text-white">{lang === 'ar' ? 'الجوال' : 'Phone'}:</strong> {o.customer_phone}</div>}
+                          {o.payment_status === 'paid' && <button type="button" disabled={!alertReadiness?.email || resendEmail.isPending} onClick={(e) => { e.stopPropagation(); resendEmail.mutate({ id: o.id }); }} className="rounded-lg border border-blue-500/30 px-3 py-2 text-blue-300 disabled:opacity-40">{lang === 'ar' ? 'إرسال تنبيه البريد' : 'Send email alert'}</button>}
                           {Array.isArray(o.items) && o.items.length > 0 && <div className="space-y-2"><div className="text-gray-400 text-xs font-bold">{t.admin.items}:</div>{o.items.map((item: any, i: number) => (<div key={i} className="flex justify-between text-gray-300 text-sm"><span>{item.product_name} × {item.quantity}</span><span className="text-emerald-400">{item.price} {t.admin.currency}</span></div>))}</div>}
                         </div>
                       </td></tr>

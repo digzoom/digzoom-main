@@ -15,10 +15,10 @@ function html(value: unknown) {
   })[character] || character);
 }
 
-async function notifyOwner(order: any, items: any[]) {
+export async function sendOrderEmail(order: any, items: any[]) {
   const details = items.map((item) => `${item.product_title} × ${item.quantity}`).join("، ");
   const emailKey = process.env.RESEND_API_KEY;
-  if (emailKey) {
+  if (!emailKey) throw new Error("Email alerts are not configured");
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -33,9 +33,15 @@ async function notifyOwner(order: any, items: any[]) {
         html: `<h2>طلب مدفوع جديد</h2><p>رقم الطلب: ${html(order.id)}</p><p>العميل: ${html(order.customer_name)}</p><p>البريد: ${html(order.customer_email)}</p><p>الجوال: ${html(order.customer_phone)}</p><p>المنتجات: ${html(details)}</p><p>المبلغ: ${html(order.total_amount)} ر.س</p><p>افتح لوحة إدارة DigZoom لمتابعة الطلب.</p>`,
       }),
     });
-    if (!response.ok) console.error("[order-notification] email failed", order.id, response.status);
-  } else {
-    console.warn("[order-notification] RESEND_API_KEY missing", order.id);
+    if (!response.ok) throw new Error(`Email provider rejected the alert (${response.status})`);
+}
+
+async function notifyOwner(order: any, items: any[]) {
+  const details = items.map((item) => `${item.product_title} × ${item.quantity}`).join("، ");
+  try {
+    await sendOrderEmail(order, items);
+  } catch (error) {
+    console.error("[order-notification] email failed", order.id, error);
   }
 
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
