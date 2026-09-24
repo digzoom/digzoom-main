@@ -67,7 +67,7 @@ export default function Footer() {
                   src="/images/digzoom-logo-side-new.jpg"
                   alt="DigZoom"
                   className="h-full w-full object-cover"
-                  onError={(e) => {
+                  onError={e => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
                 />
@@ -81,8 +81,8 @@ export default function Footer() {
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed text-sm">
               {lang === "ar"
-                ? "ديج زوم لإدارة المواقع والتسويق الرقمي وتجهيز وبيع المنتجات الرقمية، بنطاق وأسعار واضحة قبل البدء."
-                : "DigZoom provides website management, digital marketing, and digital product services with clear scope and pricing."}
+                ? "نحدّث موقعك وعروضك، نجهز صفحات منتجاتك، ونصمم منشورات لحساباتك. وتجد في متجرنا قوالب وملفات جاهزة."
+                : "We update websites and offers, prepare product pages, and create posts for business accounts. Our store also has ready-to-use templates and files."}
             </p>
             <div className="space-y-3">
               <a
@@ -115,7 +115,7 @@ export default function Footer() {
               {t.footer.store}
             </h4>
             <ul className="space-y-3">
-              {storeLinks.map((l) => (
+              {storeLinks.map(l => (
                 <li key={l.name}>
                   <Link
                     to={l.path}
@@ -133,7 +133,7 @@ export default function Footer() {
               {t.footer.company}
             </h4>
             <ul className="space-y-3">
-              {companyLinks.map((l) => (
+              {companyLinks.map(l => (
                 <li key={l.name}>
                   <Link
                     to={l.path}
@@ -151,7 +151,7 @@ export default function Footer() {
               {lang === "ar" ? "الصفحات القانونية" : "Legal Pages"}
             </h4>
             <ul className="space-y-3">
-              {legalLinks.map((l) => (
+              {legalLinks.map(l => (
                 <li key={l.path}>
                   <Link
                     to={l.path}

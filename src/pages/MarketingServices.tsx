@@ -41,94 +41,102 @@ export default function MarketingServices() {
         {
           visual: "website" as PillarKind,
           icon: Wrench,
-          title: "إدارة المواقع",
-          text: "صيانة وتحديث المحتوى والمنتجات ومراقبة الأعطال، مع تقرير واضح بما تم.",
+          title: "نعتني بموقعك",
+          text: "نراجع عمل الموقع، نحدّث الأسعار والعروض، ونجهز صفحات المنتجات من معلوماتك وصورك.",
           points: [
-            "تحديثات وصيانة",
-            "إدارة صفحات المنتجات",
-            "نسخ احتياطي ومتابعة",
+            "متابعة الأعطال",
+            "تجهيز صفحات المنتجات",
+            "تحديث الأسعار والعروض",
           ],
           href: "/plans/website-stability",
-          cta: "شاهد باقة إدارة الموقع",
+          cta: "كيف نعتني بموقعك؟",
         },
         {
           visual: "marketing" as PillarKind,
           icon: Megaphone,
-          title: "التسويق الرقمي",
-          text: "محتوى وإعلانات وقياس أداء، ضمن خطة شهرية تحدد ما سننشره وما سنقيسه.",
-          points: ["محتوى وتصميم ونشر", "حملات إعلانية", "تحليلات وتقارير"],
+          title: "نجهز وننشر محتواك",
+          text: "نصمم منشورات وقصصًا، نكتب النصوص، وننشرها على حساباتك وفق جدول نتفق عليه معك.",
+          points: ["منشورات وقصص", "جدول نشر واضح", "تقرير عمّا نُشر"],
           href: "/plans/social-presence",
-          cta: "شاهد باقات التسويق",
+          cta: "كيف ندير حساباتك؟",
         },
         {
           visual: "products" as PillarKind,
           icon: PackageOpen,
-          title: "المنتجات الرقمية",
-          text: "منتجات DigZoom الجاهزة للشراء، مع خدمة مستقلة لتجهيز صفحات منتجاتك.",
-          points: ["متجر منتجات رقمية", "تجهيز صفحات البيع", "وصف وتصنيف واضح"],
+          title: "قوالب وملفات جاهزة",
+          text: "اشترِ قوالب وملفات يمكنك تنزيلها واستخدامها في عملك مباشرة.",
+          points: ["شراء وتنزيل مباشر", "وصف واضح لكل ملف", "قوالب وخطط عملية"],
           href: "/shop",
-          cta: "تصفح المنتجات الرقمية",
+          cta: "تصفح الملفات الجاهزة",
         },
       ]
     : [
         {
           visual: "website" as PillarKind,
           icon: Wrench,
-          title: "Website management",
-          text: "Maintenance, content and product updates, incident monitoring, and a clear work report.",
+          title: "We look after your website",
+          text: "We check the website, update prices and offers, and prepare product pages using your information and photos.",
           points: [
-            "Updates and maintenance",
-            "Product page management",
-            "Backups and monitoring",
+            "Issue monitoring",
+            "Product page preparation",
+            "Price and offer updates",
           ],
           href: "/plans/website-stability",
-          cta: "View website plan",
+          cta: "How we manage your site",
         },
         {
           visual: "marketing" as PillarKind,
           icon: Megaphone,
-          title: "Digital marketing",
-          text: "Content, advertising, and measurement through a monthly plan with clear deliverables.",
+          title: "We create and publish content",
+          text: "We design posts and stories, write captions, and publish on your accounts to an agreed calendar.",
           points: [
-            "Content, design, and publishing",
-            "Paid campaigns",
-            "Analytics and reporting",
+            "Posts and stories",
+            "Clear posting calendar",
+            "Publishing report",
           ],
           href: "/plans/social-presence",
-          cta: "View marketing plans",
+          cta: "How we manage your accounts",
         },
         {
           visual: "products" as PillarKind,
           icon: PackageOpen,
-          title: "Digital products",
-          text: "DigZoom products ready to buy, plus a standalone service for preparing your product pages.",
+          title: "Ready-to-use templates and files",
+          text: "Buy downloadable templates and files you can put to work right away.",
           points: [
-            "Digital product store",
-            "Sales-page preparation",
-            "Clear copy and categorization",
+            "Buy and download",
+            "Clear description for each file",
+            "Practical templates and plans",
           ],
           href: "/shop",
-          cta: "Browse digital products",
+          cta: "Browse ready-to-use files",
         },
       ];
 
   const needOptions: Array<{ id: Need; label: string; icon: typeof Wrench }> =
     ar
       ? [
-          { id: "website", label: "إدارة موقعي", icon: Wrench },
-          { id: "social", label: "إدارة منصات التواصل", icon: Megaphone },
-          { id: "complete", label: "الموقع والتسويق معًا", icon: Layers3 },
-          { id: "scale", label: "تنفيذ أكبر وحملات", icon: BarChart3 },
-          { id: "catalog", label: "تجهيز المنتجات", icon: PackageOpen },
-        ]
-      : [
-          { id: "website", label: "Manage my website", icon: Wrench },
-          { id: "social", label: "Manage social channels", icon: Megaphone },
-          { id: "complete", label: "Website and marketing", icon: Layers3 },
-          { id: "scale", label: "Scale execution and ads", icon: BarChart3 },
+          { id: "website", label: "موقعي يحتاج تحديث", icon: Wrench },
+          { id: "social", label: "حساباتي تحتاج منشورات", icon: Megaphone },
+          { id: "complete", label: "موقعي وحساباتي معًا", icon: Layers3 },
+          { id: "scale", label: "أحتاج محتوى وإعلانات أكثر", icon: BarChart3 },
           {
             id: "catalog",
-            label: "Prepare product listings",
+            label: "عندي منتجات أريد إضافتها",
+            icon: PackageOpen,
+          },
+        ]
+      : [
+          { id: "website", label: "My website needs updates", icon: Wrench },
+          { id: "social", label: "My accounts need posts", icon: Megaphone },
+          { id: "complete", label: "My website and accounts", icon: Layers3 },
+          {
+            id: "scale",
+            label: "I need more content and ads",
+            icon: BarChart3,
+          },
+          {
+            id: "catalog",
+            label: "I need to add products",
             icon: PackageOpen,
           },
         ];
@@ -137,31 +145,31 @@ export default function MarketingServices() {
     ? {
         website: {
           title: "باقة استقرار الموقع",
-          text: "الأنسب إذا كان موقعك قائمًا وتحتاج شخصًا يتولى الصيانة والتحديثات البسيطة.",
+          text: "نراقب موقعك، نحدّث العروض والمعلومات، ونجهز صفحتي منتج كل شهر.",
           price: "1,490 ر.س شهريًا",
           href: "/plans/website-stability",
         },
         social: {
           title: "باقة حضور اجتماعي",
-          text: "الأنسب إذا كان موقعك جاهزًا وتحتاج محتوى وتصميمًا ونشرًا منتظمًا على منصتين.",
+          text: "نجهز 12 منشورًا و12 قصة، وننشرها على حسابين تختارهما كل شهر.",
           price: "2,990 ر.س شهريًا",
           href: "/plans/social-presence",
         },
         complete: {
           title: "إدارة موقعك وتسويقك بالكامل",
-          text: "فريق واحد يدير موقعك و3 منصات، ويجهز حتى 20 منتجًا، وينشر المحتوى ويتابع حملة إعلانية ونتائجها شهريًا.",
+          text: "نحدّث موقعك، ندير 3 حسابات، نضيف حتى 20 منتجًا أو خدمة، ونتابع إعلانًا شهريًا.",
           price: "4,990 ر.س شهريًا",
           href: "/plans/growth-system",
         },
         scale: {
           title: "باقة الإدارة الموسعة",
-          text: "للمنشأة الجاهزة بحملات وعروض وتحتاج حجم تنفيذ أعلى عبر الموقع وثلاث منصات.",
+          text: "محتوى أكثر لثلاثة حسابات، حتى 25 منتجًا أو خدمة، وصفحة عرض وحملة إعلانية شهريًا.",
           price: "7,990 ر.س شهريًا",
           href: "/plans/digital-scale",
         },
         catalog: {
           title: "خدمة تجهيز المنتجات",
-          text: "إذا كانت مشكلتك في الصور والوصف والتصنيف وإدخال المنتجات، ابدأ بالكتالوج دون اشتراك شهري.",
+          text: "أرسل لنا صور المنتجات ومعلوماتها، ونجهز صفحاتها على موقعك دون اشتراك شهري.",
           price: "ابتداءً من 490 ر.س",
           href: "#catalog",
         },
@@ -169,31 +177,31 @@ export default function MarketingServices() {
     : {
         website: {
           title: "Website Stability",
-          text: "Best when your site is live and needs ongoing care and small content updates.",
+          text: "We monitor your site, refresh offers and details, and prepare two product pages each month.",
           price: "SAR 1,490/month",
           href: "/plans/website-stability",
         },
         social: {
           title: "Social Presence",
-          text: "Best when your website is ready and you need consistent content on two platforms.",
+          text: "We create 12 posts and 12 stories and publish them on two selected accounts every month.",
           price: "SAR 2,990/month",
           href: "/plans/social-presence",
         },
         complete: {
           title: "Website & Marketing Management",
-          text: "One team for your website, 3 platforms, up to 20 listings, regular content, and one managed advertising campaign each month.",
+          text: "We update your website, manage three accounts, add up to 20 products or services, and monitor one campaign monthly.",
           price: "SAR 4,990/month",
           href: "/plans/growth-system",
         },
         scale: {
           title: "Expanded Management",
-          text: "For a business with ready offers and campaigns that needs higher-volume execution.",
+          text: "More content for three accounts, up to 25 listings, an offer page, and one campaign each month.",
           price: "SAR 7,990/month",
           href: "/plans/digital-scale",
         },
         catalog: {
           title: "Product preparation",
-          text: "Start here when product images, copy, categories, and publishing are the main problem.",
+          text: "Send us your product photos and details; we prepare the pages on your website without a monthly subscription.",
           price: "From SAR 490",
           href: "#catalog",
         },
@@ -204,40 +212,40 @@ export default function MarketingServices() {
     ? [
         {
           image: "/images/products/content-calendar-90-days-realistic.webp",
-          title: "نظام تخطيط محتوى لمدة 90 يومًا",
-          text: "صورة واقعية لشكل خطة التسليم: تقويم منظم يوضح الموضوع والمنصة وموعد النشر وحالة التنفيذ.",
+          title: "جدول منشورات لمدة 90 يومًا",
+          text: "مثال لجدول يوضح ماذا سننشر، وفي أي حساب، ومتى، وما الذي اكتمل.",
           tag: "نموذج تسليم توضيحي",
         },
         {
           image: "/images/products/campaign-performance-realistic.webp",
-          title: "لوحة متابعة أداء الحملات",
-          text: "صورة واقعية لشكل التقرير الذي يجمع الإنفاق والنقرات والتحويلات وتكلفة النتيجة والعائد.",
+          title: "تقرير نتائج الإعلان",
+          text: "مثال لتقرير يوضح مبلغ الإعلان، وعدد النقرات والطلبات التي أمكن قياسها.",
           tag: "نموذج تسليم توضيحي",
         },
         {
           image: "/images/products/marketing-budget-roi-realistic.webp",
-          title: "متتبع الميزانية والعائد",
-          text: "صورة واقعية لملف متابعة يقارن الميزانية المخططة بالمصروف الفعلي وأداء كل قناة.",
+          title: "جدول ميزانية الإعلان ونتائجه",
+          text: "مثال لجدول يقارن المبلغ المخطط بما صُرف ونتيجة كل حساب أو إعلان.",
           tag: "نموذج تسليم توضيحي",
         },
       ]
     : [
         {
           image: "/images/products/content-calendar-90-days-realistic.webp",
-          title: "90-day content planning system",
-          text: "A realistic delivery preview showing topics, channels, publishing dates, and execution status.",
+          title: "90-day posting calendar",
+          text: "An example calendar showing what we will post, where, when, and what is complete.",
           tag: "Illustrative deliverable",
         },
         {
           image: "/images/products/campaign-performance-realistic.webp",
-          title: "Campaign performance dashboard",
-          text: "A realistic report preview combining spend, clicks, conversions, cost per result, and return.",
+          title: "Advertising results report",
+          text: "An example report showing ad spend, clicks, and the inquiries or orders we can measure.",
           tag: "Illustrative deliverable",
         },
         {
           image: "/images/products/marketing-budget-roi-realistic.webp",
-          title: "Budget and ROI tracker",
-          text: "A realistic tracking-file preview comparing planned budget, actual spend, and channel performance.",
+          title: "Ad budget and results table",
+          text: "An example table comparing planned and actual spend with each account or ad result.",
           tag: "Illustrative deliverable",
         },
       ];
@@ -245,7 +253,7 @@ export default function MarketingServices() {
   const productPacks = ar
     ? [
         ["إدخال 10 منتجات", "بيانات وصور جاهزة من العميل", "490"],
-        ["تجهيز 10 منتجات", "وصف وصور وتصنيف وSEO أساسي", "990"],
+        ["تجهيز 10 منتجات", "وصف وصور وتصنيف وعنوان واضح للبحث", "990"],
         ["تجهيز 25 منتجًا", "إعداد كامل وجاهز للنشر", "1,990"],
         ["تجهيز 50 منتجًا", "إعداد كامل للكتالوج", "3,490"],
       ]
@@ -253,7 +261,7 @@ export default function MarketingServices() {
         ["List 10 products", "Client provides ready copy and images", "490"],
         [
           "Prepare 10 products",
-          "Copy, images, categories, and basic SEO",
+          "Copy, images, categories, and a clear search title",
           "990",
         ],
         ["Prepare 25 products", "Complete publish-ready setup", "1,990"],
@@ -366,41 +374,43 @@ export default function MarketingServices() {
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-200">
               <Sparkles className="h-4 w-4" />
               {ar
-                ? "حلول رقمية بنطاق وأسعار واضحة"
-                : "Digital services with clear scope and pricing"}
+                ? "للمطاعم والمتاجر والشركات"
+                : "For restaurants, shops, and service businesses"}
             </div>
             <h1 className="text-[2.7rem] font-black leading-[1.06] tracking-[-.04em] sm:text-6xl lg:text-7xl">
-              {ar ? "إدارة المواقع والتسويق" : "Website management, marketing"}
+              {ar
+                ? "موقع يشرح عملك بوضوح."
+                : "A website that explains your business."}
               <span className="mt-2 block bg-gradient-to-r from-[#55a7ff] via-[#737cff] to-[#b165ff] bg-clip-text text-transparent">
-                {ar ? "والمنتجات الرقمية." : "and digital products."}
+                {ar ? "وحسابات تبقى نشطة." : "Accounts that stay active."}
               </span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
               {ar
-                ? "نحدد الخدمة، وما سنسلّمه، وما نحتاجه منك، والسعر قبل البدء. ثم ندير التنفيذ والنشر والمتابعة دون وعود مبهمة."
-                : "We define the service, deliverables, client inputs, and price before work begins—then manage execution, publishing, and reporting without vague promises."}
+                ? "نحدّث موقعك وأسعارك وعروضك، نعرض منتجاتك وخدماتك بطريقة واضحة، ونجهز منشورات لحساباتك. وإذا احتجت إعلانًا، نديره ضمن الباقة المناسبة."
+                : "We update your website, prices, and offers, present your products or services clearly, and create posts for your accounts. If you need ads, we can manage them in a suitable plan."}
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={() => scrollTo("services")}
                 className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-7 font-black shadow-[0_18px_50px_rgba(37,99,235,.3)] hover:bg-blue-500"
               >
-                {ar ? "اختر الخدمة المناسبة" : "Choose the right service"}
+                {ar ? "اعرف كيف نساعدك" : "See how we can help"}
                 <Arrow className="h-5 w-5" />
               </button>
               <button
                 onClick={() => scrollTo("plans")}
                 className="min-h-14 rounded-2xl border border-white/15 bg-white/[.04] px-7 font-bold hover:bg-white/[.08]"
               >
-                {ar ? "استعرض الباقات والأسعار" : "View plans and pricing"}
+                {ar ? "شاهد الباقات والأسعار" : "See plans and prices"}
               </button>
             </div>
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-400" />
                 {ar
-                  ? "لا دفع قبل اعتماد النطاق"
-                  : "No payment before scope approval"}
+                  ? "تعرف السعر وما يشمله قبل أن تدفع"
+                  : "Know the price and what is included before paying"}
               </span>
               <span className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-blue-400" />
@@ -429,13 +439,13 @@ export default function MarketingServices() {
                   <div>
                     <p className="text-sm font-black">
                       {ar
-                        ? "متابعة العمل والنتائج"
-                        : "Work and outcome tracking"}
+                        ? "نوضح ما فعلناه كل شهر"
+                        : "See what we did each month"}
                     </p>
                     <p className="mt-1 text-[10px] leading-5 text-slate-400">
                       {ar
-                        ? "نموذج توضيحي؛ تظهر بيانات مشروعك بعد ربط أدوات القياس."
-                        : "Illustrative model; your data appears after analytics setup."}
+                        ? "مثال توضيحي؛ تعرض تقاريرك أرقام مشروعك بعد تجهيز القياس."
+                        : "Illustration; your reports use your data after tracking is set up."}
                     </p>
                   </div>
                 </div>
@@ -449,17 +459,17 @@ export default function MarketingServices() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-black tracking-[.18em] text-blue-600">
-              {ar ? "ثلاث خدمات واضحة" : "THREE CLEAR SERVICES"}
+              {ar ? "كيف نساعد مشروعك" : "HOW WE HELP"}
             </p>
             <h2 className="mt-4 text-4xl font-black md:text-5xl">
               {ar
-                ? "اختر ما تحتاجه دون شراء أعمال لا تفيدك"
-                : "Choose what you need—without paying for what you do not"}
+                ? "أي جزء من عملك تريدنا أن نتولاه؟"
+                : "Which part of the work can we take off your hands?"}
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-600">
               {ar
-                ? "يمكنك الاشتراك في إدارة شهرية، طلب تجهيز منتجات فقط، أو شراء منتج رقمي جاهز."
-                : "Use monthly management, order product preparation only, or buy a ready-made digital product."}
+                ? "نستطيع متابعة موقعك، تجهيز منشورات حساباتك، أو توفير قوالب وملفات جاهزة لعملك."
+                : "We can manage your website, prepare posts for your accounts, or offer ready-to-use templates and files."}
             </p>
           </div>
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
@@ -506,12 +516,10 @@ export default function MarketingServices() {
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.08fr_.92fr] lg:px-8">
           <div>
             <p className="text-sm font-black tracking-[.18em] text-blue-700">
-              {ar ? "توصية مباشرة" : "DIRECT RECOMMENDATION"}
+              {ar ? "اختر حاجتك" : "CHOOSE YOUR NEED"}
             </p>
             <h2 className="mt-3 text-3xl font-black md:text-4xl">
-              {ar
-                ? "ما الذي تريد أن نتولاه؟"
-                : "What should we manage for you?"}
+              {ar ? "ما الذي يشغلك الآن؟" : "What do you need help with?"}
             </h2>
             <div className="mt-7 grid gap-3 sm:grid-cols-2">
               {needOptions.map(({ id, label, icon: Icon }) => (
@@ -528,7 +536,7 @@ export default function MarketingServices() {
           </div>
           <div className="flex flex-col justify-center rounded-[2rem] bg-[#07101e] p-8 text-white">
             <p className="text-sm font-black text-blue-300">
-              {ar ? "الاختيار الأنسب لك" : "BEST MATCH"}
+              {ar ? "باقة قد تناسبك" : "A PLAN TO CONSIDER"}
             </p>
             <h3 className="mt-3 text-3xl font-black">{recommendation.title}</h3>
             <p className="mt-4 leading-8 text-slate-300">
@@ -566,24 +574,22 @@ export default function MarketingServices() {
           <div className="grid gap-8 lg:grid-cols-[.78fr_1.22fr]">
             <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-sm font-black tracking-[.18em] text-blue-400">
-                {ar ? "نماذج من أعمالنا ومنتجاتنا" : "WORK AND PRODUCT SAMPLES"}
+                {ar ? "أمثلة توضيحية" : "EXAMPLES"}
               </p>
               <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
                 {ar
-                  ? "شاهد شكل العمل قبل أن تبدأ"
-                  : "See the work before you begin"}
+                  ? "شاهد أمثلة لما قد تستلمه"
+                  : "See examples of what we deliver"}
               </h2>
               <p className="mt-6 text-lg leading-8 text-slate-400">
                 {ar
-                  ? "هذه صور واقعية توضح شكل الملفات والتقارير التي يمكن تسليمها، وليست نتائج منسوبة لعملاء. دراسات الحالة الحقيقية تُنشر فقط بعد التوثيق والموافقة."
-                  : "These realistic previews show the files and reports that may be delivered; they are not attributed client results. Real case studies are published only after verification and approval."}
+                  ? "هذه أمثلة توضيحية لشكل الجداول والتقارير، وليست نتائج لعملاء. نعرض أعمال العملاء الفعلية بعد توثيقها وموافقتهم."
+                  : "These examples show the layout of reports and calendars; they are not client results. We share real client work only after verification and permission."}
               </p>
               <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                 <TrustItem
                   text={
-                    ar
-                      ? "نطاق وتسليمات مكتوبة"
-                      : "Written scope and deliverables"
+                    ar ? "نعرض لك المهام كتابةً" : "Your tasks are written down"
                   }
                 />
                 <TrustItem
@@ -603,8 +609,8 @@ export default function MarketingServices() {
                 <TrustItem
                   text={
                     ar
-                      ? "أي تكلفة إضافية تُعتمد قبل التنفيذ"
-                      : "Extra costs require approval"
+                      ? "نخبرك بأي تكلفة إضافية قبل العمل"
+                      : "Extra costs are agreed before work"
                   }
                 />
               </div>
@@ -646,13 +652,13 @@ export default function MarketingServices() {
             </p>
             <h2 className="mt-4 text-4xl font-black md:text-5xl">
               {ar
-                ? "أربع باقات، والفرق بينها واضح"
-                : "Four plans with clear differences"}
+                ? "اختر الباقة المناسبة لعملك"
+                : "Choose a plan for your business"}
             </h2>
             <p className="mt-5 text-lg leading-8 text-slate-600">
               {ar
-                ? "البطاقات تعرض المختصر فقط. صفحة كل باقة تشرح طريقة حساب المنشورات والقصص، وما نحتاجه منك، وما لا يشمله السعر."
-                : "Cards show the essentials. Each plan page explains counting, client inputs, and exclusions."}
+                ? "افتح أي باقة لترى السعر، وما ننفذه كل شهر، وما نحتاجه منك، وما لا يشمله الاشتراك."
+                : "Open any plan to see the price, monthly work, what we need from you, and what is not included."}
             </p>
           </div>
           <div className="mx-auto mt-12 grid max-w-6xl gap-6 lg:grid-cols-2">
@@ -729,7 +735,7 @@ export default function MarketingServices() {
                     to={`/plans/${plan.id}`}
                     className={`mt-7 inline-flex min-h-13 items-center justify-center gap-2 rounded-xl px-6 font-black ${popular ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-slate-950 text-white hover:bg-slate-800"}`}
                   >
-                    {ar ? "الشرح الكامل وطلب الباقة" : "Full details and order"}
+                    {ar ? "شاهد تفاصيل الباقة" : "See plan details"}
                     <Arrow className="h-5 w-5" />
                   </Link>
                 </article>
@@ -767,13 +773,13 @@ export default function MarketingServices() {
             </p>
             <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
               {ar
-                ? "نحوّل ملفاتك وصورك إلى صفحات منتجات جاهزة"
-                : "Turn files and images into publish-ready product pages"}
+                ? "نضيف منتجاتك إلى موقعك"
+                : "We add products to your website"}
             </h2>
             <p className="mt-6 text-lg leading-8 text-slate-400">
               {ar
-                ? "نرتب البيانات، نكتب الوصف، نجهز الصور، ننظم المواصفات والتصنيفات، ونضيف أساسيات الظهور في البحث."
-                : "We organize data, write copy, prepare images, structure specifications and categories, and add basic search optimization."}
+                ? "أرسل صور منتجاتك وأسعارها. نكتب وصفًا واضحًا، نرتب الصور والمعلومات، ونجهز الصفحات للنشر على موقعك."
+                : "Send your product photos and prices. We write clear descriptions, organize the details and images, and prepare pages for your website."}
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {productPacks.map(([name, text, price]) => (
@@ -802,7 +808,9 @@ export default function MarketingServices() {
               onClick={() => scrollTo("contact")}
               className="mt-7 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-7 py-4 font-black hover:bg-blue-500"
             >
-              {ar ? "أرسل الكتالوج للتقييم" : "Send your catalog for review"}
+              {ar
+                ? "أرسل منتجاتك لنحدد التكلفة"
+                : "Send your products for a quote"}
               <Arrow className="h-5 w-5" />
             </button>
           </div>
@@ -831,8 +839,8 @@ export default function MarketingServices() {
               </h2>
               <p className="mt-4 leading-8 text-slate-600">
                 {ar
-                  ? "قوالب وأدلة وأدوات رقمية مع وصف واضح لما ستحصل عليه وشروط الاستخدام."
-                  : "Templates, guides, and tools with clear deliverables and usage terms."}
+                  ? "قوالب وملفات تشتريها وتحملها لتستخدمها بنفسك، مع شرح محتوى كل ملف قبل الدفع."
+                  : "Buy and download templates and files you can use yourself, with a clear description before payment."}
               </p>
               <Link
                 to="/shop"
@@ -861,8 +869,8 @@ export default function MarketingServices() {
               </h2>
               <p className="mt-4 leading-8 text-slate-600">
                 {ar
-                  ? "نرتب البيانات ونكتب الوصف وننظم الصور والمواصفات والتصنيفات، ثم نسلّمك صفحات جاهزة للنشر."
-                  : "We organize the data, write the copy, prepare images, specifications, and categories, then deliver publish-ready pages."}
+                  ? "نكتب وصف المنتج، نرتب صوره وسعره ومعلوماته، ثم نضيفه إلى موقعك بعد اعتمادك."
+                  : "We write product descriptions and organize photos, prices, and details, then add approved pages to your website."}
               </p>
               <button
                 onClick={() => scrollTo("catalog")}
@@ -887,13 +895,13 @@ export default function MarketingServices() {
             </p>
             <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
               {ar
-                ? "أرسل المطلوب وسنؤكد لك الخدمة المناسبة"
-                : "Tell us what you need and we will confirm the right service"}
+                ? "قل لنا ما تحتاجه لمشروعك"
+                : "Tell us what your business needs"}
             </h2>
             <p className="mt-6 text-lg leading-8 text-slate-400">
               {ar
-                ? "هذه ليست صفحة دفع. نراجع موقعك أو حسابك، نثبت النطاق والتسليمات، ثم نرسل لك الخطوة التالية."
-                : "This is not a payment page. We review your site or account, confirm scope and deliverables, then send the next step."}
+                ? "أرسل رابط موقعك أو حسابك وما تحتاجه. نراجع طلبك ونوضح ما سنفعله والسعر قبل أن تبدأ؛ إرسال النموذج لا يتطلب دفعًا."
+                : "Share your website or account and what you need. We explain the work and price before you start; sending this form requires no payment."}
             </p>
             <div className="mt-8 space-y-3">
               <TrustItem
@@ -1028,7 +1036,7 @@ export default function MarketingServices() {
                 </>
               ) : (
                 <>
-                  {ar ? "إرسال الطلب للمراجعة" : "Send request for review"}
+                  {ar ? "أرسل طلبي" : "Send my request"}
                   <Arrow className="h-5 w-5" />
                 </>
               )}
