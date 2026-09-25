@@ -16,7 +16,7 @@ import {
   ChevronUp,
   Loader2,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { fetchCatalog } from "@/lib/catalog";
 import type { Product } from "@/types/database";
 import { useLanguage } from "@/hooks/useLanguage";
 import { productTitle, productLongDescription } from "@/lib/i18n";
@@ -58,8 +58,9 @@ export default function ProductDetail() {
   const pTitle = product ? productTitle(product, lang) : "";
   const pLongDesc = product ? productLongDescription(product, lang) : "";
 
-  // Fetch product from Supabase
+  // Refresh the product from the same-origin public catalog.
   useEffect(() => {
+    let active = true;
     const fetchProduct = async () => {
       const cached = cachedProduct(Number(id));
       if (cached) {
@@ -78,31 +79,22 @@ export default function ProductDetail() {
       } else {
         setLoading(true);
       }
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", Number(id))
-        .eq("is_active", true)
-        .single();
-
-      if (!error && data) {
-        setProduct(data);
-        // Fetch related products (same category)
-        if (data.category_id) {
-          const { data: rel } = await supabase
-            .from("products")
-            .select("*")
-            .eq("category_id", data.category_id)
-            .eq("is_active", true)
-            .neq("id", data.id)
-            .limit(4);
-          setRelated(rel || []);
+      try {
+        const { products } = await fetchCatalog();
+        if (!active) return;
+        const data = products.find(item => item.id === Number(id));
+        if (data) {
+          setProduct(data);
+          setRelated(products.filter(item => item.id !== data.id && item.category_id === data.category_id).slice(0, 4));
         }
+      } catch {
+        // Keep an already cached product available during a temporary outage.
       }
-      setLoading(false);
+      if (active) setLoading(false);
     };
 
     fetchProduct();
+    return () => { active = false; };
   }, [id]);
 
   /* Show sticky bar after scrolling past the main CTA */

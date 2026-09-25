@@ -1,30 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Product, Category } from "@/types/database";
+import { fetchCatalog } from "@/lib/catalog";
 import {
   readStorefrontCache,
   writeStorefrontCache,
 } from "@/lib/storefrontCache";
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-
-const headers = {
-  apikey: ANON_KEY,
-  Authorization: `Bearer ${ANON_KEY}`,
-};
-
-async function apiGet<T>(path: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
-      headers,
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
-}
 
 interface UseSupabaseProductsReturn {
   products: Product[];
@@ -60,20 +40,13 @@ export function useSupabaseProducts(): UseSupabaseProductsReturn {
   const fetchProducts = useCallback(async () => {
     if (!readStorefrontCache()) setLoading(true);
     setError(null);
-    const [productData, categoryData] = await Promise.all([
-      apiGet<Product[]>("/products?select=*&is_active=eq.true&order=id"),
-      apiGet<Category[]>(
-        "/categories?select=*&is_active=eq.true&order=sort_order",
-      ),
-    ]);
-    if (productData) {
-      const nextCategories =
-        categoryData ?? readStorefrontCache()?.categories ?? [];
+    try {
+      const { products: productData, categories: categoryData } = await fetchCatalog();
       setProducts(productData);
-      setCategories(nextCategories);
-      writeStorefrontCache(productData, nextCategories);
-    } else if (!readStorefrontCache()) {
-      setError("Failed to load products");
+      setCategories(categoryData);
+      writeStorefrontCache(productData, categoryData);
+    } catch {
+      if (!readStorefrontCache()) setError("Catalog unavailable");
     }
     setLoading(false);
   }, []);
@@ -96,22 +69,26 @@ export function useSupabaseProducts(): UseSupabaseProductsReturn {
     async (id: number): Promise<Product | null> => {
       const cached = products.find((p) => p.id === id);
       if (cached) return cached;
-      const data = await apiGet<Product[]>(
-        `/products?select=*&id=eq.${id}&is_active=eq.true&limit=1`,
-      );
-      return data?.[0] || null;
+      try {
+        return (await fetchCatalog()).products.find((p) => p.id === id) ?? null;
+      } catch {
+        return null;
+      }
     },
     [products],
   );
 
   const getProductBySlug = useCallback(
     async (slug: string): Promise<Product | null> => {
-      const data = await apiGet<Product[]>(
-        `/products?select=*&slug=eq.${slug}&is_active=eq.true&limit=1`,
-      );
-      return data?.[0] || null;
+      const cached = products.find((p) => p.slug === slug);
+      if (cached) return cached;
+      try {
+        return (await fetchCatalog()).products.find((p) => p.slug === slug) ?? null;
+      } catch {
+        return null;
+      }
     },
-    [],
+    [products],
   );
 
   const filteredProducts = useMemo(() => {

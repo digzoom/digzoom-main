@@ -42,6 +42,7 @@ export default function Shop() {
     error,
     filterByCategory,
     searchProducts,
+    refresh,
   } = useSupabaseProducts();
 
   // Sync URL category with Supabase filter
@@ -257,9 +258,11 @@ export default function Shop() {
           <h2 className="text-xl font-bold text-white mb-2">
             {lang === "ar" ? "خطأ في الاتصال" : "Connection Error"}
           </h2>
-          <p className="text-gray-400 text-sm mb-4">{error}</p>
+          <p className="text-gray-400 text-sm mb-4">
+            {lang === "ar" ? "تعذر تحميل المنتجات مؤقتًا. حاول مرة أخرى." : "Products could not be loaded. Please try again."}
+          </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={refresh}
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             {lang === "ar" ? "إعادة المحاولة" : "Retry"}
