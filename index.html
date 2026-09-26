@@ -86,6 +86,24 @@
   </head>
   <body class="bg-[#0a0a0f] text-white antialiased">
     <div id="root"></div>
+    <script>
+      // A tab left open across deployments may request a deleted Vite chunk.
+      // Reload once to pick up the new HTML and asset manifest.
+      function recoverStaleAssets(event) {
+        var message = String((event && (event.message || (event.payload && event.payload.message) || (event.reason && event.reason.message))) || '');
+        if (event.type !== 'vite:preloadError' && !/dynamically imported module|valid JavaScript MIME type|Failed to fetch module script/i.test(message)) return;
+        if (event.preventDefault) event.preventDefault();
+        try {
+          var last = Number(sessionStorage.getItem('digzoom-asset-retry') || 0);
+          if (Date.now() - last < 60000) return;
+          sessionStorage.setItem('digzoom-asset-retry', String(Date.now()));
+        } catch (_) { return; }
+        window.location.reload();
+      }
+      window.addEventListener('vite:preloadError', recoverStaleAssets);
+      window.addEventListener('error', recoverStaleAssets);
+      window.addEventListener('unhandledrejection', recoverStaleAssets);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
