@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createRouter, publicQuery, authedQuery, adminQuery } from "./trpc";
 import { getSupabaseAdmin } from "./supabase-admin";
 import { confirmPaidOrder, sendOrderEmail } from "./order-confirmation";
+import { randomUUID } from "node:crypto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function admin(): any { return getSupabaseAdmin(); }
@@ -227,18 +228,18 @@ export const adminRouter = createRouter({
   createOrder: publicQuery
     .input(
       z.object({
-        customer_name: z.string().min(1),
+        customer_name: z.string().trim().min(1).max(100),
         customer_email: z.string().email(),
-        customer_phone: z.string().optional(),
+        customer_phone: z.string().max(30).optional(),
         items: z.array(
           z.object({
             product_id: z.number(),
-            quantity: z.number().min(1),
+            quantity: z.number().int().min(1).max(100),
             price: z.number().min(0),
-            title: z.string(),
+            title: z.string().max(200),
             product_type: z.string().default("digital_download"),
           })
-        ),
+        ).min(1).max(20),
         subtotal: z.number().min(0),
         tax_amount: z.number().min(0).default(0),
         total_amount: z.number().min(0),
@@ -256,6 +257,13 @@ export const adminRouter = createRouter({
         throw new Error("Checkout is temporarily unavailable");
       }
 
+      const { count: recentOrders, error: limitError } = await admin().from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("customer_email", input.customer_email.trim().toLowerCase())
+        .gte("created_at", new Date(Date.now() - 60 * 60 * 1000).toISOString());
+      if (limitError) throw new Error("Unable to check order availability");
+      if ((recentOrders || 0) >= 5) throw new Error("Too many checkout attempts. Try again later");
+
       // Never trust prices, titles, product state, or totals supplied by the
       // browser. Rebuild the order from active database products.
       const { validatedItems, subtotal } = await loadValidatedCart(input.items);
@@ -266,7 +274,7 @@ export const adminRouter = createRouter({
       const taxAmount = 0;
       const totalAmount = coupon.totalAmount + taxAmount;
 
-      const orderId = `DZ-${Date.now().toString(36).toUpperCase()}`;
+      const orderId = `DZ-${randomUUID()}`;
 
       // 1. Insert order
       const { error: orderError } = await admin()
@@ -346,10 +354,20 @@ export const adminRouter = createRouter({
         }
         const session = await createStripeCheckout(stripeParams);
 
-        await admin().from("orders").update({
+        const { data: savedOrder, error: saveError } = await admin().from("orders").update({
           payment_method: "stripe",
           payment_payload: { checkout_session_id: session.id },
-        }).eq("id", orderId);
+        }).eq("id", orderId).eq("status", "pending").select("id").single();
+        if (saveError || !savedOrder) {
+          try {
+            await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(session.id)}/expire`, {
+              method: "POST", headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+            });
+          } catch (expireError) {
+            console.error("[createOrder] unable to expire orphaned session", expireError);
+          }
+          throw new Error("Unable to save checkout session");
+        }
 
         return { orderId, status: "pending", checkoutUrl: session.url };
       } catch (error: any) {
