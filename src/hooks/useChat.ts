@@ -23,37 +23,37 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['شراء', 'اشتري', 'أشتري', 'شرى', 'اشتر', 'طلب', 'اطلب', 'أطلب', 'تسوق', 'أشتري', 'آخذ', 'أخذ'],
-      response: 'يمكنك الآن تصفح المنتجات وفتح صفحة كل منتج للاطلاع على الصور والمزايا. 🛍️\n\nالدفع والشراء مقفلان مؤقتاً إلى أن تكتمل بوابة الدفع والتسليم الآمن. لن يطلب منك الموقع دفع أي مبلغ حالياً، وسنحدّث هذه الرسالة عند الإطلاق.',
+      response: 'يمكنك الآن تصفح المنتجات وفتح صفحة كل منتج للاطلاع على الصور والمزايا. 🛍️\n\nأضف المنتج إلى السلة، ثم أدخل اسمك وبريدك ورقم جوالك في صفحة الدفع. يمكن الشراء دون إنشاء حساب، وستنتقل بعدها إلى بوابة Stripe لإكمال الدفع.',
       suggestions: ['طرق الدفع', 'كيف أحمل المنتج؟', 'المنتجات المتوفرة']
     },
     {
       keywords: ['دفع', 'الدفع', 'فيزا', 'ماستر', 'مدى', 'بطاقة', 'أبل باي', 'جوجل باي', 'سترايب', 'حوالة', 'تحويل'],
-      response: 'بوابة الدفع قيد التجهيز حالياً، لذلك لا نقبل مدفوعات من الموقع في هذه المرحلة. 🔒\n\nلن نعرض وسيلة دفع قبل ربطها واختبارها رسمياً. للاستفسار تواصل معنا على info@digzoom.com.',
+      response: 'الشراء الإلكتروني متاح عبر Stripe. تظهر طرق الدفع المتاحة لك في صفحة الدفع الآمنة بعد مراجعة طلبك؛ لا ندخل بيانات البطاقة داخل موقعنا.',
       suggestions: ['الأسعار', 'كيف أشتري؟', 'ضمان الاسترجاع']
     },
     {
       keywords: ['تحميل', 'احمل', 'أحمل', 'الملف', 'الملفات', 'ينزل', 'نزل', 'تنزيل', '_DOWNLOAD_', 'download', 'فتح', 'وصل'],
-      response: 'ملفات المنتجات محفوظة بشكل خاص، وسيُفعّل رابط التنزيل الآمن بعد تشغيل الدفع والتحقق من الطلب. 📥\n\nالتنزيل غير متاح قبل إتمام ربط بوابة الدفع، ولا توجد روابط ملفات عامة.',
+      response: 'ملفات المنتجات محفوظة بشكل خاص. بعد تأكيد الدفع، افتح صفحة تأكيد الطلب لتحصل على رابط تنزيل آمن؛ إذا اشتريت بحسابك يمكنك الرجوع إلى «طلباتي». لا توجد روابط ملفات عامة.',
       suggestions: ['مشكلة في التحميل', 'كيف أشتري؟', 'تواصل مع الدعم']
     },
     {
       keywords: ['استرجاع', 'رجع', 'استرداد', 'فلوس', 'للأسف', 'ما عجبني', 'رد', 'المنتج ما يشتغل', 'عطلان', 'مكسور', 'ما يفتح'],
-      response: 'إذا واجهتك مشكلة بعد الإطلاق، تواصل معنا من صفحة "اتصل بنا" أو عبر info@digzoom.com. تُراجع طلبات الاسترجاع وفق سياسة الاسترجاع المنشورة وشروط المنتجات الرقمية.',
+      response: 'إذا واجهتك مشكلة بعد الشراء، تواصل معنا من صفحة "اتصل بنا" أو عبر info@digzoom.com. تُراجع طلبات الاسترجاع وفق سياسة الاسترجاع المنشورة وشروط المنتجات الرقمية.',
       suggestions: ['تواصل مع الدعم', 'سياسة الاسترجاع', 'المنتج ما يشتغل']
     },
     {
       keywords: ['منتج', 'منتجات', 'كتب', 'قوالب', 'فيديو', 'صور', 'خطوط', 'كورسات', 'تصاميم', 'PLR', 'مكتبة', 'عندكم'],
-      response: 'المتجر يعرض حالياً 10 قوالب Excel احترافية أصلية تشمل المحاسبة والمبيعات والمخزون والميزانيات وإدارة المشاريع. 📊\n\nكل منتج يتضمن بيانات نموذجية وصيغاً ولوحة معلومات وتعليمات بالعربية والإنجليزية.',
+      response: 'المتجر يعرض حالياً 10 قوالب Excel للتسويق والمحتوى والميزانية والمبيعات والتخطيط. 📊\n\nكل منتج يتضمن بيانات نموذجية وصيغاً ولوحة معلومات وتعليمات بالعربية والإنجليزية.',
       suggestions: ['المنتجات الأكثر مبيعاً', 'كيف أشتري؟', 'الاشتراكات']
     },
     {
       keywords: ['سعر', 'أسعار', 'السعر', 'بكم', 'كام', 'رخيص', 'غالي', 'تكلفة', 'درهم', 'دولار', 'ريال', 'خصم', 'عرض', 'تخفيض'],
-      response: 'تظهر الأسعار الحالية في صفحة كل منتج بالريال السعودي. لا توجد خصومات دائمة أو اشتراكات مفعّلة حالياً، والدفع مقفل إلى حين اكتمال التجهيز.',
+      response: 'تظهر أسعار المنتجات بالريال السعودي في المتجر. يمكنك إدخال كوبون في صفحة الدفع؛ تأكد من المبلغ النهائي قبل الانتقال إلى Stripe.',
       suggestions: ['الاشتراكات', 'كيف أشتري؟', 'طرق الدفع']
     },
     {
       keywords: ['اشتراك', 'اشتراكات', 'شهري', 'سنوي', 'باقة', 'خطة', 'Subscribe', 'subscription', 'pro', 'أعمال', 'أساسي'],
-      response: 'لا توجد خطط اشتراك متاحة حالياً. المتجر يجهّز بيع المنتجات الفردية أولاً، ولن نعلن أي اشتراك قبل تفعيله واختباره رسمياً.',
+      response: 'منتجات المتجر تُشترى مرة واحدة. توجد باقات شهرية لخدمات الموقع والمحتوى؛ دفع الشهر الأول لا ينشئ تجديداً تلقائياً.',
       suggestions: ['كيف أشترك؟', 'المنتجات المتوفرة', 'طرق الدفع']
     },
     {
@@ -90,37 +90,37 @@ const botResponses: Record<string, ChatResponse[]> = {
     },
     {
       keywords: ['buy', 'purchase', 'order', 'shop', 'get', 'how to buy', 'checkout', 'cart', 'add to cart'],
-      response: 'You can browse the catalog and open each product page to review its previews and features. 🛍️\n\nCheckout is temporarily locked while payment and secure delivery are being finalized. The site will not ask you to pay at this stage.',
+      response: 'You can browse the catalog and open each product page to review its previews and features. 🛍️\n\nAdd the product to your cart and enter your name, email, and phone at checkout. No account is required; Stripe handles secure payment.',
       suggestions: ['Payment methods', 'How to download?', 'Available products']
     },
     {
       keywords: ['pay', 'payment', 'visa', 'mastercard', 'mada', 'card', 'apple pay', 'google pay', 'stripe', 'credit card'],
-      response: 'The payment gateway is still being configured, so the website is not accepting payments yet. 🔒\n\nNo payment method will be advertised before it is officially connected and tested. Contact info@digzoom.com for questions.',
+      response: 'Online checkout is available through Stripe. Available payment methods appear on the secure payment page after you review your order.',
       suggestions: ['Pricing', 'How to buy?', 'Refund policy']
     },
     {
       keywords: ['download', 'get file', 'files', 'extract', 'save', 'link'],
-      response: 'Product files are stored privately. Secure download links will be enabled only after payment integration and order verification are complete. 📥\n\nThere are no public file links.',
+      response: 'Product files are private. After payment is verified, open the order confirmation page for a secure download. Signed-in purchases also appear under My Orders.',
       suggestions: ['Download issue', 'How to buy?', 'Contact support']
     },
     {
       keywords: ['refund', 'return', 'money back', 'not working', 'broken', 'issue', 'problem', 'doesn\'t work'],
-      response: 'If you encounter an issue after launch, contact us through the Contact page or at info@digzoom.com. Refund requests are reviewed under the published refund policy and its terms for digital products.',
+      response: 'If you encounter an issue after purchase, contact us through the Contact page or at info@digzoom.com. Refund requests are reviewed under the published refund policy and its terms for digital products.',
       suggestions: ['Contact support', 'Refund policy', 'Download issue']
     },
     {
       keywords: ['products', 'product', 'books', 'templates', 'videos', 'images', 'fonts', 'courses', 'designs', 'plr', 'library', 'what do you have'],
-      response: 'The store currently features 10 original professional Excel templates covering accounting, sales, inventory, budgeting, and project management. 📊\n\nEach includes sample data, formulas, a dashboard, and Arabic/English instructions.',
+      response: 'The store currently features 10 Excel templates for marketing, content planning, budgeting, sales, and strategy. 📊\n\nEach includes sample data, formulas, a dashboard, and Arabic/English instructions.',
       suggestions: ['Best sellers', 'How to buy?', 'Subscriptions']
     },
     {
       keywords: ['price', 'prices', 'cost', 'how much', 'cheap', 'expensive', 'discount', 'offer', 'sale', 'deal', 'promo'],
-      response: 'Current prices are shown on each product page in SAR. There are no permanent discounts or active subscriptions, and checkout remains locked until setup is complete.',
+      response: 'Prices appear in SAR. You can apply a coupon at checkout; review the final amount before continuing to Stripe.',
       suggestions: ['Subscriptions', 'How to buy?', 'Payment methods']
     },
     {
       keywords: ['subscription', 'subscribe', 'monthly', 'yearly', 'plan', 'pro', 'business', 'basic'],
-      response: 'No subscription plans are available at this time. The store is preparing individual product sales first, and no subscription will be announced before it is live and tested.',
+      response: 'Store products are one-time purchases. Monthly website and content service plans are available; paying for the first month does not renew automatically.',
       suggestions: ['How to subscribe?', 'Available products', 'Payment methods']
     },
     {
