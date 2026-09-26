@@ -137,7 +137,7 @@ async function getCouponDiscount(code: string | undefined, subtotal: number) {
   };
 }
 
-// Helper: log admin activity (non-blocking, swallows errors)
+// Record admin changes using the real audit table columns and enum values.
 async function logActivity(data: {
   adminEmail: string;
   adminId?: string;
@@ -149,16 +149,26 @@ async function logActivity(data: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newValue?: any;
 }) {
+  if (!data.adminId) return;
+  const action = ({
+    create_product: "product_created",
+    update_product: "product_updated",
+    toggle_product: data.newValue?.in_stock !== undefined ? "product_toggled_stock" : "product_toggled_active",
+    delete_product: "product_deleted",
+    upload_image: "product_updated",
+    create_coupon: "coupon_created",
+  } as Record<string, string>)[data.action];
+  if (!action) return;
   try {
-    await admin().from("admin_audit_logs").insert({
-      admin_email: data.adminEmail,
+    const { error } = await admin().from("admin_audit_logs").insert({
       admin_id: data.adminId,
-      action: data.action,
-      entity_id: data.productId,
-      entity_type: data.productTitle,
-      old_value: data.oldValue,
-      new_value: data.newValue,
+      action,
+      entity_id: String(data.productId ?? data.newValue?.code ?? data.newValue?.filename ?? "unknown"),
+      entity_type: data.action.includes("coupon") ? "coupon" : data.action === "upload_image" ? "product_image" : "product",
+      old_values: data.oldValue ?? null,
+      new_values: { ...(data.newValue ?? {}), admin_email: data.adminEmail, product_title: data.productTitle },
     });
+    if (error) throw error;
   } catch (e: any) {
     console.error("[logActivity] failed:", e.message);
   }
@@ -634,7 +644,7 @@ export const adminRouter = createRouter({
         throw new Error(error.message);
       }
 
-      logActivity({
+      await logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "create_product",
@@ -705,7 +715,7 @@ export const adminRouter = createRouter({
         throw new Error(error.message);
       }
 
-      logActivity({
+      await logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "update_product",
@@ -740,7 +750,7 @@ export const adminRouter = createRouter({
         throw new Error(error.message);
       }
 
-      logActivity({
+      await logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "toggle_product",
@@ -773,7 +783,7 @@ export const adminRouter = createRouter({
         throw new Error(error.message);
       }
 
-      logActivity({
+      await logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "delete_product",
@@ -969,7 +979,7 @@ export const adminRouter = createRouter({
         .from("product-images")
         .getPublicUrl(safeFilename);
 
-      logActivity({
+      await logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "upload_image",
@@ -1113,9 +1123,9 @@ export const adminRouter = createRouter({
         .limit(10);
       latestActivity = (data ?? []).map((a: any) => ({
         ...a,
-        admin_email: a.admin_email,
+        admin_email: a.new_values?.admin_email || "",
         action: a.action,
-        product_title: a.entity_type,
+        product_title: a.new_values?.product_title || a.entity_type,
         created_at: a.created_at,
       }));
     } catch (e: any) {
@@ -1154,9 +1164,9 @@ export const adminRouter = createRouter({
       }
       return (data ?? []).map((a: any) => ({
         ...a,
-        admin_email: a.admin_email,
+        admin_email: a.new_values?.admin_email || "",
         action: a.action,
-        product_title: a.entity_type,
+        product_title: a.new_values?.product_title || a.entity_type,
         created_at: a.created_at,
       }));
     }),
@@ -1259,7 +1269,7 @@ export const adminRouter = createRouter({
         .single();
 
       if (error) throw new Error(error.message);
-      logActivity({
+      await logActivity({
         adminEmail: user?.email || "unknown",
         adminId: user?.id,
         action: "create_coupon",
