@@ -192,8 +192,8 @@ export default function ServicePlanDetail() {
           </h2>
           <p className="mx-auto mt-4 max-w-2xl leading-8 text-slate-400">
             {ar
-              ? "راجع بيانات المنشأة، وافق على نطاق العمل، ثم انتقل إلى الدفع الآمن عند تفعيل البوابة."
-              : "Review your business details, accept the scope, then continue to secure payment once the gateway is enabled."}
+              ? "راجع بيانات المنشأة، وافق على نطاق العمل، ثم انتقل إلى الدفع الآمن."
+              : "Review your business details, accept the scope, then continue to secure payment."}
           </p>
           <Link
             to={`/service-checkout/${plan.id}`}

@@ -10,8 +10,8 @@ export default function DeliveryPolicy() {
       icon: <Download className="w-6 h-6 text-blue-400" />,
       title: isAr ? 'تسليم بعد تأكيد الدفع' : 'Delivery after payment confirmation',
       text: isAr
-        ? 'جميع منتجاتنا رقمية 100٪. بعد إطلاق بوابة الدفع وتأكيد العملية بنجاح، يظهر المنتج المؤهل في حسابك للتنزيل الآمن. لا توجد منتجات فيزيائية يتم شحنها.'
-        : 'All products are 100% digital. Once checkout launches and payment is verified, eligible products appear in your account for secure download. No physical goods are shipped.',
+        ? 'منتجات المتجر رقمية. بعد تأكيد الدفع، تحصل على رابط تنزيل آمن في صفحة تأكيد الطلب، وتظهر مشتريات الحساب في «طلباتي». لا تُشحن منتجات المتجر ماديًا.'
+        : 'Store products are digital. After payment is verified, a secure download is available on the order confirmation page. Account purchases also appear in My Orders. Store products are not physically shipped.',
     },
     {
       icon: <Clock className="w-6 h-6 text-purple-400" />,
@@ -24,8 +24,8 @@ export default function DeliveryPolicy() {
       icon: <Package className="w-6 h-6 text-emerald-400" />,
       title: isAr ? 'طريقة التسليم' : 'Delivery Method',
       text: isAr
-        ? 'يتم التسليم من قسم «طلباتي» داخل الحساب. الرابط مؤقت لمدة دقيقتين، ويسمح لكل منتج بخمس محاولات تنزيل ما لم يذكر وصفه خلاف ذلك.'
-        : 'Delivery is available under “My Orders” in your account. Each link expires after two minutes, with five download attempts per product unless its description states otherwise.',
+        ? 'يمكنك التنزيل من صفحة تأكيد الطلب دون إنشاء حساب، أو من «طلباتي» إذا اشتريت بحسابك. الرابط مؤقت لمدة دقيقتين، ويسمح لكل منتج بخمس محاولات تنزيل ما لم يذكر وصفه خلاف ذلك.'
+        : 'Download from the order confirmation page without creating an account, or from My Orders if you purchased while signed in. Each link expires after two minutes, with five download attempts per product unless stated otherwise.',
     },
     {
       icon: <Mail className="w-6 h-6 text-amber-400" />,

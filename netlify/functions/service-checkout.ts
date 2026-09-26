@@ -84,10 +84,10 @@ export const handler: Handler = async event => {
     });
     const session = await response.json() as { id?: string; url?: string; error?: { message?: string } };
     if (!response.ok || !session.id || !session.url) throw new Error(session.error?.message || "Stripe checkout failed");
-    const { error: saveError } = await database.from("orders")
+    const { data: savedOrder, error: saveError } = await database.from("orders")
       .update({ payment_method: "stripe", payment_payload: { checkout_session_id: session.id } })
-      .eq("id", orderId).eq("status", "pending");
-    if (saveError) {
+      .eq("id", orderId).eq("status", "pending").select("id").single();
+    if (saveError || !savedOrder) {
       await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(session.id)}/expire`, {
         method: "POST", headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
       }).catch(expireError => console.error("[service-checkout] session expiry failed", expireError));

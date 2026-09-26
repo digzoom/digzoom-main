@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   ShoppingCart,
   Check,
@@ -21,6 +21,9 @@ import type { Product } from "@/types/database";
 import { useLanguage } from "@/hooks/useLanguage";
 import { productTitle, productLongDescription } from "@/lib/i18n";
 import { cachedProduct, readStorefrontCache } from "@/lib/storefrontCache";
+import { useCart } from "@/hooks/useCart";
+
+const CHECKOUT_ENABLED = import.meta.env.VITE_CHECKOUT_ENABLED === "true";
 
 /* ── Trust badges ── */
 const getTrustBadges = (hasDeliveryAsset: boolean) => [
@@ -46,6 +49,8 @@ const getTrustBadges = (hasDeliveryAsset: boolean) => [
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { lang, t } = useLanguage();
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +67,8 @@ export default function ProductDetail() {
   useEffect(() => {
     let active = true;
     const fetchProduct = async () => {
+      setProduct(null);
+      setRelated([]);
       const cached = cachedProduct(Number(id));
       if (cached) {
         setProduct(cached);
@@ -187,6 +194,12 @@ export default function ProductDetail() {
   const trustBadges = getTrustBadges(
     Boolean(product.download_url || product.storage_path),
   );
+  const requestProduct = () => {
+    if (!CHECKOUT_ENABLED) return navigate(`/contact?product=${product.id}`);
+    if (!product.in_stock) return;
+    addToCart(product as unknown as Parameters<typeof addToCart>[0]);
+    navigate("/cart");
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pt-20 md:pt-24 pb-24 md:pb-16">
@@ -336,24 +349,26 @@ export default function ProductDetail() {
               id="product-cta-section"
               className="flex flex-col sm:flex-row gap-2 md:gap-3"
             >
-              <Link
-                to={`/contact?product=${product.id}`}
+              <button
+                type="button"
+                onClick={requestProduct}
+                disabled={CHECKOUT_ENABLED && !product.in_stock}
                 className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3.5 text-sm font-bold text-white transition hover:from-blue-600 hover:to-purple-700 md:px-8 md:py-4 md:text-base"
               >
                 <ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
-                {lang === "ar"
-                  ? "اطلب المنتج وسنؤكد طريقة الدفع"
-                  : "Request the product and confirm payment"}
-              </Link>
+                {CHECKOUT_ENABLED
+                  ? (lang === "ar" ? "أضف للسلة وأكمل الشراء" : "Add to cart and checkout")
+                  : (lang === "ar" ? "استفسر عن المنتج" : "Ask about this product")}
+              </button>
             </div>
 
             {/* Guarantee */}
             <div className="flex items-center gap-2 mt-4 md:mt-5 text-gray-500 text-xs md:text-sm">
               <ShieldCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
               <span>
-                {lang === "ar"
-                  ? "الشراء الإلكتروني سيُفعّل بعد اعتماد بوابة الدفع. لا يتم تحصيل أي مبلغ من هذه الصفحة الآن."
-                  : "Online checkout will open after payment approval. No payment is collected on this page yet."}
+                {CHECKOUT_ENABLED
+                  ? (lang === "ar" ? "الدفع يتم عبر بوابة Stripe الآمنة بعد مراجعة السلة." : "Payment is completed through secure Stripe checkout after reviewing your cart.")
+                  : (lang === "ar" ? "يمكنك الاستفسار عن المنتج عبر نموذج التواصل." : "You can ask about this product through the contact form.")}
               </span>
             </div>
           </div>
@@ -427,13 +442,15 @@ export default function ProductDetail() {
             )}
           </div>
           <div className="flex-1 flex gap-2">
-            <Link
-              to={`/contact?product=${product.id}`}
+            <button
+              type="button"
+              onClick={requestProduct}
+              disabled={CHECKOUT_ENABLED && !product.in_stock}
               className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 py-3 text-sm font-bold text-white"
             >
               <ShoppingCart className="w-4 h-4" />
-              <span>{lang === "ar" ? "اطلب المنتج" : "Request product"}</span>
-            </Link>
+              <span>{CHECKOUT_ENABLED ? (lang === "ar" ? "أضف للسلة" : "Add to cart") : (lang === "ar" ? "استفسر عن المنتج" : "Ask about product")}</span>
+            </button>
           </div>
         </div>
       </div>

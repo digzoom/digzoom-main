@@ -11,7 +11,7 @@ export default function Privacy() {
     sections: [
       ['المعلومات التي نجمعها', 'قد نجمع الاسم والبريد ورقم الهاتف ومعلومات الطلب والتنزيل، إضافة إلى بيانات تقنية محدودة مثل نوع المتصفح وعنوان IP وسجلات الأمان. لا نخزن بيانات البطاقة الكاملة.'],
       ['كيف نستخدم المعلومات', 'نستخدم البيانات لإنشاء الحسابات ومعالجة الطلبات وتسليم المنتجات وتقديم الدعم ومنع الاحتيال والوفاء بالالتزامات القانونية وتحسين الموقع.'],
-      ['مشاركة البيانات', 'نشارك الحد الأدنى اللازم مع مزودي الاستضافة وقواعد البيانات والبريد والتحليلات وبوابة الدفع عند تفعيلها. لا نبيع بياناتك الشخصية. وقد نفصح عنها إذا طُلب ذلك قانونيًا.'],
+      ['مشاركة البيانات', 'نشارك الحد الأدنى اللازم مع مزودي الاستضافة وقواعد البيانات والبريد والتحليلات وبوابة الدفع لمعالجة الطلبات. لا نبيع بياناتك الشخصية. وقد نفصح عنها إذا طُلب ذلك قانونيًا.'],
       ['أمن البيانات والاحتفاظ بها', 'نستخدم HTTPS وضوابط وصول وروابط تنزيل محدودة. نحتفظ بالبيانات بقدر الحاجة لتقديم الخدمة وحفظ السجلات والامتثال القانوني، ثم نحذفها أو نجعلها مجهولة عند عدم الحاجة.'],
       ['حقوقك', 'يمكنك طلب نسخة من بياناتك أو تصحيحها أو حذفها أو الاعتراض على بعض أوجه معالجتها، مع مراعاة السجلات التي يلزمنا الاحتفاظ بها قانونيًا.'],
       ['ملفات الارتباط', 'نستخدم ملفات ارتباط ضرورية لتسجيل الدخول والسلة واللغة والأمان، وقد نستخدم تحليلات محدودة لتحسين الأداء. يمكنك التحكم بها من إعدادات المتصفح.'],
@@ -22,7 +22,7 @@ export default function Privacy() {
     sections: [
       ['Information we collect', 'We may collect your name, email, phone number, order and download information, plus limited technical data such as browser type, IP address, and security logs. We do not store complete card details.'],
       ['How we use information', 'We use data to create accounts, process orders, deliver products, provide support, prevent fraud, meet legal obligations, and improve the website.'],
-      ['Data sharing', 'We share only what is necessary with hosting, database, email, analytics, and payment providers when enabled. We do not sell personal data. We may disclose data when legally required.'],
+      ['Data sharing', 'We share only what is necessary with hosting, database, email, analytics, and payment providers to process orders. We do not sell personal data. We may disclose data when legally required.'],
       ['Security and retention', 'We use HTTPS, access controls, and time-limited download links. We retain information only as needed to provide services, keep business records, and meet legal obligations, then delete or anonymize it.'],
       ['Your rights', 'You may request access, correction, or deletion of personal data, or object to certain processing, subject to records we must retain by law.'],
       ['Cookies', 'We use necessary cookies for sign-in, cart, language, and security, and may use limited analytics to improve performance. You can control cookies in your browser settings.'],
