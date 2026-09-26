@@ -68,13 +68,19 @@
       type="image/jpeg"
       href="/images/digzoom-logo-side-new.jpg"
     />
-    <link
-      rel="preload"
-      as="image"
-      href="/images/digzoom/growth-hero-live-v3.webp"
-      type="image/webp"
-      fetchpriority="high"
-    />
+    <script>
+      // Prioritize the hero only where it appears; checkout and store pages
+      // should not download this image while loading their own content.
+      if (location.pathname === '/' || location.pathname === '/marketing') {
+        var heroPreload = document.createElement('link');
+        heroPreload.rel = 'preload';
+        heroPreload.as = 'image';
+        heroPreload.href = '/images/digzoom/growth-hero-live-v3.webp';
+        heroPreload.type = 'image/webp';
+        heroPreload.fetchPriority = 'high';
+        document.head.appendChild(heroPreload);
+      }
+    </script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
