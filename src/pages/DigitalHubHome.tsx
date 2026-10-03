@@ -178,6 +178,25 @@ export default function DigitalHubHome() {
         </div>
       </div></section>
 
+      <section className="border-y border-slate-200 bg-[#f8fafc]">
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+          <div className="flex gap-3 overflow-x-auto pb-1">
+            {[
+              ["STC","bg-violet-50 text-violet-700"],
+              ["Mobily","bg-sky-50 text-sky-700"],
+              ["Zain","bg-emerald-50 text-emerald-700"],
+              ["PlayStation","bg-blue-50 text-blue-700"],
+              ["Xbox","bg-green-50 text-green-700"],
+              ["Microsoft","bg-cyan-50 text-cyan-700"],
+              ["Adobe","bg-rose-50 text-rose-700"],
+              ["AI","bg-slate-950 text-white"],
+            ].map(([name, tone]) => (
+              <div key={name} className={`shrink-0 rounded-2xl border border-slate-200 px-5 py-3 text-sm font-black shadow-sm ${tone}`}>{name}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <ProductSection ar={ar} title={ar ? "الأكثر مبيعًا" : "Best sellers"} subtitle={ar ? "مجموعة بارزة من المنتجات المتاحة حاليًا." : "A highlighted selection of products currently available."} products={featured} loading={loading} add={add} lang={lang} />
 
       <ProductSection ar={ar} title={ar ? "وصل حديثًا" : "New arrivals"} subtitle={ar ? "أحدث المنتجات المضافة إلى متجر DigZoom." : "The latest products added to DigZoom."} products={newArrivals} loading={loading} add={add} lang={lang} />
@@ -327,11 +346,11 @@ function ProductSection({ ar, title, subtitle, products, loading, add, lang, ico
         <Link to="/shop" className="inline-flex items-center gap-2 font-bold text-blue-600">{ar ? "عرض الكل" : "View all"}<ArrowRight className="h-4 w-4" /></Link>
       </div>
       {loading ? (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0,1,2,3].map(i => <div key={i} className="h-72 animate-pulse rounded-3xl bg-slate-100" />)}</div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">{[0,1,2,3,4,5].map(i => <div key={i} className="h-64 animate-pulse rounded-3xl bg-slate-100" />)}</div>
       ) : products.length === 0 ? (
         <div className="rounded-3xl border border-slate-200 bg-[#f8fafc] px-6 py-14 text-center text-slate-500">{ar ? "استكشف القسم لمعرفة أحدث المنتجات." : "Explore the section for the latest products."}</div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 md:gap-5 lg:grid-cols-4">{products.map(product => <ProductCard key={product.id} product={product} ar={ar} lang={lang} add={add} />)}</div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">{products.map(product => <ProductCard key={product.id} product={product} ar={ar} lang={lang} add={add} />)}</div>
       )}
     </div></section>
   );
@@ -342,11 +361,11 @@ function ProductCard({ product, ar, lang, add, compact = false }: { product: any
   return (
     <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl">
       <Link to={`/product/${product.id}`} className="relative block overflow-hidden bg-slate-100">
-        <img src={product.image_url || "/images/placeholder.jpg"} alt={productTitle(product, lang)} loading="lazy" className={`w-full object-cover transition duration-500 group-hover:scale-105 ${compact ? "aspect-[16/10]" : "aspect-[4/3]"}`} />
+        <img src={product.image_url || "/images/placeholder.jpg"} alt={productTitle(product, lang)} loading="lazy" className={`w-full object-cover transition duration-500 group-hover:scale-105 ${compact ? "aspect-[16/10]" : "aspect-square"}`} />
         {hasDiscount && <span className="absolute start-3 top-3 rounded-full bg-fuchsia-600 px-2.5 py-1 text-[10px] font-black text-white">{ar ? "خصم" : "SALE"}</span>}
       </Link>
-      <div className="p-4">
-        <Link to={`/product/${product.id}`}><h3 className="min-h-10 line-clamp-2 text-sm font-black transition group-hover:text-blue-600 md:text-base">{productTitle(product, lang)}</h3></Link>
+      <div className="p-3 md:p-4">
+        <Link to={`/product/${product.id}`}><h3 className="min-h-10 line-clamp-2 text-sm font-black transition group-hover:text-blue-600">{productTitle(product, lang)}</h3></Link>
         {!compact && <p className="mt-2 min-h-8 line-clamp-2 text-xs text-slate-500">{productDescription(product, lang)}</p>}
         <div className="mt-4 flex items-center justify-between gap-2">
           <div>
