@@ -162,7 +162,7 @@ export default function DigitalHubHome() {
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           {categories.map(({ icon: Icon, ar: arName, en, slug, image }) => (
-            <Link key={slug} to={`/shop?category=${slug}`} className="group relative min-h-40 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <Link key={slug} to={`/shop?category=${slug}`} className="group relative min-h-40 overflow-hidden rounded-2xl border border-slate-200 bg-white text-white shadow-sm">
               <img src={image} alt={ar ? arName : en} className="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-500 group-hover:scale-105 group-hover:opacity-60" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10" />
               <div className="relative flex h-full flex-col justify-end p-4">
@@ -178,7 +178,7 @@ export default function DigitalHubHome() {
       <ProductSection ar={ar} title={ar ? "الأكثر مبيعًا" : "Best sellers"} subtitle={ar ? "مجموعة بارزة من المنتجات المتاحة حاليًا." : "A highlighted selection of products currently available."} products={featured} loading={loading} add={add} lang={lang} />
 
       <section className="bg-[#f0f3f8]"><div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[30px] border border-fuchsia-400/20 bg-gradient-to-r from-[#310a32] via-[#17112a] to-[#081b3d] p-7 md:p-10">
+        <div className="relative overflow-hidden rounded-[30px] border border-fuchsia-400/20 bg-gradient-to-r from-[#310a32] via-[#17112a] to-[#081b3d] p-7 text-white shadow-xl md:p-10">
           <div className="absolute -end-16 -top-20 h-56 w-56 rounded-full bg-fuchsia-500/20 blur-3xl" />
           <div className="relative grid items-center gap-7 lg:grid-cols-[1fr_auto]">
             <div>
@@ -203,7 +203,7 @@ export default function DigitalHubHome() {
 
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-2">
-          <div className="overflow-hidden rounded-[32px] border border-violet-400/20 bg-gradient-to-br from-blue-950/70 via-[#111329] to-violet-950/50 p-7 md:p-8">
+          <div className="overflow-hidden rounded-[32px] border border-violet-400/20 bg-gradient-to-br from-blue-950/70 via-[#111329] to-violet-950/50 p-7 text-white shadow-xl md:p-8">
             <img src="/images/digzoom/growth-hero-live-v3.webp" alt={ar ? "خدمات DigZoom" : "DigZoom services"} className="aspect-[16/8] w-full rounded-[22px] object-cover" loading="lazy" />
             <div className="mt-6">
               <div className="text-sm font-black uppercase tracking-[.18em] text-violet-300">DIGZOOM BUSINESS</div>
@@ -213,7 +213,7 @@ export default function DigitalHubHome() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-cyan-950/50 via-[#0d1422] to-blue-950/60 p-7 md:p-8">
+          <div className="overflow-hidden rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-cyan-950/50 via-[#0d1422] to-blue-950/60 p-7 text-white shadow-xl md:p-8">
             <img src="/images/digzoom/creator-partner-live.webp" alt={ar ? "بيع منتج رقمي عبر DigZoom" : "Sell through DigZoom"} className="aspect-[16/8] w-full rounded-[22px] object-cover" loading="lazy" />
             <div className="mt-6">
               <div className="text-sm font-black uppercase tracking-[.18em] text-cyan-300">DIGZOOM PARTNERS</div>
@@ -228,7 +228,7 @@ export default function DigitalHubHome() {
       {freeProducts.length > 0 && <ProductSection ar={ar} title={ar ? "منتجات مجانية" : "Free products"} subtitle={ar ? "منتجات مجانية متاحة حاليًا داخل المتجر." : "Free products currently available in the store."} products={freeProducts} loading={false} add={add} lang={lang} icon={<Gift className="h-6 w-6 text-emerald-300" />} />}
 
       <section id="digzoom-pass" className="bg-[#f0f3f8]"><div className="mx-auto max-w-7xl scroll-mt-28 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-[30px] border border-violet-400/20 bg-gradient-to-r from-violet-950/70 via-[#12142a] to-blue-950/70 p-7 md:p-9">
+        <div className="overflow-hidden rounded-[30px] border border-violet-400/20 bg-gradient-to-r from-violet-950/70 via-[#12142a] to-blue-950/70 p-7 text-white shadow-xl md:p-9">
           <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto]">
             <div>
               <div className="text-sm font-black uppercase tracking-[.18em] text-violet-300">DIGZOOM PASS</div>
@@ -249,7 +249,7 @@ export default function DigitalHubHome() {
             { icon: CheckCircle2, title: ar ? "منتجات مختارة" : "Curated products", text: ar ? "عرض مرتب وواضح" : "Clear product presentation" },
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="rounded-2xl border border-slate-200 bg-[#f8fafc] p-5">
-              <Icon className="h-6 w-6 text-blue-300" />
+              <Icon className="h-6 w-6 text-blue-600" />
               <h3 className="mt-4 font-black">{title}</h3>
               <p className="mt-2 text-sm text-slate-500">{text}</p>
             </div>
@@ -291,7 +291,7 @@ function ProductSection({ ar, title, subtitle, products, loading, add, lang, ico
         <Link to="/shop" className="inline-flex items-center gap-2 font-bold text-blue-600">{ar ? "عرض الكل" : "View all"}<ArrowRight className="h-4 w-4" /></Link>
       </div>
       {loading ? (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0,1,2,3].map(i => <div key={i} className="h-72 animate-pulse rounded-3xl bg-white/[.05]" />)}</div>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0,1,2,3].map(i => <div key={i} className="h-72 animate-pulse rounded-3xl bg-slate-100" />)}</div>
       ) : products.length === 0 ? (
         <div className="rounded-3xl border border-slate-200 bg-[#f8fafc] px-6 py-14 text-center text-slate-500">{ar ? "استكشف القسم لمعرفة أحدث المنتجات." : "Explore the section for the latest products."}</div>
       ) : (
