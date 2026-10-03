@@ -1,33 +1,55 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import {
-  ShoppingCart,
-  Menu,
-  X,
+  Bot,
+  BriefcaseBusiness,
+  ChevronDown,
+  Cloud,
+  Gamepad2,
+  Gift,
+  Globe,
+  Home,
+  Laptop2,
   LogIn,
   LogOut,
-  ShieldCheck,
-  ChevronDown,
-  Globe,
+  Menu,
   Package,
+  PackageOpen,
+  ShieldCheck,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  Tag,
+  UploadCloud,
   UserCircle,
+  X,
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
-const getNavLinks = (lang: string) => {
-  const isAr = lang === "ar";
-  return [
-    { name: isAr ? "الخدمات" : "Services", path: "/#services" },
-    { name: isAr ? "نماذج أعمال" : "Work samples", path: "/#work" },
-    { name: isAr ? "الباقات" : "Plans", path: "/#plans" },
-    { name: isAr ? "المتجر" : "Shop", path: "/shop" },
-  ];
-};
+const primaryLinks = (isAr: boolean) => [
+  { name: isAr ? "الرئيسية" : "Home", path: "/", icon: Home },
+  { name: isAr ? "العروض" : "Offers", path: "/shop?sort=offers", icon: Tag },
+  { name: isAr ? "الأكثر مبيعًا" : "Best sellers", path: "/shop?sort=popular", icon: ShoppingBag },
+  { name: isAr ? "الاشتراكات" : "Subscriptions", path: "/shop?category=subscriptions", icon: Cloud },
+  { name: isAr ? "الذكاء الاصطناعي" : "AI", path: "/shop?category=ai", icon: Bot },
+  { name: isAr ? "البرامج" : "Software", path: "/shop?category=software", icon: Laptop2 },
+  { name: isAr ? "الألعاب" : "Gaming", path: "/shop?category=gaming", icon: Gamepad2 },
+  { name: isAr ? "المنتجات الرقمية" : "Digital products", path: "/shop?category=templates", icon: PackageOpen },
+];
+
+const sideLinks = (isAr: boolean) => [
+  ...primaryLinks(isAr),
+  { name: isAr ? "خدمات DigZoom" : "DigZoom services", path: "/marketing", icon: BriefcaseBusiness },
+  { name: isAr ? "بيع منتجاتك معنا" : "Sell with us", path: "/partners", icon: UploadCloud },
+  { name: isAr ? "منتجات مجانية" : "Free products", path: "/shop?price=free", icon: Gift },
+  { name: "DigZoom Pass", path: "/#digzoom-pass", icon: ShieldCheck },
+  { name: isAr ? "المتجر" : "Store", path: "/shop", icon: Store },
+];
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { totalItems } = useCart();
@@ -36,372 +58,154 @@ export default function Navbar() {
   const location = useLocation();
   const isAr = lang === "ar";
 
-  const navLinks = getNavLinks(lang);
-
-  // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(e.target as Node)
-      ) {
+    setDrawerOpen(false);
+    setUserMenuOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const handleOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  // Close menus on route change
   useEffect(() => {
-    setUserMenuOpen(false);
-    setMobileOpen(false);
-  }, [location.pathname]);
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawerOpen]);
+
+  const topLinks = primaryLinks(isAr).slice(0, 6);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.07] bg-[rgba(8,11,18,.94)] shadow-[0_4px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* One visual lockup: tiger mark + DigZoom wordmark */}
-          <Link
-            to="/"
-            className="group flex shrink-0 items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.035] py-1.5 pe-3 ps-1.5 transition hover:border-blue-400/30 hover:bg-white/[0.06]"
-            aria-label="DigZoom"
-          >
-            <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-[.7rem] ring-1 ring-blue-400/25 shadow-[0_0_18px_rgba(59,130,246,.2)] transition-all group-hover:ring-blue-400/60 sm:h-9 sm:w-9">
-              <img
-                src="/images/digzoom-logo-side-new.jpg"
-                alt="DigZoom"
-                className="h-full w-full object-cover"
-                onError={e => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-            </div>
-            <span className="hidden min-[360px]:inline text-base font-black tracking-tight sm:text-lg">
-              <span className="text-white">Dig</span>
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Zoom
-              </span>
-            </span>
-          </Link>
-
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map(link => (
-              <a
-                key={link.path}
-                href={link.path}
-                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  location.pathname === link.path.split("?")[0]
-                    ? "text-blue-400"
-                    : "text-gray-400 hover:text-white"
-                }`}
+    <>
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.07] bg-[rgba(7,10,16,.96)] shadow-[0_4px_30px_rgba(0,0,0,.28)] backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-3 lg:h-20">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setDrawerOpen(true)}
+                className="flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[.035] px-3 text-sm font-bold text-slate-200 transition hover:bg-white/[.07]"
+                aria-label={isAr ? "فتح القائمة" : "Open menu"}
               >
-                {link.name}
-                {location.pathname === link.path.split("?")[0] && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-blue-400 rounded-full" />
-                )}
-              </a>
-            ))}
-          </div>
+                <Menu className="h-5 w-5" />
+                <span className="hidden sm:inline">{isAr ? "القائمة" : "Menu"}</span>
+              </button>
 
-          {/* Right side */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {/* Language Switcher */}
-            <button
-              onClick={toggleLang}
-              aria-label={isAr ? "Switch to English" : "التبديل للعربية"}
-              className="hidden lg:flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/5"
-            >
-              <span className={lang === "ar" ? "text-gray-500" : "text-white"}>
-                EN
-              </span>
-              <span className="text-gray-600">|</span>
-              <span className={lang === "ar" ? "text-white" : "text-gray-500"}>
-                AR
-              </span>
-            </button>
-
-            {/* Cart */}
-            <Link
-              to="/cart"
-              aria-label={
-                isAr
-                  ? `سلة المشتريات، ${totalItems} منتج`
-                  : `Shopping cart, ${totalItems} items`
-              }
-              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-gray-300 transition-all hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span
-                  className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-1 text-[10px] font-black leading-none text-white shadow-[0_0_0_2px_rgba(8,11,18,.95)]"
-                  aria-hidden="true"
-                >
-                  {totalItems > 99 ? "99+" : totalItems}
+              <Link
+                to="/"
+                className="group flex shrink-0 items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.035] py-1.5 pe-3 ps-1.5 transition hover:border-blue-400/30 hover:bg-white/[0.06]"
+                aria-label="DigZoom"
+              >
+                <div className="h-8 w-8 overflow-hidden rounded-[.7rem] ring-1 ring-blue-400/25 shadow-[0_0_18px_rgba(59,130,246,.2)] sm:h-9 sm:w-9">
+                  <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="h-full w-full object-cover" />
+                </div>
+                <span className="hidden min-[360px]:inline text-base font-black tracking-tight sm:text-lg">
+                  <span className="text-white">Dig</span>
+                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoom</span>
                 </span>
-              )}
-            </Link>
+              </Link>
+            </div>
 
-            {/* === AUTH: Logged In === */}
-            {user ? (
-              <div ref={userMenuRef} className="relative hidden lg:block">
-                {/* User Toggle Button */}
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm"
+            <div className="hidden xl:flex items-center gap-1">
+              {topLinks.map(link => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-400 transition hover:bg-white/[.04] hover:text-white"
                 >
-                  {/* Avatar or Initial */}
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt=""
-                      className="w-8 h-8 rounded-full object-cover ring-1 ring-white/10"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                onClick={toggleLang}
+                className="hidden items-center gap-1 rounded-xl px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 lg:flex"
+              >
+                <Globe className="h-4 w-4" />
+                {isAr ? "EN" : "AR"}
+              </button>
+
+              <Link to="/cart" className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/5 hover:text-white" aria-label={isAr ? "السلة" : "Cart"}>
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-1 text-[10px] font-black text-white">
+                    {totalItems > 99 ? "99+" : totalItems}
+                  </span>
+                )}
+              </Link>
+
+              {user ? (
+                <div ref={userMenuRef} className="relative hidden lg:block">
+                  <button
+                    onClick={() => setUserMenuOpen(v => !v)}
+                    className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-xs font-black text-white">
                       {(user.name || user.email || "?")[0].toUpperCase()}
                     </div>
+                    <ChevronDown className={`h-3.5 w-3.5 transition ${userMenuOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {userMenuOpen && (
+                    <div className={`absolute top-full mt-2 w-56 rounded-2xl border border-white/[.08] bg-[#121722] py-2 shadow-2xl ${isAr ? "left-0" : "right-0"}`}>
+                      <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-white/5"><UserCircle className="h-4 w-4" />{isAr ? "الملف الشخصي" : "Profile"}</Link>
+                      <Link to="/orders" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-white/5"><Package className="h-4 w-4" />{isAr ? "طلباتي" : "Orders"}</Link>
+                      {isAdmin && <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-sm text-purple-300 hover:bg-purple-500/10"><ShieldCheck className="h-4 w-4" />{isAr ? "لوحة التحكم" : "Admin"}</Link>}
+                      <button onClick={() => logout()} className="flex w-full items-center gap-3 border-t border-white/[.06] px-4 py-3 text-sm text-slate-400 hover:bg-red-500/10 hover:text-red-400"><LogOut className="h-4 w-4" />{isAr ? "تسجيل الخروج" : "Logout"}</button>
+                    </div>
                   )}
-                  <span className="hidden sm:block max-w-[80px] lg:max-w-[120px] truncate">
-                    {user.name || user.email}
-                  </span>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 ${
-                      userMenuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {/* Dropdown Menu */}
-                {userMenuOpen && (
-                  <div
-                    className={`absolute top-full mt-2 w-56 bg-[#151520] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 py-2 z-[100] ${
-                      isAr ? "left-0" : "right-0"
-                    }`}
-                  >
-                    {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-3">
-                      {user.avatar ? (
-                        <img
-                          src={user.avatar}
-                          alt=""
-                          className="w-10 h-10 rounded-full object-cover ring-1 ring-white/10"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
-                          {(user.name || user.email || "?")[0].toUpperCase()}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm font-medium truncate">
-                          {user.name || user.email}
-                        </div>
-                        <div className="text-gray-500 text-xs truncate">
-                          {user.email}
-                        </div>
-                        {isAdmin && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-400 mt-0.5">
-                            <ShieldCheck className="w-3 h-3" /> ADMIN
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="py-1">
-                      <Link
-                        to="/profile"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                      >
-                        <UserCircle className="w-4 h-4 text-gray-500" />
-                        {isAr ? "الملف الشخصي" : "Profile"}
-                      </Link>
-                      <Link
-                        to="/orders"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                      >
-                        <Package className="w-4 h-4 text-gray-500" />
-                        {isAr ? "طلباتي" : "My Orders"}
-                      </Link>
-                      {isAdmin && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-all"
-                        >
-                          <ShieldCheck className="w-4 h-4" />
-                          {isAr ? "لوحة التحكم" : "Admin Dashboard"}
-                        </Link>
-                      )}
-                    </div>
-
-                    {/* Logout */}
-                    <div className="border-t border-white/[0.06] pt-1 mt-1">
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          logout();
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        {isAr ? "تسجيل الخروج" : "Logout"}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* === AUTH: Not Logged In === */
-              <Link
-                to="/login"
-                className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all text-sm font-bold shadow-lg shadow-blue-500/20"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>{isAr ? "دخول" : "Login"}</span>
-              </Link>
-            )}
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={
-                mobileOpen
-                  ? isAr
-                    ? "إغلاق القائمة"
-                    : "Close menu"
-                  : isAr
-                    ? "فتح القائمة"
-                    : "Open menu"
-              }
-              className="lg:hidden p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
-            >
-              {mobileOpen ? (
-                <X className="w-5 h-5" />
+                </div>
               ) : (
-                <Menu className="w-5 h-5" />
+                <Link to="/login" className="hidden items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-black text-white shadow-lg shadow-blue-500/20 md:flex">
+                  <LogIn className="h-4 w-4" />{isAr ? "دخول" : "Login"}
+                </Link>
               )}
-            </button>
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* ========== MOBILE MENU ========== */}
-      {mobileOpen && (
-        <div className="lg:hidden bg-[#0f0f1a]/98 backdrop-blur-xl border-t border-white/[0.06] max-h-[80vh] overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
-            {/* Nav Links */}
-            {navLinks.map(link => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  location.pathname === link.path.split("?")[0]
-                    ? "text-blue-400 bg-blue-500/10"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-
-            {/* Language */}
-            <button
-              onClick={toggleLang}
-              className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
-            >
-              <Globe className="w-4 h-4" />
-              {isAr ? "Switch to English" : "التبديل للعربية"}
-            </button>
-
-            {/* Divider */}
-            <div className="border-t border-white/[0.06] pt-2 mt-2" />
-
-            {/* Mobile: Logged In */}
-            {user ? (
-              <div className="space-y-1">
-                {/* User Card */}
-                <div className="px-4 py-3 flex items-center gap-3">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt=""
-                      className="w-12 h-12 rounded-full object-cover ring-1 ring-white/10"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-lg font-bold text-white">
-                      {(user.name || user.email || "?")[0].toUpperCase()}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium truncate">
-                      {user.name || user.email}
-                    </div>
-                    <div className="text-gray-500 text-xs truncate">
-                      {user.email}
-                    </div>
-                    {isAdmin && (
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-400 mt-0.5">
-                        <ShieldCheck className="w-3 h-3" /> ADMIN
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {/* Links */}
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                >
-                  <UserCircle className="w-4 h-4 text-gray-500" />{" "}
-                  {isAr ? "الملف الشخصي" : "Profile"}
-                </Link>
-                <Link
-                  to="/orders"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
-                >
-                  <Package className="w-4 h-4 text-gray-500" />{" "}
-                  {isAr ? "طلباتي" : "My Orders"}
-                </Link>
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-purple-400 hover:bg-purple-500/10 transition-all"
-                  >
-                    <ShieldCheck className="w-4 h-4" />{" "}
-                    {isAr ? "لوحة التحكم" : "Admin Dashboard"}
-                  </Link>
-                )}
-                <button
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
-                >
-                  <LogOut className="w-4 h-4" />{" "}
-                  {isAr ? "تسجيل الخروج" : "Logout"}
-                </button>
+      {drawerOpen && (
+        <div className="fixed inset-0 z-[100]">
+          <button className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} aria-label={isAr ? "إغلاق القائمة" : "Close menu"} />
+          <aside className={`absolute top-0 h-full w-[88vw] max-w-[390px] overflow-y-auto border-white/10 bg-[#090d15] shadow-2xl ${isAr ? "right-0 border-l" : "left-0 border-r"}`}>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-[#090d15]/95 px-5 py-4 backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="h-10 w-10 rounded-xl object-cover" />
+                <div><div className="font-black text-white">DigZoom</div><div className="text-xs text-slate-500">{isAr ? "كل عالمك الرقمي" : "Your digital world"}</div></div>
               </div>
-            ) : (
-              /* Mobile: Not Logged In */
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl text-sm font-bold"
-              >
-                <LogIn className="w-4 h-4" /> {isAr ? "تسجيل الدخول" : "Login"}
-              </Link>
-            )}
-          </div>
+              <button onClick={() => setDrawerOpen(false)} className="rounded-xl p-2 text-slate-400 hover:bg-white/5 hover:text-white"><X className="h-5 w-5" /></button>
+            </div>
+
+            <div className="p-4">
+              <div className="mb-3 text-xs font-black uppercase tracking-[.18em] text-blue-400">{isAr ? "تصفح DigZoom" : "Explore DigZoom"}</div>
+              <div className="space-y-1">
+                {sideLinks(isAr).map(({ name, path, icon: Icon }) => (
+                  <Link key={path} to={path} className="flex items-center justify-between rounded-xl px-3 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/[.05] hover:text-white">
+                    <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-blue-300" />{name}</span>
+                    <span className="text-slate-600">›</span>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="my-5 border-t border-white/10" />
+
+              <button onClick={toggleLang} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-300 hover:bg-white/[.05]"><Globe className="h-4 w-4 text-cyan-300" />{isAr ? "English" : "العربية"}</button>
+
+              {!user && (
+                <Link to="/login" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 font-black text-white"><LogIn className="h-4 w-4" />{isAr ? "تسجيل الدخول" : "Login"}</Link>
+              )}
+            </div>
+          </aside>
         </div>
       )}
-    </nav>
+    </>
   );
 }
