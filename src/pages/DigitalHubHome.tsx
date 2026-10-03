@@ -117,8 +117,8 @@ export default function DigitalHubHome() {
   const current = slides[slide];
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#05070d] text-white">
-      <section className="relative pt-24 md:pt-28">
+    <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
+      <section className="relative bg-[#05070d] pb-10 pt-24 text-white md:pt-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-white/10 bg-[#09101a] shadow-[0_30px_80px_rgba(0,0,0,.35)] md:min-h-[560px]">
             {slides.map((item, index) => (
@@ -159,10 +159,10 @@ export default function DigitalHubHome() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           {categories.map(({ icon: Icon, ar: arName, en, slug, image }) => (
-            <Link key={slug} to={`/shop?category=${slug}`} className="group relative min-h-40 overflow-hidden rounded-2xl border border-white/10 bg-[#10141e]">
+            <Link key={slug} to={`/shop?category=${slug}`} className="group relative min-h-40 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <img src={image} alt={ar ? arName : en} className="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-500 group-hover:scale-105 group-hover:opacity-60" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10" />
               <div className="relative flex h-full flex-col justify-end p-4">
@@ -173,11 +173,11 @@ export default function DigitalHubHome() {
             </Link>
           ))}
         </div>
-      </section>
+      </div></section>
 
       <ProductSection ar={ar} title={ar ? "الأكثر مبيعًا" : "Best sellers"} subtitle={ar ? "مجموعة بارزة من المنتجات المتاحة حاليًا." : "A highlighted selection of products currently available."} products={featured} loading={loading} add={add} lang={lang} />
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+      <section className="bg-[#f0f3f8]"><div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[30px] border border-fuchsia-400/20 bg-gradient-to-r from-[#310a32] via-[#17112a] to-[#081b3d] p-7 md:p-10">
           <div className="absolute -end-16 -top-20 h-56 w-56 rounded-full bg-fuchsia-500/20 blur-3xl" />
           <div className="relative grid items-center gap-7 lg:grid-cols-[1fr_auto]">
@@ -194,14 +194,14 @@ export default function DigitalHubHome() {
             </div>
           )}
         </div>
-      </section>
+      </div></section>
 
       <CategoryShowcase ar={ar} title={ar ? "الاشتراكات" : "Subscriptions"} text={ar ? "تصفح قسم الاشتراكات الرقمية والخدمات المتكررة." : "Browse digital subscriptions and recurring services."} image="/images/business-workspace.jpg" href="/shop?category=subscriptions" icon={<Cloud className="h-7 w-7" />} />
       <CategoryShowcase ar={ar} title={ar ? "الذكاء الاصطناعي" : "Artificial Intelligence"} text={ar ? "أدوات وحلول ذكاء اصطناعي ضمن قسم مستقل وسهل التصفح." : "AI tools and solutions in a dedicated, easy-to-browse section."} image="/images/ai-technology.jpg" href="/shop?category=ai" icon={<Bot className="h-7 w-7" />} reverse />
       <CategoryShowcase ar={ar} title={ar ? "البرامج والأدوات" : "Software & Tools"} text={ar ? "برامج وأدوات رقمية تساعدك في العمل والإنتاجية." : "Software and digital tools for work and productivity."} image="/images/digzoom/digital-products-live.webp" href="/shop?category=software" icon={<Laptop2 className="h-7 w-7" />} />
       <CategoryShowcase ar={ar} title={ar ? "الألعاب" : "Gaming"} text={ar ? "قسم الألعاب والمنتجات الرقمية المرتبطة بها." : "Gaming and related digital products."} image="/images/3d-printing.jpg" href="/shop?category=gaming" icon={<Gamepad2 className="h-7 w-7" />} reverse />
 
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-2">
           <div className="overflow-hidden rounded-[32px] border border-violet-400/20 bg-gradient-to-br from-blue-950/70 via-[#111329] to-violet-950/50 p-7 md:p-8">
             <img src="/images/digzoom/growth-hero-live-v3.webp" alt={ar ? "خدمات DigZoom" : "DigZoom services"} className="aspect-[16/8] w-full rounded-[22px] object-cover" loading="lazy" />
@@ -223,11 +223,11 @@ export default function DigitalHubHome() {
             </div>
           </div>
         </div>
-      </section>
+      </div></section>
 
       {freeProducts.length > 0 && <ProductSection ar={ar} title={ar ? "منتجات مجانية" : "Free products"} subtitle={ar ? "منتجات مجانية متاحة حاليًا داخل المتجر." : "Free products currently available in the store."} products={freeProducts} loading={false} add={add} lang={lang} icon={<Gift className="h-6 w-6 text-emerald-300" />} />}
 
-      <section id="digzoom-pass" className="mx-auto max-w-7xl scroll-mt-28 px-4 pb-20 sm:px-6 lg:px-8">
+      <section id="digzoom-pass" className="bg-[#f0f3f8]"><div className="mx-auto max-w-7xl scroll-mt-28 px-4 py-16 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-[30px] border border-violet-400/20 bg-gradient-to-r from-violet-950/70 via-[#12142a] to-blue-950/70 p-7 md:p-9">
           <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto]">
             <div>
@@ -238,9 +238,9 @@ export default function DigitalHubHome() {
             <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-violet-400/10 ring-1 ring-violet-300/20"><Gift className="h-9 w-9 text-violet-300" /></div>
           </div>
         </div>
-      </section>
+      </div></section>
 
-      <section className="border-t border-white/10 bg-[#080b13]">
+      <section className="border-t border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
           {[
             { icon: Zap, title: ar ? "تسليم رقمي" : "Digital delivery", text: ar ? "حسب نوع المنتج" : "By product type" },
@@ -248,7 +248,7 @@ export default function DigitalHubHome() {
             { icon: Headphones, title: ar ? "دعم سريع" : "Fast support", text: ar ? "قبل وبعد الطلب" : "Before and after purchase" },
             { icon: CheckCircle2, title: ar ? "منتجات مختارة" : "Curated products", text: ar ? "عرض مرتب وواضح" : "Clear product presentation" },
           ].map(({ icon: Icon, title, text }) => (
-            <div key={title} className="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+            <div key={title} className="rounded-2xl border border-slate-200 bg-[#f8fafc] p-5">
               <Icon className="h-6 w-6 text-blue-300" />
               <h3 className="mt-4 font-black">{title}</h3>
               <p className="mt-2 text-sm text-slate-500">{text}</p>
@@ -262,55 +262,55 @@ export default function DigitalHubHome() {
 
 function CategoryShowcase({ ar, title, text, image, href, icon, reverse = false }: { ar: boolean; title: string; text: string; image: string; href: string; icon: ReactNode; reverse?: boolean }) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className={`grid items-center gap-7 overflow-hidden rounded-[30px] border border-white/10 bg-[#0c111b] p-6 md:grid-cols-2 md:p-8 ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
+    <section className="bg-[#f6f7fb]"><div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className={`grid items-center gap-7 overflow-hidden rounded-[30px] border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2 md:p-8 ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
         <div className="overflow-hidden rounded-[22px]">
           <img src={image} alt={title} className="aspect-[16/9] w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
         </div>
         <div>
           <div className="inline-flex rounded-2xl bg-blue-500/10 p-3 text-blue-300 ring-1 ring-blue-400/15">{icon}</div>
           <h2 className="mt-5 text-3xl font-black md:text-4xl">{title}</h2>
-          <p className="mt-4 max-w-xl leading-7 text-slate-400">{text}</p>
-          <Link to={href} className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/10 bg-white/[.05] px-5 font-black text-white hover:bg-white/[.08]">
+          <p className="mt-4 max-w-xl leading-7 text-slate-600">{text}</p>
+          <Link to={href} className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-slate-800">
             {ar ? "استكشف القسم" : "Explore category"}<ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
-    </section>
+    </div></section>
   );
 }
 
 function ProductSection({ ar, title, subtitle, products, loading, add, lang, icon }: { ar: boolean; title: string; subtitle: string; products: any[]; loading: boolean; add: (product: any) => void; lang: string; icon?: ReactNode }) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mb-9 flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <div className="flex items-center gap-2">{icon}<h2 className="text-3xl font-black md:text-5xl">{title}</h2></div>
           <p className="mt-3 text-slate-500">{subtitle}</p>
         </div>
-        <Link to="/shop" className="inline-flex items-center gap-2 font-bold text-blue-300">{ar ? "عرض الكل" : "View all"}<ArrowRight className="h-4 w-4" /></Link>
+        <Link to="/shop" className="inline-flex items-center gap-2 font-bold text-blue-600">{ar ? "عرض الكل" : "View all"}<ArrowRight className="h-4 w-4" /></Link>
       </div>
       {loading ? (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[0,1,2,3].map(i => <div key={i} className="h-72 animate-pulse rounded-3xl bg-white/[.05]" />)}</div>
       ) : products.length === 0 ? (
-        <div className="rounded-3xl border border-white/10 bg-white/[.03] px-6 py-14 text-center text-slate-400">{ar ? "استكشف القسم لمعرفة أحدث المنتجات." : "Explore the section for the latest products."}</div>
+        <div className="rounded-3xl border border-slate-200 bg-[#f8fafc] px-6 py-14 text-center text-slate-500">{ar ? "استكشف القسم لمعرفة أحدث المنتجات." : "Explore the section for the latest products."}</div>
       ) : (
         <div className="grid grid-cols-2 gap-3 md:gap-5 lg:grid-cols-4">{products.map(product => <ProductCard key={product.id} product={product} ar={ar} lang={lang} add={add} />)}</div>
       )}
-    </section>
+    </div></section>
   );
 }
 
 function ProductCard({ product, ar, lang, add, compact = false }: { product: any; ar: boolean; lang: string; add: (product: any) => void; compact?: boolean }) {
   const hasDiscount = typeof product.original_price === "number" && product.original_price > product.price;
   return (
-    <article className="group overflow-hidden rounded-2xl border border-white/10 bg-[#10141e] transition hover:-translate-y-1 hover:border-blue-400/30">
-      <Link to={`/product/${product.id}`} className="relative block overflow-hidden bg-[#151a25]">
+    <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl">
+      <Link to={`/product/${product.id}`} className="relative block overflow-hidden bg-slate-100">
         <img src={product.image_url || "/images/placeholder.jpg"} alt={productTitle(product, lang)} loading="lazy" className={`w-full object-cover transition duration-500 group-hover:scale-105 ${compact ? "aspect-[16/10]" : "aspect-[4/3]"}`} />
         {hasDiscount && <span className="absolute start-3 top-3 rounded-full bg-fuchsia-600 px-2.5 py-1 text-[10px] font-black text-white">{ar ? "خصم" : "SALE"}</span>}
       </Link>
       <div className="p-4">
-        <Link to={`/product/${product.id}`}><h3 className="min-h-10 line-clamp-2 text-sm font-black transition group-hover:text-blue-300 md:text-base">{productTitle(product, lang)}</h3></Link>
+        <Link to={`/product/${product.id}`}><h3 className="min-h-10 line-clamp-2 text-sm font-black transition group-hover:text-blue-600 md:text-base">{productTitle(product, lang)}</h3></Link>
         {!compact && <p className="mt-2 min-h-8 line-clamp-2 text-xs text-slate-500">{productDescription(product, lang)}</p>}
         <div className="mt-4 flex items-center justify-between gap-2">
           <div>
