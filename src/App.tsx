@@ -39,6 +39,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ServicePlanDetail = lazy(() => import("./pages/ServicePlanDetail"));
 const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
 const ServicePaymentSuccess = lazy(() => import("./pages/ServicePaymentSuccess"));
+const Partners = lazy(() => import("./pages/Partners"));
 
 export default function App() {
   const location = useLocation();
@@ -118,10 +119,7 @@ export default function App() {
                 <Route path="/services/:slug" element={<ServiceDetail />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/orders" element={<OrdersPage />} />
-                <Route
-                  path="/partners"
-                  element={<Navigate to="/shop" replace />}
-                />
+                <Route path="/partners" element={<Partners />} />
                 <Route path="/plans/:planId" element={<ServicePlanDetail />} />
                 <Route
                   path="/service-checkout/:planId"
