@@ -40,6 +40,7 @@ const ServicePlanDetail = lazy(() => import("./pages/ServicePlanDetail"));
 const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
 const ServicePaymentSuccess = lazy(() => import("./pages/ServicePaymentSuccess"));
 const Partners = lazy(() => import("./pages/Partners"));
+const DigitalAssets = lazy(() => import("./pages/DigitalAssets"));
 
 export default function App() {
   const location = useLocation();
@@ -120,6 +121,7 @@ export default function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/partners" element={<Partners />} />
+                <Route path="/digital-assets" element={<DigitalAssets />} />
                 <Route path="/plans/:planId" element={<ServicePlanDetail />} />
                 <Route
                   path="/service-checkout/:planId"
