@@ -305,26 +305,6 @@ export default function DigitalHubHome() {
   );
 }
 
-function CategoryShowcase({ ar, title, text, image, href, icon, reverse = false }: { ar: boolean; title: string; text: string; image: string; href: string; icon: ReactNode; reverse?: boolean }) {
-  return (
-    <section className="bg-[#f6f7fb]"><div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className={`grid items-center gap-7 overflow-hidden rounded-[30px] border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2 md:p-8 ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}>
-        <div className="overflow-hidden rounded-[22px]">
-          <img src={image} alt={title} className="aspect-[16/9] w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
-        </div>
-        <div>
-          <div className="inline-flex rounded-2xl bg-blue-500/10 p-3 text-blue-300 ring-1 ring-blue-400/15">{icon}</div>
-          <h2 className="mt-5 text-3xl font-black md:text-4xl">{title}</h2>
-          <p className="mt-4 max-w-xl leading-7 text-slate-600">{text}</p>
-          <Link to={href} className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-slate-800">
-            {ar ? "استكشف القسم" : "Explore category"}<ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-    </div></section>
-  );
-}
-
 function ProductSection({ ar, title, subtitle, products, loading, add, lang, icon }: { ar: boolean; title: string; subtitle: string; products: any[]; loading: boolean; add: (product: any) => void; lang: string; icon?: ReactNode }) {
   return (
     <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
