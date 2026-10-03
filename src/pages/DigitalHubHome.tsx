@@ -158,6 +158,25 @@ export default function DigitalHubHome() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-cyan-950/50 via-[#0d1422] to-blue-950/60 p-7 md:p-10">
+          <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+            <div>
+              <div className="mb-3 text-sm font-black uppercase tracking-[.18em] text-cyan-300">DIGZOOM PARTNERS</div>
+              <h2 className="text-3xl font-black md:text-5xl">{ar ? "عندك منتج رقمي؟ بعْه معنا." : "Have a digital product? Sell it with us."}</h2>
+              <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
+                {ar
+                  ? "قدّم منتجك للمراجعة. نراجع الجودة وحقوق البيع، ثم نتفق على العمولة والتسوية قبل نشره في المتجر."
+                  : "Submit your product for review. We verify quality and selling rights, then agree on commission and settlement before publishing it."}
+              </p>
+            </div>
+            <Link to="/partners" className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-cyan-300 px-7 font-black text-[#07111d]">
+              {ar ? "بيع منتجاتك معنا" : "Sell with DigZoom"}<Arrow className="h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-[32px] border border-violet-400/20 bg-gradient-to-br from-blue-950/70 via-[#111329] to-violet-950/50 p-7 md:p-10">
           <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
