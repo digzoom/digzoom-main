@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import AdminGuard from "./components/AdminGuard";
 import Seo from "./components/Seo";
 import MarketingServices from "./pages/MarketingServices";
+import DigitalHubHome from "./pages/DigitalHubHome";
 
 const Login = lazy(() => import("./pages/Login"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -67,7 +68,7 @@ export default function App() {
               }
             >
               <Routes>
-                <Route path="/" element={<MarketingServices />} />
+                <Route path="/" element={<DigitalHubHome />} />
                 <Route
                   path="/store"
                   element={<Navigate to="/shop" replace />}
