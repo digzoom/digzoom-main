@@ -3,15 +3,9 @@ import { Link } from "react-router";
 import {
   ArrowLeft,
   ArrowRight,
-  Bot,
   CheckCircle2,
-  Cloud,
-  Gamepad2,
   Gift,
   Headphones,
-  Laptop2,
-  PackageCheck,
-  Smartphone,
   ShieldCheck,
   ShoppingCart,
   Tag,
@@ -23,21 +17,8 @@ import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/hooks/useCart";
 import { productDescription, productTitle } from "@/lib/i18n";
 import { toast } from "sonner";
-const rechargeArt = "/images/digzoom/categories/recharge-approved.webp";
-const digitalProductsArt = "/images/digzoom/categories/digital-products-approved.webp";
-const gamingArt = "/images/digzoom/categories/gaming-approved.webp";
-const softwareArt = "/images/digzoom/categories/software-approved.webp";
-const subscriptionsArt = "/images/digzoom/categories/subscriptions-approved.webp";
-const aiArt = "/images/digzoom/categories/ai-approved.webp";
-
-const categories = [
-  { icon: Cloud, ar: "الاشتراكات", en: "Subscriptions", slug: "subscriptions", image: subscriptionsArt },
-  { icon: Bot, ar: "الذكاء الاصطناعي", en: "AI Tools", slug: "ai", image: aiArt },
-  { icon: Laptop2, ar: "البرامج", en: "Software", slug: "software", image: softwareArt },
-  { icon: Gamepad2, ar: "الألعاب", en: "Gaming", slug: "gaming", image: gamingArt },
-  { icon: PackageCheck, ar: "المنتجات الرقمية", en: "Digital Products", slug: "templates", image: digitalProductsArt },
-  { icon: Smartphone, ar: "بطاقات الشحن", en: "Recharge Cards", slug: "recharge", image: rechargeArt },
-];
+import { storefrontSections } from "@/data/storefrontSections";
+import SectionCard from "@/components/SectionCard";
 
 export default function DigitalHubHome() {
   const { lang } = useLanguage();
@@ -170,20 +151,7 @@ export default function DigitalHubHome() {
 
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map(({ icon: Icon, ar: arName, en, slug, image }) => (
-            <Link key={slug} to={`/shop?category=${slug}`} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-              <div className="overflow-hidden bg-slate-50">
-                <img src={image} alt={ar ? arName : en} width={1672} height={941} loading="lazy" decoding="async" className="aspect-video w-full object-contain" />
-              </div>
-              <div className="flex items-center justify-between gap-3 p-4">
-                <div>
-                  <h2 className="font-black text-slate-950">{ar ? arName : en}</h2>
-                  <div className="mt-1 text-xs text-slate-500">{counts[slug] ? (ar ? `${counts[slug]} منتج` : `${counts[slug]} products`) : (ar ? "استكشف القسم" : "Explore category")}</div>
-                </div>
-                <div className="rounded-xl bg-blue-50 p-2 text-blue-600"><Icon className="h-5 w-5" /></div>
-              </div>
-            </Link>
-          ))}
+          {storefrontSections.map(section => <SectionCard key={section.slug} section={section} ar={ar} count={counts[section.slug]} />)}
         </div>
       </div></section>
 
@@ -237,11 +205,7 @@ export default function DigitalHubHome() {
             <p className="mt-3 text-slate-500">{ar ? "صور واضحة لكل قسم حتى تعرف محتواه من أول نظرة." : "Clear visual categories that show each section at a glance."}</p>
           </div>
           <div className="grid gap-5 lg:grid-cols-2">
-            {categories.map(({ ar: arName, en, slug, image }) => (
-              <Link key={`visual-${slug}`} to={`/shop?category=${slug}`} className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                <img src={image} alt={ar ? arName : en} width={1672} height={941} loading="lazy" decoding="async" className="aspect-video w-full object-contain" />
-              </Link>
-            ))}
+            {storefrontSections.map(section => <SectionCard key={`visual-${section.slug}`} section={section} ar={ar} large />)}
           </div>
         </div>
       </section>

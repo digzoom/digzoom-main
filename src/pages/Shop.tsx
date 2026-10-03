@@ -18,6 +18,7 @@ import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/hooks/useCart";
 import { useLanguage } from "@/hooks/useLanguage";
 import { productTitle, productDescription } from "@/lib/i18n";
+import { storefrontSections, getStorefrontSection, matchesBrand } from "@/data/storefrontSections";
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,34 +44,43 @@ export default function Shop() {
     categories,
     loading,
     error,
-    filterByCategory,
-    searchProducts,
     refresh,
   } = useSupabaseProducts();
 
-  // Sync URL category with Supabase filter
+  const activeSection = getStorefrontSection(activeCat);
+  const selectedBrand = activeSection?.brands.find(brand => brand.id === searchParams.get("brand"));
+  useEffect(() => {
+    setActiveCat(urlCat);
+    setSearch(urlSearch);
+    setSort(urlSort);
+    setSegment("all");
+  }, [urlCat, urlSearch, urlSort]);
+
   const handleCat = (cat: string) => {
     setActiveCat(cat);
     setSegment("all");
     setSearch("");
-    // Map category slug to id
-    const catObj = categories.find(c => c.slug === cat);
-    filterByCategory(catObj ? catObj.id : null);
-    if (cat === "all") setSearchParams({});
-    else setSearchParams({ category: cat });
+    setSearchParams(cat === "all" ? {} : { category: cat });
   };
-
-  // Handle search
   const handleSearch = (val: string) => {
     setSearch(val);
     setSegment("all");
-    if (val.trim()) {
-      searchProducts(val);
-      setActiveCat("all");
-    } else {
-      searchProducts("");
-    }
+    const params = new URLSearchParams(searchParams);
+    if(val.trim()) params.set("search", val); else params.delete("search");
+    setSearchParams(params, { replace: true });
   };
+  const handleBrand = (brandId: string) => {
+    setSearch("");
+    setSegment("all");
+    const params = new URLSearchParams({ category: activeCat });
+    if(brandId) params.set("brand",brandId);
+    setSearchParams(params);
+  };
+  const categoryProducts = useMemo(() => {
+    if(activeCat === "all") return products;
+    const category = categories.find(c => c.slug === activeCat || String(c.id) === activeCat);
+    return category ? products.filter(p => p.category_id === category.id) : [];
+  }, [products, categories, activeCat]);
 
   // Professional Arabic search: normalize for better matching
   const normalizeText = (text: string): string => {
@@ -100,7 +110,8 @@ export default function Shop() {
 
   // Local filtering on top of Supabase results
   const filtered = useMemo(() => {
-    let res = products;
+    let res = [...categoryProducts];
+    if(selectedBrand) res = res.filter(product => matchesBrand(product,selectedBrand));
 
     if (segment !== "all") {
       res = res.filter(product => productSegment(product) === segment);
@@ -139,13 +150,6 @@ export default function Shop() {
         if (!aTitle && bTitle) return 1;
         return 0;
       });
-    } else if (activeCat !== "all" && categories.length > 0) {
-      const catObj = categories.find(
-        c => c.slug === activeCat || c.id.toString() === activeCat
-      );
-      if (catObj) {
-        res = res.filter(p => p.category_id === catObj.id);
-      }
     }
 
     // Sort
@@ -158,7 +162,7 @@ export default function Shop() {
     }
 
     return res;
-  }, [activeCat, sort, search, segment, products, categories, freeOnly]);
+  }, [sort, search, segment, categoryProducts, selectedBrand, freeOnly]);
 
   const getTitle = (p: (typeof products)[0]) => productTitle(p, lang);
   const getDesc = (p: (typeof products)[0]) => productDescription(p, lang);
@@ -173,7 +177,7 @@ export default function Shop() {
     [categories, products]
   );
 
-  useEffect(() => setPage(1), [activeCat, sort, search, segment]);
+  useEffect(() => setPage(1), [activeCat, sort, search, segment, selectedBrand?.id]);
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const visibleProducts = filtered.slice(
     (page - 1) * pageSize,
@@ -226,9 +230,9 @@ export default function Shop() {
               {lang === "ar" ? "متجر DigZoom الرقمي" : "DigZoom digital store"}
             </span>
             <h1 className="mt-5 text-4xl font-black sm:text-5xl">
-              {t.shop.title}
+              {activeSection ? (lang === "ar" ? activeSection.ar : activeSection.en) : t.shop.title}
             </h1>
-            <p className="mt-4 text-slate-300">{t.shop.subtitle}</p>
+            <p className="mt-4 text-slate-300">{activeSection ? (lang === "ar" ? "تصفح الخدمات والمنتجات داخل القسم، ثم اختر المنتج للاطلاع على تفاصيله." : "Browse this department, then choose a product to view its details.") : t.shop.subtitle}</p>
           </div>
         </section>
         <section className="relative -mt-8 px-4 pb-20 sm:px-6 lg:px-8">
@@ -294,10 +298,10 @@ export default function Shop() {
               {lang === "ar" ? "متجر DigZoom الرقمي" : "DigZoom digital store"}
             </span>
             <h1 className="mb-4 text-4xl font-black sm:text-5xl">
-              {t.shop.title}
+              {activeSection ? (lang === "ar" ? activeSection.ar : activeSection.en) : t.shop.title}
             </h1>
             <p className="max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-              {t.shop.subtitle}
+              {activeSection ? (lang === "ar" ? "تصفح الخدمات والمنتجات داخل القسم، ثم اختر المنتج للاطلاع على تفاصيله." : "Browse this department, then choose a product to view its details.") : t.shop.subtitle}
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300">
               <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
@@ -319,6 +323,34 @@ export default function Shop() {
 
       <section className="relative -mt-8 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 flex flex-wrap gap-2 text-sm">
+            <Link to="/" className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-bold">{lang === "ar" ? "الرئيسية" : "Home"}</Link>
+            <button onClick={() => handleCat("all")} className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-bold">{lang === "ar" ? "جميع المنتجات" : "All products"}</button>
+          </div>
+          <nav aria-label={lang === "ar" ? "أقسام المتجر" : "Store departments"} className="mb-8 flex flex-wrap gap-2">
+            {storefrontSections.map(section => <button key={section.slug} onClick={() => handleCat(section.slug)} aria-pressed={activeCat===section.slug} className="rounded-xl border px-4 py-3 text-sm font-bold" style={{ borderColor: section.accent, background:activeCat===section.slug?section.accent:'white', color:activeCat===section.slug?'white':section.accent }}>{lang === "ar" ? section.ar : section.en}</button>)}
+          </nav>
+          {activeSection && <div className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <img src={activeSection.image} alt={lang === "ar" ? activeSection.ar : activeSection.en} className="mx-auto aspect-video w-full max-w-3xl object-contain" width={1672} height={941} />
+          </div>}
+          {activeSection && activeSection.brands.length > 0 && <section className="mb-8">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-black">{lang === "ar" ? "اختر الخدمة" : "Choose a service"}</h2>
+              {selectedBrand && <button onClick={() => handleBrand("")} className="text-sm font-bold text-blue-700">{lang === "ar" ? "عرض كل خدمات القسم" : "Show all services"}</button>}
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {activeSection.brands.map(brand => {
+                const count=categoryProducts.filter(product => matchesBrand(product,brand)).length;
+                return <button key={brand.id} onClick={() => handleBrand(brand.id)} aria-pressed={selectedBrand?.id===brand.id} className={`rounded-2xl border-2 bg-white p-5 text-start transition hover:shadow-md ${selectedBrand?.id===brand.id?'border-blue-600 ring-2 ring-blue-100':'border-slate-200'}`}>
+                  <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-xl font-black text-white" style={{background:activeSection.accent}} aria-hidden="true">{brand.mark}</span>
+                  <h3 className="font-black">{lang === "ar" ? brand.ar : brand.en}</h3>
+                  <p className={`mt-2 text-xs ${count?'text-emerald-700':'text-slate-500'}`}>{count ? `${count} ${lang === "ar" ? "منتج" : "products"}` : (lang === "ar" ? "غير متاح حاليًا" : "Currently unavailable")}</p>
+                  <span className="mt-4 block text-sm font-bold text-blue-700">{lang === "ar" ? "تصفح" : "Browse"}</span>
+                </button>;
+              })}
+            </div>
+          </section>}
+          {selectedBrand && <h2 className="mb-5 text-2xl font-black">{lang === "ar" ? selectedBrand.ar : selectedBrand.en}</h2>}
           {/* Search + Filters */}
           {products.length > 0 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/5 mb-8 flex flex-col sm:flex-row gap-4">
@@ -374,7 +406,7 @@ export default function Shop() {
           )}
 
           {/* Clear customer-facing categories, independent from technical product types. */}
-          {products.length > 0 && (
+          {products.length > 0 && (activeCat === "all" || activeCat === "templates") && (
             <div className="mb-6">
               <p className="mb-3 text-sm font-bold text-slate-700">
                 {lang === "ar" ? "اختر حسب احتياجك" : "Browse by use case"}
@@ -385,8 +417,10 @@ export default function Shop() {
                     key={item.value}
                     onClick={() => {
                       setSegment(item.value);
-                      setActiveCat("all");
                       setSearch("");
+                      const params = new URLSearchParams(searchParams);
+                      params.delete("search");
+                      setSearchParams(params);
                     }}
                     className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${segment === item.value ? "bg-slate-950 text-white shadow-lg" : "border border-slate-200 bg-white text-slate-600 hover:text-slate-950"}`}
                   >
@@ -617,7 +651,7 @@ export default function Shop() {
                   ? lang === "ar"
                     ? "لا توجد نتائج"
                     : "No Results Found"
-                  : t.shop.empty}
+                  : activeSection ? (lang === "ar" ? "لا توجد منتجات متاحة في هذا القسم حاليًا" : "No products currently available in this department") : t.shop.empty}
               </h3>
               <p className="text-slate-500 mb-8 max-w-xl mx-auto text-sm md:text-base leading-7">
                 {search.trim()
@@ -625,8 +659,8 @@ export default function Shop() {
                     ? `لم نعثر على منتجات تطابق "${search}". جرب كلمة بحث مختلفة.`
                     : `No products matching "${search}". Try a different search term.`
                   : lang === "ar"
-                    ? "أوقفنا المنتجات التجريبية، ونعمل حالياً على تجهيز منتجات حقيقية بملفات وتسليم واضح."
-                    : "We removed the demo catalog and are preparing real products with verified files and clear delivery."}
+                    ? activeSection ? "يمكنك تصفح الأقسام الأخرى أو إرسال طلبك. سيظهر المنتج هنا عند توفره مع السعر وتفاصيل التفعيل والتسليم." : "نعمل على تجهيز منتجات بملفات وتسليم واضح."
+                    : activeSection ? "Browse another department or send us a request. Available products will appear with pricing, activation, and delivery details." : "We are preparing products with verified files and clear delivery."}
               </p>
               {search.trim() ? (
                 <button

@@ -73,3 +73,28 @@
     @apply bg-background text-foreground;
   }
 }
+/* Each frame uses the visual language of its department. */
+.section-frame { display:block; position:relative; overflow:hidden; border:2px solid var(--section-accent); border-radius:24px; background:#fff; box-shadow:0 8px 22px color-mix(in srgb,var(--section-accent) 10%,transparent); transition:transform .2s,box-shadow .2s; }
+.section-frame:hover { transform:translateY(-3px); box-shadow:0 14px 30px color-mix(in srgb,var(--section-accent) 20%,transparent); }
+.section-frame:focus-visible { outline:3px solid var(--section-accent); outline-offset:4px; }
+.section-frame__art { margin:8px; overflow:hidden; border-radius:14px; background:#fff; }
+.section-frame__browse { background:var(--section-accent); }
+.section-frame__rail { display:flex; align-items:center; gap:5px; height:18px; padding:0 14px; background:color-mix(in srgb,var(--section-accent) 10%,white); }
+.section-frame__rail span { width:5px; height:5px; border-radius:50%; background:var(--section-accent); }
+.section-frame--stream { border-radius:16px; border-width:3px; }
+.section-frame--stream .section-frame__rail { height:16px; background:repeating-linear-gradient(90deg,var(--section-accent) 0 10px,#fff 10px 16px); }
+.section-frame--stream .section-frame__rail span { display:none; }
+.section-frame--circuit { border-radius:8px 28px 8px 28px; }
+.section-frame--circuit .section-frame__rail { background-image:linear-gradient(90deg,transparent 45%,var(--section-accent) 45% 47%,transparent 47%),linear-gradient(0deg,transparent 45%,var(--section-accent) 45% 47%,transparent 47%); background-size:22px 18px; }
+.section-frame--window { border-radius:14px; }
+.section-frame--window .section-frame__rail { height:25px; }
+.section-frame--gaming { border-radius:30px 8px 30px 8px; border-width:3px; }
+.section-frame--gaming .section-frame__rail span { width:7px; height:7px; border-radius:1px; transform:rotate(45deg); }
+.section-frame--paper { border-style:dashed; border-radius:8px 8px 24px 8px; }
+.section-frame--paper .section-frame__rail { background:repeating-linear-gradient(90deg,#fff 0 16px,#d1fae5 16px 17px); }
+.section-frame--signal { border-radius:28px; border-width:3px; }
+.section-frame--signal .section-frame__rail { justify-content:flex-end; }
+.section-frame--signal .section-frame__rail span { width:4px; border-radius:2px; height:5px; }
+.section-frame--signal .section-frame__rail span:nth-child(2) { height:9px; }
+.section-frame--signal .section-frame__rail span:nth-child(3) { height:13px; }
+@media(prefers-reduced-motion:reduce) { .section-frame { transition:none; } .section-frame:hover { transform:none; } }
