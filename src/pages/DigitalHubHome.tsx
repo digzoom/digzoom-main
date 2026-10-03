@@ -72,7 +72,7 @@ export default function DigitalHubHome() {
           <div className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
             {slides.map((item, index) => (
               <div key={item.href} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-                <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top md:object-cover" : "h-full w-full object-cover"} />
+                <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top" : "h-full w-full object-cover"} />
                 {index !== 0 && <div className="absolute inset-0 bg-gradient-to-r from-[#05070d]/95 via-[#05070d]/75 to-[#05070d]/15 rtl:bg-gradient-to-l" />}
               </div>
             ))}
