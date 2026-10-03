@@ -30,13 +30,13 @@ export default function DigitalHubHome() {
 
   const slides = [
     {
-      image: "/images/digzoom/digital-products-live.webp",
+      image: "/images/digzoom/store-hero-lifestyle-v1.webp",
       eyebrow: ar ? "DIGZOOM STORE" : "DIGZOOM STORE",
-      title: ar ? "كل ما تحتاجه رقميًا" : "Everything digital you need",
+      title: ar ? "عالمك الرقمي،" : "Your digital world,",
       accent: ar ? "في مكان واحد." : "in one place.",
-      text: ar ? "منتجات رقمية وأدوات أعمال وخدمات تساعدك على الإنجاز والنمو." : "Digital products, business tools, and services that help you work and grow.",
-      cta: ar ? "تسوق الآن" : "Shop now",
-      href: "/shop",
+      text: ar ? "اشتراكاتك، ألعابك، برامجك وأدوات الذكاء الاصطناعي." : "Subscriptions, games, software and AI tools.",
+      cta: ar ? "تصفح الأقسام" : "Browse departments",
+      href: "#departments",
     },
     {
       image: "/images/business-workspace.jpg",
@@ -108,31 +108,31 @@ export default function DigitalHubHome() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
-      <section className="relative bg-[#05070d] pb-10 pt-24 text-white md:pt-28">
+      <section className={`relative pb-10 pt-24 md:pt-28 ${slide === 0 ? "bg-[#f3f0ff] text-slate-950" : "bg-[#05070d] text-white"}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-white/10 bg-[#09101a] shadow-[0_30px_80px_rgba(0,0,0,.35)] md:min-h-[560px]">
+          <div className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
             {slides.map((item, index) => (
               <div key={item.href} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-                <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#05070d]/95 via-[#05070d]/75 to-[#05070d]/15 rtl:bg-gradient-to-l" />
+                <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top md:object-cover" : "h-full w-full object-cover"} />
+                {index !== 0 && <div className="absolute inset-0 bg-gradient-to-r from-[#05070d]/95 via-[#05070d]/75 to-[#05070d]/15 rtl:bg-gradient-to-l" />}
               </div>
             ))}
 
-            <div className="relative z-10 flex min-h-[500px] items-center px-7 py-12 sm:px-10 md:min-h-[560px] md:px-14 lg:px-16">
-              <div className="max-w-2xl">
-                <div className="mb-5 inline-flex rounded-full border border-cyan-300/20 bg-black/30 px-4 py-2 text-sm font-black tracking-[.14em] text-cyan-200 backdrop-blur-xl">{current.eyebrow}</div>
-                <h1 className="text-5xl font-black leading-[1.02] tracking-[-.04em] sm:text-6xl lg:text-7xl">
+            <div className={`relative z-10 flex min-h-[500px] items-center px-7 py-12 sm:px-10 md:min-h-[560px] md:px-10 lg:px-12 ${slide === 0 ? "pt-[48vw] md:pt-28" : ""}`}>
+              <div className={slide === 0 ? "w-full md:ml-auto md:max-w-[43%]" : "max-w-2xl"}>
+                {slide !== 0 && <div className="mb-5 inline-flex rounded-full border border-cyan-300/20 bg-black/30 px-4 py-2 text-sm font-black tracking-[.14em] text-cyan-200 backdrop-blur-xl">{current.eyebrow}</div>}
+                <h1 className={`font-black leading-[1.12] tracking-[-.04em] ${slide === 0 ? "text-4xl sm:text-5xl lg:text-6xl" : "text-5xl sm:text-6xl lg:text-7xl"}`}>
                   {current.title}
-                  <span className="mt-2 block bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">{current.accent}</span>
+                  <span className="mt-2 block bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">{current.accent}</span>
                 </h1>
-                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">{current.text}</p>
+                <p className={`mt-6 max-w-xl text-lg leading-8 ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>{current.text}</p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Link to={current.href} className="inline-flex min-h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-7 font-black shadow-[0_18px_60px_rgba(59,130,246,.25)]">
+                  <Link onClick={slide === 0 ? (event) => { event.preventDefault(); document.getElementById("departments")?.scrollIntoView({ behavior: "smooth", block: "start" }); } : undefined} to={current.href} className="inline-flex min-h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-7 font-black text-white shadow-[0_18px_60px_rgba(59,130,246,.25)]">
                     {current.cta}<Arrow className="h-5 w-5" />
                   </Link>
-                  <Link to="/shop" className="inline-flex min-h-14 items-center gap-2 rounded-2xl border border-white/15 bg-black/30 px-7 font-bold backdrop-blur-xl">{ar ? "استكشف المتجر" : "Explore store"}</Link>
+                  {slide !== 0 && <Link to="/shop" className="inline-flex min-h-14 items-center gap-2 rounded-2xl border border-white/15 bg-black/30 px-7 font-bold backdrop-blur-xl">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
                 </div>
-                <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-slate-300">
+                <div className={`mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>
                   <span className="inline-flex items-center gap-2"><Zap className="h-4 w-4 text-amber-300" />{ar ? "تسليم رقمي" : "Digital delivery"}</span>
                   <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" />{ar ? "دفع آمن" : "Secure checkout"}</span>
                   <span className="inline-flex items-center gap-2"><Headphones className="h-4 w-4 text-cyan-300" />{ar ? "دعم سريع" : "Fast support"}</span>
@@ -142,14 +142,14 @@ export default function DigitalHubHome() {
 
             <div className="absolute bottom-5 start-6 z-20 flex gap-2">
               {slides.map((item, index) => (
-                <button key={item.href} onClick={() => setSlide(index)} className={`h-2.5 rounded-full transition-all ${index === slide ? "w-9 bg-white" : "w-2.5 bg-white/35"}`} aria-label={`${ar ? "الشريحة" : "Slide"} ${index + 1}`} />
+                <button key={item.href} onClick={() => setSlide(index)} className={`h-2.5 rounded-full transition-all ${index === slide ? (slide === 0 ? "w-9 bg-blue-600" : "w-9 bg-white") : (slide === 0 ? "w-2.5 bg-slate-400/50" : "w-2.5 bg-white/35")}`} aria-label={`${ar ? "الشريحة" : "Slide"} ${index + 1}`} />
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <section id="departments" className="scroll-mt-24 bg-white"><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {storefrontSections.map(section => <SectionCard key={section.slug} section={section} ar={ar} count={counts[section.slug]} />)}
         </div>
