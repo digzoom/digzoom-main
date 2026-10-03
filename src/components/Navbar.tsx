@@ -19,6 +19,8 @@ import {
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
+  Search,
+  Smartphone,
   Store,
   Tag,
   UploadCloud,
@@ -38,6 +40,7 @@ const primaryLinks = (isAr: boolean) => [
   { name: isAr ? "البرامج" : "Software", path: "/shop?category=software", icon: Laptop2 },
   { name: isAr ? "الألعاب" : "Gaming", path: "/shop?category=gaming", icon: Gamepad2 },
   { name: isAr ? "المنتجات الرقمية" : "Digital products", path: "/shop?category=templates", icon: PackageOpen },
+  { name: isAr ? "بطاقات الشحن" : "Recharge cards", path: "/shop?category=recharge", icon: Smartphone },
 ];
 
 const sideLinks = (isAr: boolean) => [
@@ -125,6 +128,18 @@ export default function Navbar() {
                 </Link>
               ))}
             </div>
+
+            <form action="/shop" method="get" className="hidden min-w-[220px] max-w-[320px] flex-1 items-center lg:flex">
+              <div className="relative w-full">
+                <Search className={`absolute top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 ${isAr ? "right-3" : "left-3"}`} />
+                <input
+                  name="search"
+                  type="search"
+                  placeholder={isAr ? "ابحث عن منتج..." : "Search products..."}
+                  className={`w-full rounded-xl border border-white/10 bg-white/[.05] py-2.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400/40 focus:bg-white/[.07] ${isAr ? "pr-10 pl-3" : "pl-10 pr-3"}`}
+                />
+              </div>
+            </form>
 
             <div className="flex items-center gap-1 sm:gap-2">
               <button
