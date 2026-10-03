@@ -9,6 +9,7 @@ import {
   Gift,
   Globe,
   Home,
+  KeyRound,
   Laptop2,
   LogIn,
   LogOut,
@@ -42,6 +43,7 @@ const primaryLinks = (isAr: boolean) => [
 const sideLinks = (isAr: boolean) => [
   ...primaryLinks(isAr),
   { name: isAr ? "خدمات DigZoom" : "DigZoom services", path: "/marketing", icon: BriefcaseBusiness },
+  { name: isAr ? "سوق الأصول الرقمية" : "Digital assets", path: "/digital-assets", icon: KeyRound },
   { name: isAr ? "بيع منتجاتك معنا" : "Sell with us", path: "/partners", icon: UploadCloud },
   { name: isAr ? "منتجات مجانية" : "Free products", path: "/shop?price=free", icon: Gift },
   { name: "DigZoom Pass", path: "/#digzoom-pass", icon: ShieldCheck },
