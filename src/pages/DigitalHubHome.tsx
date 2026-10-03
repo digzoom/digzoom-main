@@ -18,11 +18,11 @@ import {
 import { useLanguage } from "@/hooks/useLanguage";
 
 const categories = [
-  { icon: Bot, ar: "الذكاء الاصطناعي", en: "AI Tools", href: "/shop/ai" },
-  { icon: Cloud, ar: "الاشتراكات", en: "Subscriptions", href: "/shop/subscriptions" },
-  { icon: Laptop2, ar: "البرامج", en: "Software", href: "/shop/software" },
-  { icon: Gamepad2, ar: "الألعاب", en: "Gaming", href: "/shop/gaming" },
-  { icon: Box, ar: "القوالب والملفات", en: "Templates & Files", href: "/shop/templates" },
+  { icon: Bot, ar: "الذكاء الاصطناعي", en: "AI Tools", href: "/shop?category=ai" },
+  { icon: Cloud, ar: "الاشتراكات", en: "Subscriptions", href: "/shop?category=subscriptions" },
+  { icon: Laptop2, ar: "البرامج", en: "Software", href: "/shop?category=software" },
+  { icon: Gamepad2, ar: "الألعاب", en: "Gaming", href: "/shop?category=gaming" },
+  { icon: Box, ar: "القوالب والملفات", en: "Templates & Files", href: "/shop?category=templates" },
   { icon: BriefcaseBusiness, ar: "حلول الأعمال", en: "Business Solutions", href: "/marketing" },
 ];
 
