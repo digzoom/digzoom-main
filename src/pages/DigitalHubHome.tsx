@@ -97,22 +97,22 @@ export default function DigitalHubHome() {
           </div>
 
           <div className="relative">
-            <div className="absolute -inset-6 -z-10 rounded-[36px] bg-gradient-to-br from-blue-600/20 via-violet-500/10 to-cyan-400/20 blur-3xl" />
-            <div className="rounded-[30px] border border-white/10 bg-white/[.055] p-5 shadow-2xl backdrop-blur-xl">
-              <div className="mb-5 flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-[.18em] text-cyan-300">DIGZOOM</div>
-                  <div className="mt-1 text-lg font-black">{ar ? "السوق الرقمي" : "Digital marketplace"}</div>
-                </div>
-                <div className="rounded-xl bg-white/10 p-3"><ShoppingBag className="h-5 w-5" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {categories.map(({ icon: Icon, ar: arName, en, href }) => (
-                  <Link key={href} to={href} className="group rounded-2xl border border-white/10 bg-black/25 p-4 transition hover:-translate-y-1 hover:border-blue-400/30 hover:bg-white/[.08]">
-                    <div className="mb-4 inline-flex rounded-xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 p-3 ring-1 ring-white/10">
-                      <Icon className="h-6 w-6 text-blue-200" />
-                    </div>
-                    <div className="text-sm font-extrabold text-white">{ar ? arName : en}</div>
+            <div className="absolute -inset-8 -z-10 rounded-[40px] bg-gradient-to-br from-blue-600/25 via-violet-500/15 to-cyan-400/20 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[30px] border border-white/10 bg-white/[.055] p-2 shadow-2xl backdrop-blur-xl">
+              <img
+                src="/images/digzoom/digital-products-live.webp"
+                alt={ar ? "عالم DigZoom للمنتجات الرقمية" : "DigZoom digital products"}
+                className="aspect-[16/11] w-full rounded-[24px] object-cover"
+              />
+              <div className="absolute inset-x-5 bottom-5 grid grid-cols-3 gap-2">
+                {categories.slice(0, 3).map(({ icon: Icon, ar: arName, en, href }) => (
+                  <Link
+                    key={href}
+                    to={href}
+                    className="rounded-2xl border border-white/10 bg-black/65 p-3 text-center backdrop-blur-xl transition hover:bg-black/80"
+                  >
+                    <Icon className="mx-auto h-5 w-5 text-cyan-200" />
+                    <div className="mt-2 text-[11px] font-extrabold text-white sm:text-xs">{ar ? arName : en}</div>
                   </Link>
                 ))}
               </div>
@@ -160,7 +160,7 @@ export default function DigitalHubHome() {
 
       <section className="mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-cyan-950/50 via-[#0d1422] to-blue-950/60 p-7 md:p-10">
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
             <div>
               <div className="mb-3 text-sm font-black uppercase tracking-[.18em] text-cyan-300">DIGZOOM PARTNERS</div>
               <h2 className="text-3xl font-black md:text-5xl">{ar ? "عندك منتج رقمي؟ بعْه معنا." : "Have a digital product? Sell it with us."}</h2>
@@ -169,29 +169,45 @@ export default function DigitalHubHome() {
                   ? "قدّم منتجك للمراجعة. نراجع الجودة وحقوق البيع، ثم نتفق على العمولة والتسوية قبل نشره في المتجر."
                   : "Submit your product for review. We verify quality and selling rights, then agree on commission and settlement before publishing it."}
               </p>
+              <Link to="/partners" className="mt-7 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-cyan-300 px-7 font-black text-[#07111d]">
+                {ar ? "بيع منتجاتك معنا" : "Sell with DigZoom"}<Arrow className="h-5 w-5" />
+              </Link>
             </div>
-            <Link to="/partners" className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-cyan-300 px-7 font-black text-[#07111d]">
-              {ar ? "بيع منتجاتك معنا" : "Sell with DigZoom"}<Arrow className="h-5 w-5" />
-            </Link>
+            <div className="overflow-hidden rounded-[26px] border border-white/10 bg-black/20 p-2">
+              <img
+                src="/images/digzoom/creator-partner-live.webp"
+                alt={ar ? "صانع منتج رقمي يبيع عبر DigZoom" : "Creator selling through DigZoom"}
+                className="aspect-[16/10] w-full rounded-[20px] object-cover"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-[32px] border border-violet-400/20 bg-gradient-to-br from-blue-950/70 via-[#111329] to-violet-950/50 p-7 md:p-10">
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+          <div className="grid items-center gap-10 lg:grid-cols-[.95fr_1.05fr]">
+            <div className="overflow-hidden rounded-[26px] border border-white/10 bg-black/20 p-2">
+              <img
+                src="/images/digzoom/growth-hero-live-v3.webp"
+                alt={ar ? "إدارة مواقع وخدمات DigZoom" : "DigZoom website management services"}
+                className="aspect-[16/10] w-full rounded-[20px] object-cover"
+                loading="lazy"
+              />
+            </div>
             <div>
               <div className="mb-3 text-sm font-black uppercase tracking-[.18em] text-violet-300">DIGZOOM BUSINESS</div>
-              <h2 className="text-3xl font-black md:text-5xl">{ar ? "ولا نلغي خدمات إدارة المواقع." : "Website management stays."}</h2>
+              <h2 className="text-3xl font-black md:text-5xl">{ar ? "خدمات إدارة المواقع تبقى جزءًا أساسيًا." : "Website management stays a core service."}</h2>
               <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
                 {ar
                   ? "إذا كنت صاحب متجر أو شركة وتريد فريقًا يتولى موقعك ومنتجاتك ومحتواك، يبقى هذا المسار موجودًا كخدمة مستقلة داخل DigZoom."
                   : "If you run a store or company and need a team to manage your site, products, and content, that remains a dedicated DigZoom service."}
               </p>
+              <Link to="/marketing" className="mt-7 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-white px-7 font-black text-[#090b12]">
+                {ar ? "شاهد خدمات الأعمال" : "View business services"}<Arrow className="h-5 w-5" />
+              </Link>
             </div>
-            <Link to="/marketing" className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-white px-7 font-black text-[#090b12]">
-              {ar ? "شاهد خدمات الأعمال" : "View business services"}<Arrow className="h-5 w-5" />
-            </Link>
           </div>
         </div>
       </section>
