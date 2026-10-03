@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import type { ReactNode } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -261,15 +262,15 @@ export default function DigitalHubHome() {
       <section className="border-t border-white/10 bg-[#080b13]">
         <div className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
           {[
-            [Zap, ar ? "تسليم رقمي" : "Digital delivery", ar ? "حسب نوع المنتج" : "By product type"],
-            [ShieldCheck, ar ? "منتجات موثوقة" : "Verified listings", ar ? "تفاصيل واضحة قبل الشراء" : "Clear details before purchase"],
-            [Headphones, ar ? "دعم سريع" : "Fast support", ar ? "قبل وبعد الطلب" : "Before and after purchase"],
-            [PackageCheck, ar ? "كتالوج منظم" : "Organized catalog", ar ? "بحث وتصنيفات واضحة" : "Clear search and categories"],
-          ].map(([Icon, title, text]) => (
-            <div key={String(title)} className="rounded-2xl border border-white/10 bg-white/[.03] p-5">
-              {typeof Icon !== "string" && <Icon className="h-6 w-6 text-blue-300" />}
-              <h3 className="mt-4 font-black">{String(title)}</h3>
-              <p className="mt-2 text-sm text-slate-500">{String(text)}</p>
+            { icon: Zap, title: ar ? "تسليم رقمي" : "Digital delivery", text: ar ? "حسب نوع المنتج" : "By product type" },
+            { icon: ShieldCheck, title: ar ? "منتجات موثوقة" : "Verified listings", text: ar ? "تفاصيل واضحة قبل الشراء" : "Clear details before purchase" },
+            { icon: Headphones, title: ar ? "دعم سريع" : "Fast support", text: ar ? "قبل وبعد الطلب" : "Before and after purchase" },
+            { icon: PackageCheck, title: ar ? "كتالوج منظم" : "Organized catalog", text: ar ? "بحث وتصنيفات واضحة" : "Clear search and categories" },
+          ].map(({ icon: Icon, title, text }) => (
+            <div key={title} className="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+              <Icon className="h-6 w-6 text-blue-300" />
+              <h3 className="mt-4 font-black">{title}</h3>
+              <p className="mt-2 text-sm text-slate-500">{text}</p>
             </div>
           ))}
         </div>
@@ -295,7 +296,7 @@ function ProductSection({
   loading: boolean;
   add: (product: any) => void;
   lang: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
