@@ -92,9 +92,10 @@ export default function DigitalHubHome() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
-      <section className={`relative pb-10 pt-24 md:pt-28 ${slide === 0 ? "bg-[#f3f0ff] text-slate-950" : "bg-[#05070d] text-white"}`}>
+      <section className="relative bg-[#f3f0ff] pb-10 pt-24 md:pt-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)} onFocusCapture={() => setHeroPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroPaused(false); }} aria-roledescription={ar ? "عرض شرائح" : "carousel"} aria-label={ar ? "اكتشف DigZoom" : "Discover DigZoom"} className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
+          <div onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)} onFocusCapture={() => setHeroPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroPaused(false); }} aria-roledescription={ar ? "عرض شرائح" : "carousel"} aria-label={ar ? "اكتشف DigZoom" : "Discover DigZoom"} className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-blue-400/60 via-indigo-300/40 to-violet-500/60 p-[2px] shadow-[0_20px_60px_rgba(79,70,229,.14)]">
+            <div className={`relative overflow-hidden rounded-[30px] bg-[#f7f4ff] ${slide === 0 ? "text-slate-950" : "text-white"}`}>
             {slides.map((item, index) => (
               <div key={item.href} aria-hidden={index !== slide} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
                 <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top" : "h-full w-full object-cover"} />
@@ -102,15 +103,15 @@ export default function DigitalHubHome() {
               </div>
             ))}
 
-            <div className={`relative z-10 flex min-h-[500px] items-center px-7 py-12 sm:px-10 md:min-h-[560px] md:px-10 lg:px-12 ${slide === 0 ? "pt-[48vw] md:pt-28" : ""}`}>
+            <div className="relative z-10 flex min-h-[740px] items-end px-7 pb-20 pt-[52vw] sm:px-10 md:min-h-[600px] md:px-10 md:pt-36 lg:px-12">
               <div className={slide === 0 ? "w-full md:ml-auto md:max-w-[43%]" : "max-w-2xl"}>
-                {slide !== 0 && <div className="mb-5 inline-flex rounded-full border border-cyan-300/20 bg-black/30 px-4 py-2 text-sm font-black tracking-[.14em] text-cyan-200 backdrop-blur-xl">{current.eyebrow}</div>}
-                <h1 className={`font-black leading-[1.12] tracking-[-.04em] ${slide === 0 ? "text-4xl sm:text-5xl lg:text-6xl" : "text-5xl sm:text-6xl lg:text-7xl"}`}>
+                {slide !== 0 && <div className="mb-5 inline-flex rounded-full border border-indigo-200/30 bg-black/30 px-4 py-2 text-sm font-black tracking-[.14em] text-indigo-100 backdrop-blur-xl md:absolute md:top-24">{current.eyebrow}</div>}
+                <h1 className="min-h-[135px] text-4xl font-black leading-[1.2] tracking-[-.04em] sm:text-5xl md:min-h-[126px]">
                   {current.title}
                   <span className="mt-2 block bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 bg-clip-text text-transparent">{current.accent}</span>
                 </h1>
-                <p className={`mt-6 max-w-xl text-lg leading-8 ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>{current.text}</p>
-                <div className="mt-8 flex flex-wrap gap-3">
+                <p className={`mt-6 min-h-16 max-w-xl text-lg leading-8 ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>{current.text}</p>
+                <div className="mt-8 flex min-h-14 flex-wrap gap-3">
                   <Link onClick={slide === 0 ? (event) => { event.preventDefault(); document.getElementById("departments")?.scrollIntoView({ behavior: "smooth", block: "start" }); } : undefined} to={current.href} className="inline-flex min-h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-7 font-black text-white shadow-[0_18px_60px_rgba(59,130,246,.25)]">
                     {current.cta}<Arrow className="h-5 w-5" />
                   </Link>
@@ -124,8 +125,9 @@ export default function DigitalHubHome() {
               </div>
             </div>
 
-            <div className="absolute bottom-4 start-6 z-20 flex gap-2" aria-label={ar ? "التنقل بين الشرائح" : "Slide navigation"}>
-              {slides.map((item, index) => <button key={item.href} onClick={() => setSlide(index)} aria-label={`${ar ? "الشريحة" : "Slide"} ${index + 1}`} aria-pressed={index === slide} className="flex h-8 w-10 items-center justify-center"><span className={`h-2.5 rounded-full transition-all ${index === slide ? (slide === 0 ? "w-8 bg-blue-600" : "w-8 bg-white") : (slide === 0 ? "w-2.5 bg-slate-400" : "w-2.5 bg-white/40")}`} /></button>)}
+            <div className="absolute bottom-4 start-6 z-20 flex gap-2 rounded-full border border-indigo-200/60 bg-[#f7f4ff]/95 px-2 shadow-sm backdrop-blur-xl" aria-label={ar ? "التنقل بين الشرائح" : "Slide navigation"}>
+              {slides.map((item, index) => <button key={item.href} onClick={() => setSlide(index)} aria-label={`${ar ? "الشريحة" : "Slide"} ${index + 1}`} aria-pressed={index === slide} className="flex h-8 w-10 items-center justify-center"><span className={`h-2.5 rounded-full transition-all ${index === slide ? "w-8 bg-indigo-600" : "w-2.5 bg-slate-400"}`} /></button>)}
+            </div>
             </div>
           </div>
         </div>
