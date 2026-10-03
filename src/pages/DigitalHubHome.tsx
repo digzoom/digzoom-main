@@ -38,7 +38,7 @@ const benefitsEn = [
   ["Support before and after purchase", "We explain licensing and usage before you pay."],
 ];
 
-export default function DigitalHubHome() {
+// audit preview before partners\nexport default function DigitalHubHome() {
   const { lang } = useLanguage();
   const ar = lang === "ar";
   const Arrow = ar ? ArrowLeft : ArrowRight;
