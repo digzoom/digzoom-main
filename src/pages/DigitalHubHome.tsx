@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link } from "react-router";
 import {
   ArrowLeft,
@@ -26,8 +26,7 @@ export default function DigitalHubHome() {
   const Arrow = ar ? ArrowLeft : ArrowRight;
   const { products, categories: dbCategories, loading } = useSupabaseProducts();
   const { addToCart } = useCart();
-  const [slide, setSlide] = useState(0);
-  const [heroPaused, setHeroPaused] = useState(false);
+  const slide = 0;
 
   const slides = [
     {
@@ -39,49 +38,7 @@ export default function DigitalHubHome() {
       cta: ar ? "تصفح الأقسام" : "Browse departments",
       href: "#departments",
     },
-    {
-      image: "/images/business-workspace.jpg",
-      eyebrow: ar ? "اشتراكات رقمية" : "DIGITAL SUBSCRIPTIONS",
-      title: ar ? "اشتراكاتك الرقمية" : "Your digital subscriptions",
-      accent: ar ? "بواجهة أوضح." : "in a clearer store.",
-      text: ar ? "تصفح قسم الاشتراكات والعروض والخدمات الرقمية من مكان واحد." : "Browse subscriptions, offers, and digital services from one place.",
-      cta: ar ? "استكشف الاشتراكات" : "Explore subscriptions",
-      href: "/shop?category=subscriptions",
-    },
-    {
-      image: "/images/ai-technology.jpg",
-      eyebrow: ar ? "أدوات الذكاء الاصطناعي" : "AI TOOLS",
-      title: ar ? "أدوات تساعدك" : "Tools that help you",
-      accent: ar ? "تنجز أسرع." : "move faster.",
-      text: ar ? "قسم مستقل لأدوات الذكاء الاصطناعي والحلول الرقمية الحديثة." : "A dedicated section for AI tools and modern digital solutions.",
-      cta: ar ? "استكشف الذكاء الاصطناعي" : "Explore AI",
-      href: "/shop?category=ai",
-    },
-    {
-      image: "/images/digzoom/growth-hero-live-v3.webp",
-      eyebrow: ar ? "خدمات DigZoom" : "DIGZOOM SERVICES",
-      title: ar ? "ندير موقعك وتسويقك" : "We manage your site",
-      accent: ar ? "بشكل احترافي." : "and your growth.",
-      text: ar ? "إدارة مواقع، محتوى، منتجات، وتسويق ضمن خدمة واضحة ومستقلة." : "Website, content, product, and marketing management in one clear service.",
-      cta: ar ? "شاهد الخدمات" : "View services",
-      href: "/marketing",
-    },
-    {
-      image: "/images/digzoom/creator-partner-live.webp",
-      eyebrow: ar ? "بيع منتجاتك معنا" : "SELL WITH DIGZOOM",
-      title: ar ? "عندك منتج رقمي؟" : "Have a digital product?",
-      accent: ar ? "بعْه معنا." : "Sell it with us.",
-      text: ar ? "قدّم منتجك للمراجعة وانضم إلى متجر DigZoom." : "Submit your product for review and join the DigZoom store.",
-      cta: ar ? "ابدأ التقديم" : "Start applying",
-      href: "/partners",
-    },
   ];
-
-  useEffect(() => {
-    if (heroPaused) return;
-    const timer = window.setInterval(() => setSlide(current => (current + 1) % slides.length), 5500);
-    return () => window.clearInterval(timer);
-  }, [slides.length, slide, heroPaused]);
 
   const sortedProducts = [...products].sort(
     (a, b) =>
@@ -112,7 +69,7 @@ export default function DigitalHubHome() {
     <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
       <section className={`relative pb-10 pt-24 md:pt-28 ${slide === 0 ? "bg-[#f3f0ff] text-slate-950" : "bg-[#05070d] text-white"}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)} onFocusCapture={() => setHeroPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroPaused(false); }} className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
+          <div className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
             {slides.map((item, index) => (
               <div key={item.href} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
                 <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top md:object-cover" : "h-full w-full object-cover"} />
@@ -142,11 +99,7 @@ export default function DigitalHubHome() {
               </div>
             </div>
 
-            <div className="absolute bottom-5 start-6 z-20 flex gap-2">
-              {slides.map((item, index) => (
-                <button key={item.href} onClick={() => setSlide(index)} className={`h-2.5 rounded-full transition-all ${index === slide ? (slide === 0 ? "w-9 bg-blue-600" : "w-9 bg-white") : (slide === 0 ? "w-2.5 bg-slate-400/50" : "w-2.5 bg-white/35")}`} aria-label={`${ar ? "الشريحة" : "Slide"} ${index + 1}`} />
-              ))}
-            </div>
+
           </div>
         </div>
       </section>
