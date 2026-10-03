@@ -23,14 +23,20 @@ import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/hooks/useCart";
 import { productDescription, productTitle } from "@/lib/i18n";
 import { toast } from "sonner";
+import rechargeArt from "@/assets/category/recharge";
+import digitalProductsArt from "@/assets/category/digital-products";
+import gamingArt from "@/assets/category/gaming";
+import softwareArt from "@/assets/category/software";
+import subscriptionsArt from "@/assets/category/subscriptions";
+import aiArt from "@/assets/category/ai";
 
 const categories = [
-  { icon: Cloud, ar: "الاشتراكات", en: "Subscriptions", slug: "subscriptions", image: "/images/business-workspace.jpg" },
-  { icon: Bot, ar: "الذكاء الاصطناعي", en: "AI Tools", slug: "ai", image: "/images/ai-technology.jpg" },
-  { icon: Laptop2, ar: "البرامج", en: "Software", slug: "software", image: "/images/digzoom/digital-products-live.webp" },
-  { icon: Gamepad2, ar: "الألعاب", en: "Gaming", slug: "gaming", image: "/images/3d-printing.jpg" },
-  { icon: PackageCheck, ar: "المنتجات الرقمية", en: "Digital Products", slug: "templates", image: "/images/cm-05-social-templates.jpg" },
-  { icon: Smartphone, ar: "بطاقات الشحن", en: "Recharge Cards", slug: "recharge", image: "/images/shop-bg.jpg" },
+  { icon: Cloud, ar: "الاشتراكات", en: "Subscriptions", slug: "subscriptions", image: subscriptionsArt },
+  { icon: Bot, ar: "الذكاء الاصطناعي", en: "AI Tools", slug: "ai", image: aiArt },
+  { icon: Laptop2, ar: "البرامج", en: "Software", slug: "software", image: softwareArt },
+  { icon: Gamepad2, ar: "الألعاب", en: "Gaming", slug: "gaming", image: gamingArt },
+  { icon: PackageCheck, ar: "المنتجات الرقمية", en: "Digital Products", slug: "templates", image: digitalProductsArt },
+  { icon: Smartphone, ar: "بطاقات الشحن", en: "Recharge Cards", slug: "recharge", image: rechargeArt },
 ];
 
 export default function DigitalHubHome() {
@@ -162,16 +168,19 @@ export default function DigitalHubHome() {
         </div>
       </section>
 
-      <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {categories.map(({ icon: Icon, ar: arName, en, slug, image }) => (
-            <Link key={slug} to={`/shop?category=${slug}`} className="group relative min-h-40 overflow-hidden rounded-2xl border border-slate-200 bg-white text-white shadow-sm">
-              <img src={image} alt={ar ? arName : en} className="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-500 group-hover:scale-105 group-hover:opacity-60" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10" />
-              <div className="relative flex h-full flex-col justify-end p-4">
-                <Icon className="h-6 w-6 text-cyan-200" />
-                <h2 className="mt-3 font-black">{ar ? arName : en}</h2>
-                <div className="mt-1 text-xs text-slate-300">{counts[slug] ? (ar ? `${counts[slug]} منتج` : `${counts[slug]} products`) : (ar ? "استكشف القسم" : "Explore category")}</div>
+            <Link key={slug} to={`/shop?category=${slug}`} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+              <div className="overflow-hidden bg-slate-50">
+                <img src={image} alt={ar ? arName : en} className="aspect-[16/9] w-full object-cover opacity-100 transition duration-500 group-hover:scale-[1.02]" />
+              </div>
+              <div className="flex items-center justify-between gap-3 p-4">
+                <div>
+                  <h2 className="font-black text-slate-950">{ar ? arName : en}</h2>
+                  <div className="mt-1 text-xs text-slate-500">{counts[slug] ? (ar ? `${counts[slug]} منتج` : `${counts[slug]} products`) : (ar ? "استكشف القسم" : "Explore category")}</div>
+                </div>
+                <div className="rounded-xl bg-blue-50 p-2 text-blue-600"><Icon className="h-5 w-5" /></div>
               </div>
             </Link>
           ))}
@@ -220,41 +229,22 @@ export default function DigitalHubHome() {
         </div>
       </div></section>
 
-      <section className="bg-white">
+      <section className="bg-[#f6f7fb]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-slate-950 text-white shadow-xl">
-            <img src="/images/shop-bg.jpg" alt={ar ? "بطاقات الشحن والاتصالات" : "Recharge and telecom cards"} className="absolute inset-0 h-full w-full object-cover opacity-25" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/70 rtl:bg-gradient-to-l" />
-            <div className="relative grid items-center gap-10 p-7 md:p-10 lg:grid-cols-[1.05fr_.95fr]">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-black text-cyan-200">
-                  <Smartphone className="h-4 w-4" />
-                  {ar ? "بطاقات الشحن والاتصالات" : "Recharge & Telecom"}
-                </div>
-                <h2 className="mt-5 text-3xl font-black md:text-5xl">{ar ? "شحن واتصالات في قسم واحد" : "Recharge and telecom in one place"}</h2>
-                <p className="mt-4 max-w-2xl leading-7 text-slate-300">{ar ? "قسم مخصص لبطاقات وشحن خدمات الاتصالات مثل STC وموبايلي وزين وغيرها حسب المنتجات المتاحة." : "A dedicated section for telecom recharge products such as STC, Mobily, Zain and others based on available catalog items."}</p>
-                <Link to="/shop?category=recharge" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-white px-5 font-black text-slate-950">
-                  {ar ? "تصفح بطاقات الشحن" : "Browse recharge cards"}<Arrow className="h-4 w-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {["STC", "Mobily", "Zain"].map((provider, index) => (
-                  <div key={provider} className="flex aspect-[4/5] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/[.08] p-4 text-center backdrop-blur-xl">
-                    <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-black ${index === 0 ? "bg-violet-500/20 text-violet-200" : index === 1 ? "bg-emerald-500/20 text-emerald-200" : "bg-amber-500/20 text-amber-200"}`}>{provider.slice(0,1)}</div>
-                    <div className="mt-4 font-black">{provider}</div>
-                    <div className="mt-1 text-xs text-slate-400">{ar ? "بطاقات وشحن" : "Recharge"}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="mb-9">
+            <div className="text-sm font-black uppercase tracking-[.18em] text-blue-600">DIGZOOM CATEGORIES</div>
+            <h2 className="mt-3 text-3xl font-black md:text-5xl">{ar ? "اكتشف عالمك الرقمي" : "Explore your digital world"}</h2>
+            <p className="mt-3 text-slate-500">{ar ? "صور واضحة لكل قسم حتى تعرف محتواه من أول نظرة." : "Clear visual categories that show each section at a glance."}</p>
+          </div>
+          <div className="grid gap-5 lg:grid-cols-2">
+            {categories.map(({ ar: arName, en, slug, image }) => (
+              <Link key={`visual-${slug}`} to={`/shop?category=${slug}`} className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+                <img src={image} alt={ar ? arName : en} loading="lazy" className="aspect-[16/9] w-full object-cover transition duration-500 group-hover:scale-[1.015]" />
+              </Link>
+            ))}
           </div>
         </div>
       </section>
-
-      <CategoryShowcase ar={ar} title={ar ? "الاشتراكات" : "Subscriptions"} text={ar ? "تصفح قسم الاشتراكات الرقمية والخدمات المتكررة." : "Browse digital subscriptions and recurring services."} image="/images/business-workspace.jpg" href="/shop?category=subscriptions" icon={<Cloud className="h-7 w-7" />} />
-      <CategoryShowcase ar={ar} title={ar ? "الذكاء الاصطناعي" : "Artificial Intelligence"} text={ar ? "أدوات وحلول ذكاء اصطناعي ضمن قسم مستقل وسهل التصفح." : "AI tools and solutions in a dedicated, easy-to-browse section."} image="/images/ai-technology.jpg" href="/shop?category=ai" icon={<Bot className="h-7 w-7" />} reverse />
-      <CategoryShowcase ar={ar} title={ar ? "البرامج والأدوات" : "Software & Tools"} text={ar ? "برامج وأدوات رقمية تساعدك في العمل والإنتاجية." : "Software and digital tools for work and productivity."} image="/images/digzoom/digital-products-live.webp" href="/shop?category=software" icon={<Laptop2 className="h-7 w-7" />} />
-      <CategoryShowcase ar={ar} title={ar ? "الألعاب" : "Gaming"} text={ar ? "قسم الألعاب والمنتجات الرقمية المرتبطة بها." : "Gaming and related digital products."} image="/images/3d-printing.jpg" href="/shop?category=gaming" icon={<Gamepad2 className="h-7 w-7" />} reverse />
 
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-2">
