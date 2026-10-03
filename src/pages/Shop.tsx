@@ -342,7 +342,9 @@ export default function Shop() {
               {activeSection.brands.map(brand => {
                 const count=categoryProducts.filter(product => matchesBrand(product,brand)).length;
                 return <button key={brand.id} onClick={() => handleBrand(brand.id)} aria-pressed={selectedBrand?.id===brand.id} className={`rounded-2xl border-2 bg-white p-5 text-start transition hover:shadow-md ${selectedBrand?.id===brand.id?'border-blue-600 ring-2 ring-blue-100':'border-slate-200'}`}>
-                  <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-xl font-black text-white" style={{background:activeSection.accent}} aria-hidden="true">{brand.mark}</span>
+                  <span className={`mb-4 flex h-20 w-full items-center justify-center rounded-xl px-4 ${brand.darkLogo ? 'bg-slate-950' : 'bg-slate-50'}`}>
+                    {brand.logo ? <img src={brand.logo} alt={brand.en} width="144" height="56" loading="lazy" className="h-14 w-full max-w-[144px] object-contain" /> : <span style={{color:activeSection.accent}} aria-hidden="true">{brand.mark}</span>}
+                  </span>
                   <h3 className="font-black">{lang === "ar" ? brand.ar : brand.en}</h3>
                   <p className={`mt-2 text-xs ${count?'text-emerald-700':'text-slate-500'}`}>{count ? `${count} ${lang === "ar" ? "منتج" : "products"}` : (lang === "ar" ? "غير متاح حاليًا" : "Currently unavailable")}</p>
                   <span className="mt-4 block text-sm font-bold text-blue-700">{lang === "ar" ? "تصفح" : "Browse"}</span>
