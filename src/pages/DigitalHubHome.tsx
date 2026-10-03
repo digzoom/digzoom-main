@@ -11,6 +11,7 @@ import {
   Headphones,
   Laptop2,
   PackageCheck,
+  Smartphone,
   ShieldCheck,
   ShoppingCart,
   Tag,
@@ -29,6 +30,7 @@ const categories = [
   { icon: Laptop2, ar: "البرامج", en: "Software", slug: "software", image: "/images/digzoom/digital-products-live.webp" },
   { icon: Gamepad2, ar: "الألعاب", en: "Gaming", slug: "gaming", image: "/images/3d-printing.jpg" },
   { icon: PackageCheck, ar: "المنتجات الرقمية", en: "Digital Products", slug: "templates", image: "/images/cm-05-social-templates.jpg" },
+  { icon: Smartphone, ar: "بطاقات الشحن", en: "Recharge Cards", slug: "recharge", image: "/images/shop-bg.jpg" },
 ];
 
 export default function DigitalHubHome() {
@@ -99,6 +101,7 @@ export default function DigitalHubHome() {
       b.id - a.id,
   );
   const featured = sortedProducts.slice(0, 8);
+  const newArrivals = [...products].sort((a, b) => b.id - a.id).slice(0, 8);
   const discounted = sortedProducts.filter(p => typeof p.original_price === "number" && p.original_price > p.price).slice(0, 8);
   const freeProducts = sortedProducts.filter(p => p.price === 0).slice(0, 8);
 
@@ -160,7 +163,7 @@ export default function DigitalHubHome() {
       </section>
 
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           {categories.map(({ icon: Icon, ar: arName, en, slug, image }) => (
             <Link key={slug} to={`/shop?category=${slug}`} className="group relative min-h-40 overflow-hidden rounded-2xl border border-slate-200 bg-white text-white shadow-sm">
               <img src={image} alt={ar ? arName : en} className="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-500 group-hover:scale-105 group-hover:opacity-60" />
@@ -176,6 +179,8 @@ export default function DigitalHubHome() {
       </div></section>
 
       <ProductSection ar={ar} title={ar ? "الأكثر مبيعًا" : "Best sellers"} subtitle={ar ? "مجموعة بارزة من المنتجات المتاحة حاليًا." : "A highlighted selection of products currently available."} products={featured} loading={loading} add={add} lang={lang} />
+
+      <ProductSection ar={ar} title={ar ? "وصل حديثًا" : "New arrivals"} subtitle={ar ? "أحدث المنتجات المضافة إلى متجر DigZoom." : "The latest products added to DigZoom."} products={newArrivals} loading={loading} add={add} lang={lang} />
 
       <section className="bg-[#f0f3f8]"><div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[30px] border border-fuchsia-400/20 bg-gradient-to-r from-[#310a32] via-[#17112a] to-[#081b3d] p-7 text-white shadow-xl md:p-10">
@@ -195,6 +200,37 @@ export default function DigitalHubHome() {
           )}
         </div>
       </div></section>
+
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-slate-950 text-white shadow-xl">
+            <img src="/images/shop-bg.jpg" alt={ar ? "بطاقات الشحن والاتصالات" : "Recharge and telecom cards"} className="absolute inset-0 h-full w-full object-cover opacity-25" loading="lazy" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/70 rtl:bg-gradient-to-l" />
+            <div className="relative grid items-center gap-10 p-7 md:p-10 lg:grid-cols-[1.05fr_.95fr]">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm font-black text-cyan-200">
+                  <Smartphone className="h-4 w-4" />
+                  {ar ? "بطاقات الشحن والاتصالات" : "Recharge & Telecom"}
+                </div>
+                <h2 className="mt-5 text-3xl font-black md:text-5xl">{ar ? "شحن واتصالات في قسم واحد" : "Recharge and telecom in one place"}</h2>
+                <p className="mt-4 max-w-2xl leading-7 text-slate-300">{ar ? "قسم مخصص لبطاقات وشحن خدمات الاتصالات مثل STC وموبايلي وزين وغيرها حسب المنتجات المتاحة." : "A dedicated section for telecom recharge products such as STC, Mobily, Zain and others based on available catalog items."}</p>
+                <Link to="/shop?category=recharge" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-white px-5 font-black text-slate-950">
+                  {ar ? "تصفح بطاقات الشحن" : "Browse recharge cards"}<Arrow className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {["STC", "Mobily", "Zain"].map((provider, index) => (
+                  <div key={provider} className="flex aspect-[4/5] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/[.08] p-4 text-center backdrop-blur-xl">
+                    <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-black ${index === 0 ? "bg-violet-500/20 text-violet-200" : index === 1 ? "bg-emerald-500/20 text-emerald-200" : "bg-amber-500/20 text-amber-200"}`}>{provider.slice(0,1)}</div>
+                    <div className="mt-4 font-black">{provider}</div>
+                    <div className="mt-1 text-xs text-slate-400">{ar ? "بطاقات وشحن" : "Recharge"}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <CategoryShowcase ar={ar} title={ar ? "الاشتراكات" : "Subscriptions"} text={ar ? "تصفح قسم الاشتراكات الرقمية والخدمات المتكررة." : "Browse digital subscriptions and recurring services."} image="/images/business-workspace.jpg" href="/shop?category=subscriptions" icon={<Cloud className="h-7 w-7" />} />
       <CategoryShowcase ar={ar} title={ar ? "الذكاء الاصطناعي" : "Artificial Intelligence"} text={ar ? "أدوات وحلول ذكاء اصطناعي ضمن قسم مستقل وسهل التصفح." : "AI tools and solutions in a dedicated, easy-to-browse section."} image="/images/ai-technology.jpg" href="/shop?category=ai" icon={<Bot className="h-7 w-7" />} reverse />
