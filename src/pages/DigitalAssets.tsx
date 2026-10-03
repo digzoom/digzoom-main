@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  BriefcaseBusiness,
   CheckCircle2,
   FileText,
   Globe2,
