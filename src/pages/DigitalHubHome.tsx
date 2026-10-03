@@ -23,12 +23,12 @@ import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/hooks/useCart";
 import { productDescription, productTitle } from "@/lib/i18n";
 import { toast } from "sonner";
-import rechargeArt from "@/assets/category/recharge";
-import digitalProductsArt from "@/assets/category/digital-products";
-import gamingArt from "@/assets/category/gaming";
-import softwareArt from "@/assets/category/software";
-import subscriptionsArt from "@/assets/category/subscriptions";
-import aiArt from "@/assets/category/ai";
+const rechargeArt = "/images/digzoom/categories/recharge-approved.webp";
+const digitalProductsArt = "/images/digzoom/categories/digital-products-approved.webp";
+const gamingArt = "/images/digzoom/categories/gaming-approved.webp";
+const softwareArt = "/images/digzoom/categories/software-approved.webp";
+const subscriptionsArt = "/images/digzoom/categories/subscriptions-approved.webp";
+const aiArt = "/images/digzoom/categories/ai-approved.webp";
 
 const categories = [
   { icon: Cloud, ar: "الاشتراكات", en: "Subscriptions", slug: "subscriptions", image: subscriptionsArt },
@@ -169,11 +169,11 @@ export default function DigitalHubHome() {
       </section>
 
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map(({ icon: Icon, ar: arName, en, slug, image }) => (
             <Link key={slug} to={`/shop?category=${slug}`} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
               <div className="overflow-hidden bg-slate-50">
-                <img src={image} alt={ar ? arName : en} className="aspect-[16/9] w-full object-cover opacity-100 transition duration-500 group-hover:scale-[1.02]" />
+                <img src={image} alt={ar ? arName : en} width={1672} height={941} loading="lazy" decoding="async" className="aspect-video w-full object-contain" />
               </div>
               <div className="flex items-center justify-between gap-3 p-4">
                 <div>
@@ -239,7 +239,7 @@ export default function DigitalHubHome() {
           <div className="grid gap-5 lg:grid-cols-2">
             {categories.map(({ ar: arName, en, slug, image }) => (
               <Link key={`visual-${slug}`} to={`/shop?category=${slug}`} className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                <img src={image} alt={ar ? arName : en} loading="lazy" className="aspect-[16/9] w-full object-cover transition duration-500 group-hover:scale-[1.015]" />
+                <img src={image} alt={ar ? arName : en} width={1672} height={941} loading="lazy" decoding="async" className="aspect-video w-full object-contain" />
               </Link>
             ))}
           </div>
@@ -348,3 +348,4 @@ function ProductCard({ product, ar, lang, add, compact = false }: { product: any
     </article>
   );
 }
+
