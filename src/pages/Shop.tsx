@@ -22,9 +22,12 @@ import { productTitle, productDescription } from "@/lib/i18n";
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const urlCat = searchParams.get("category") || "all";
+  const urlSearch = searchParams.get("search") || "";
+  const urlSort = searchParams.get("sort") || "default";
+  const freeOnly = searchParams.get("price") === "free";
   const [activeCat, setActiveCat] = useState(urlCat);
-  const [sort, setSort] = useState("default");
-  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState(urlSort);
+  const [search, setSearch] = useState(urlSearch);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [segment, setSegment] = useState<
     "all" | "content" | "performance" | "sales" | "strategy"
@@ -103,6 +106,14 @@ export default function Shop() {
       res = res.filter(product => productSegment(product) === segment);
     }
 
+    if (freeOnly) {
+      res = res.filter(product => product.price === 0);
+    }
+
+    if (sort === "offers") {
+      res = res.filter(product => typeof product.original_price === "number" && product.original_price > product.price);
+    }
+
     if (search.trim()) {
       const q = normalizeText(search.trim());
       const qRaw = search.trim().toLowerCase();
@@ -142,11 +153,12 @@ export default function Shop() {
       const sorted = [...res];
       if (sort === "price-low") sorted.sort((a, b) => a.price - b.price);
       else if (sort === "price-high") sorted.sort((a, b) => b.price - a.price);
+      else if (sort === "popular") sorted.sort((a, b) => Number(b.is_trending) - Number(a.is_trending) || Number(b.is_featured) - Number(a.is_featured) || b.id - a.id);
       return sorted;
     }
 
     return res;
-  }, [activeCat, sort, search, segment, products, categories]);
+  }, [activeCat, sort, search, segment, products, categories, freeOnly]);
 
   const getTitle = (p: (typeof products)[0]) => productTitle(p, lang);
   const getDesc = (p: (typeof products)[0]) => productDescription(p, lang);
