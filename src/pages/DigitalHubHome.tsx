@@ -27,6 +27,7 @@ export default function DigitalHubHome() {
   const { products, categories: dbCategories, loading } = useSupabaseProducts();
   const { addToCart } = useCart();
   const [slide, setSlide] = useState(0);
+  const [heroPaused, setHeroPaused] = useState(false);
 
   const slides = [
     {
@@ -77,9 +78,10 @@ export default function DigitalHubHome() {
   ];
 
   useEffect(() => {
+    if (heroPaused) return;
     const timer = window.setInterval(() => setSlide(current => (current + 1) % slides.length), 5500);
     return () => window.clearInterval(timer);
-  }, [slides.length, slide]);
+  }, [slides.length, slide, heroPaused]);
 
   const sortedProducts = [...products].sort(
     (a, b) =>
@@ -110,7 +112,7 @@ export default function DigitalHubHome() {
     <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
       <section className={`relative pb-10 pt-24 md:pt-28 ${slide === 0 ? "bg-[#f3f0ff] text-slate-950" : "bg-[#05070d] text-white"}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
+          <div onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)} onFocusCapture={() => setHeroPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroPaused(false); }} className="relative min-h-[500px] overflow-hidden rounded-[30px] border border-slate-200 bg-[#f7f4ff] shadow-xl md:min-h-[560px]">
             {slides.map((item, index) => (
               <div key={item.href} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
                 <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top md:object-cover" : "h-full w-full object-cover"} />
