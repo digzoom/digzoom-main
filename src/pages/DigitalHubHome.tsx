@@ -79,7 +79,7 @@ export default function DigitalHubHome() {
   useEffect(() => {
     const timer = window.setInterval(() => setSlide(current => (current + 1) % slides.length), 5500);
     return () => window.clearInterval(timer);
-  }, [slides.length]);
+  }, [slides.length, slide]);
 
   const sortedProducts = [...products].sort(
     (a, b) =>
