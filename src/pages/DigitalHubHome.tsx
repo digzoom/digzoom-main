@@ -197,18 +197,6 @@ export default function DigitalHubHome() {
         </div>
       </div></section>
 
-      <section className="bg-[#f6f7fb]">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mb-9">
-            <div className="text-sm font-black uppercase tracking-[.18em] text-blue-600">DIGZOOM CATEGORIES</div>
-            <h2 className="mt-3 text-3xl font-black md:text-5xl">{ar ? "اكتشف عالمك الرقمي" : "Explore your digital world"}</h2>
-            <p className="mt-3 text-slate-500">{ar ? "صور واضحة لكل قسم حتى تعرف محتواه من أول نظرة." : "Clear visual categories that show each section at a glance."}</p>
-          </div>
-          <div className="grid gap-5 lg:grid-cols-2">
-            {storefrontSections.map(section => <SectionCard key={`visual-${section.slug}`} section={section} ar={ar} large />)}
-          </div>
-        </div>
-      </section>
 
       <section className="bg-white"><div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-2">
