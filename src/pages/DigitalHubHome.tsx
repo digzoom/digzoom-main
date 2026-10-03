@@ -36,7 +36,7 @@ const categoryCards = [
   { icon: Box, ar: "المنتجات الرقمية", en: "Digital Products", slug: "templates" },
 ];
 
-export default function DigitalHubHome() {
+// Netlify audit preview: no functional change\nexport default function DigitalHubHome() {
   const { lang } = useLanguage();
   const ar = lang === "ar";
   const Arrow = ar ? ArrowLeft : ArrowRight;
