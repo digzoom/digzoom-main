@@ -98,3 +98,16 @@
 .section-frame--signal .section-frame__rail span:nth-child(2) { height:9px; }
 .section-frame--signal .section-frame__rail span:nth-child(3) { height:13px; }
 @media(prefers-reduced-motion:reduce) { .section-frame { transition:none; } .section-frame:hover { transform:none; } }
+
+/* Gentle image movement keeps the slide copy stationary and readable. */
+@keyframes digzoom-hero-drift {
+  from { transform: scale(1); }
+  to { transform: scale(1.015); }
+}
+.digzoom-hero-drift {
+  animation: digzoom-hero-drift 6s ease-out both;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .digzoom-hero-drift { animation: none; }
+}

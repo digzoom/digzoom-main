@@ -6,6 +6,8 @@ import {
   CheckCircle2,
   Gift,
   Headphones,
+  Pause,
+  Play,
   ShieldCheck,
   ShoppingCart,
   Tag,
@@ -28,6 +30,7 @@ export default function DigitalHubHome() {
   const { addToCart } = useCart();
   const [slide, setSlide] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false);
+  const [manualPaused, setManualPaused] = useState(false);
 
   const slides = [
     {
@@ -60,10 +63,10 @@ export default function DigitalHubHome() {
   ];
 
   useEffect(() => {
-    if (heroPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = window.setTimeout(() => setSlide(current => (current + 1) % slides.length), 8000);
+    if (heroPaused || manualPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setTimeout(() => setSlide(current => (current + 1) % slides.length), 6000);
     return () => window.clearTimeout(timer);
-  }, [slide, heroPaused, slides.length]);
+  }, [slide, heroPaused, manualPaused, slides.length]);
 
   const sortedProducts = [...products].sort(
     (a, b) =>
@@ -98,11 +101,12 @@ export default function DigitalHubHome() {
             <div className={`relative overflow-hidden rounded-[30px] bg-[#f7f4ff] ${slide === 0 ? "text-slate-950" : "text-white"}`}>
             {slides.map((item, index) => (
               <div key={item.href} aria-hidden={index !== slide} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-                <img src={item.image} alt={item.title} className={index === 0 ? "h-full w-full object-contain object-top" : "h-full w-full object-cover"} />
-                {index !== 0 && <div className="absolute inset-0 bg-gradient-to-r from-[#05070d]/95 via-[#05070d]/75 to-[#05070d]/15 rtl:bg-gradient-to-l" />}
+                <img src={item.image} alt={item.title} style={{ animationPlayState: heroPaused || manualPaused ? "paused" : "running" }} className={`${index === slide ? "digzoom-hero-drift " : ""}${index === 0 ? "h-full w-full object-contain object-top" : "h-full w-full object-cover"}`} />
+                {index !== 0 && <div className="absolute inset-0 bg-gradient-to-r from-[#11132d]/90 via-[#141633]/65 to-[#161c43]/10 rtl:bg-gradient-to-l" />}
               </div>
             ))}
 
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] rounded-[30px] bg-[radial-gradient(ellipse_at_top_left,rgba(96,165,250,.12),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(167,139,250,.14),transparent_50%)] ring-1 ring-inset ring-indigo-200/20" />
             <div className="relative z-10 flex min-h-[740px] items-end px-7 pb-20 pt-[52vw] sm:px-10 md:min-h-[600px] md:px-10 md:pt-36 lg:px-12">
               <div className={slide === 0 ? "w-full md:ml-auto md:max-w-[43%]" : "max-w-2xl"}>
                 {slide !== 0 && <div className="mb-5 inline-flex rounded-full border border-indigo-200/30 bg-black/30 px-4 py-2 text-sm font-black tracking-[.14em] text-indigo-100 backdrop-blur-xl md:absolute md:top-24">{current.eyebrow}</div>}
@@ -126,6 +130,7 @@ export default function DigitalHubHome() {
             </div>
 
             <div className="absolute bottom-4 start-6 z-20 flex gap-2 rounded-full border border-indigo-200/60 bg-[#f7f4ff]/95 px-2 shadow-sm backdrop-blur-xl" aria-label={ar ? "التنقل بين الشرائح" : "Slide navigation"}>
+              <button onClick={() => setManualPaused(paused => !paused)} aria-label={manualPaused ? (ar ? "تشغيل العرض المتحرك" : "Play slideshow") : (ar ? "إيقاف العرض للقراءة" : "Pause slideshow to read")} title={manualPaused ? (ar ? "تشغيل" : "Play") : (ar ? "إيقاف للقراءة" : "Pause to read")} className="flex h-8 w-8 items-center justify-center rounded-full text-indigo-700 hover:bg-indigo-100">{manualPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}</button>
               {slides.map((item, index) => <button key={item.href} onClick={() => setSlide(index)} aria-label={`${ar ? "الشريحة" : "Slide"} ${index + 1}`} aria-pressed={index === slide} className="flex h-8 w-10 items-center justify-center"><span className={`h-2.5 rounded-full transition-all ${index === slide ? "w-8 bg-indigo-600" : "w-2.5 bg-slate-400"}`} /></button>)}
             </div>
             </div>
