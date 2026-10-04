@@ -24,7 +24,7 @@ export const handler: Handler = async event => {
     const payload = {
       preview_asset_ids: previewIds, product_title: clean(raw.product_title,180) || null,
       user_id: user.id, terms_version: '2026-10-v1',
-      name: clean(raw.name, 100), email: user.email.trim().toLowerCase(), phone: clean(raw.phone, 30),
+      name: clean(raw.name, 100), email: clean(raw.email ?? user.email, 254).toLowerCase(), phone: clean(raw.phone, 30),
       brand: clean(raw.brand, 120), product_type: clean(raw.product_type, 120), preview_url: clean(raw.preview_url, 500) || null,
       suggested_price: raw.suggested_price === "" || raw.suggested_price == null ? null : Number(raw.suggested_price),
       description: clean(raw.description, 2000), rights_confirmed: raw.rights_confirmed === true || raw.rights_confirmed === "true",
