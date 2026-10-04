@@ -179,8 +179,10 @@ export default function Navbar() {
               </Link>
 
               {user ? (
-                <div ref={userMenuRef} className="relative hidden lg:block">
+                <div ref={userMenuRef} className="relative">
                   <button
+                    aria-label={isAr ? "حسابي" : "My account"}
+                    aria-expanded={userMenuOpen}
                     onClick={() => setUserMenuOpen(v => !v)}
                     className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white"
                   >
@@ -199,7 +201,7 @@ export default function Navbar() {
                   )}
                 </div>
               ) : (
-                <Link to="/login" className="hidden items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-black text-white shadow-lg shadow-blue-500/20 md:flex">
+                <Link to="/login" className="flex items-center gap-1 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-2.5 py-2 text-xs font-black text-white shadow-lg shadow-blue-500/20 sm:gap-2 sm:px-4 sm:text-sm">
                   <LogIn className="h-4 w-4" />{isAr ? "دخول" : "Login"}
                 </Link>
               )}
@@ -249,8 +251,18 @@ export default function Navbar() {
 
               <button onClick={toggleLang} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-300 hover:bg-white/[.05]"><Globe className="h-4 w-4 text-cyan-300" />{isAr ? "English" : "العربية"}</button>
 
+              {user && (
+                <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.03] p-2">
+                  <div className="px-3 py-2 text-xs text-slate-400">{isAr ? "حسابي" : "My account"}<div className="mt-1 truncate font-bold text-white">{user.name || user.email}</div></div>
+                  <Link to="/profile" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-200 hover:bg-white/5"><UserCircle className="h-5 w-5 text-blue-300" />{isAr ? "الملف الشخصي" : "Profile"}</Link>
+                  <Link to="/orders" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-200 hover:bg-white/5"><Package className="h-5 w-5 text-blue-300" />{isAr ? "طلباتي" : "My orders"}</Link>
+                  <Link to="/partner-dashboard" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-200 hover:bg-white/5"><BriefcaseBusiness className="h-5 w-5 text-teal-300" />{isAr ? "لوحة التاجر" : "Partner dashboard"}</Link>
+                  {isAdmin && <Link to="/admin" className="flex items-center gap-3 rounded-xl bg-purple-500/10 px-3 py-3 text-sm font-bold text-purple-200 hover:bg-purple-500/20"><ShieldCheck className="h-5 w-5" />{isAr ? "لوحة التحكم" : "Admin dashboard"}</Link>}
+                  <button onClick={()=>logout()} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-red-300 hover:bg-red-500/10"><LogOut className="h-5 w-5" />{isAr ? "تسجيل الخروج" : "Sign out"}</button>
+                </div>
+              )}
               {!user && (
-                <Link to="/login" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 font-black text-white"><LogIn className="h-4 w-4" />{isAr ? "تسجيل الدخول" : "Login"}</Link>
+                <Link to="/login" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 font-black text-white"><LogIn className="h-4 w-4" />{isAr ? "دخول / إنشاء حساب" : "Sign in / Create account"}</Link>
               )}
             </div>
           </aside>
