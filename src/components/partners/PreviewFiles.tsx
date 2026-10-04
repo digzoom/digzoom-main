@@ -1,0 +1,31 @@
+import {useEffect,useRef,useState} from 'react';
+import {FileUp,FileText,Loader2,X,Eye} from 'lucide-react';
+import {supabase} from '@/lib/supabase';
+import {PREVIEW_MIMES,previewFileType} from '@/data/partnerFiles';
+export type PreviewAsset={id:string;name:string;mime_type:string;size_bytes:number;url?:string};
+async function uploadApi(body:unknown){
+ const response=await fetch('/api/partner-upload',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('sb_access_token')||''}`},body:JSON.stringify(body)});
+ const data=await response.json();if(!response.ok)throw new Error(data.error||'تعذر رفع الملف');return data;
+}
+export function AssetPreview({asset,ar=true}:{asset:PreviewAsset;ar?:boolean}){
+ const [preview,setPreview]=useState<PreviewAsset>(asset),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ async function show(){setBusy(true);setError('');try{setPreview(await uploadApi({action:'preview',id:asset.id}));}catch(e:any){setError(e.message);}finally{setBusy(false);}}
+ const mime=preview.mime_type,url=preview.url;
+ return <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><FileText size={18}/><span className="min-w-0 break-all text-sm font-bold">{preview.name}</span>{!url&&<button type="button" onClick={show} disabled={busy} className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm">{busy?<Loader2 size={16} className="animate-spin"/>:<Eye size={16}/>} {ar?'معاينة':'Preview'}</button>}</div>{error&&<p role="alert" className="mt-2 text-sm text-red-500">{error}</p>}{url&&<div className="mt-3">{mime.startsWith('image/')?<img src={url} alt={preview.name} className="max-h-56 max-w-full rounded-xl object-contain"/>:mime.startsWith('video/')?<video src={url} controls preload="metadata" className="max-h-60 w-full rounded-xl"/>:mime==='application/pdf'?<iframe title={ar?'معاينة الكتاب أو المستند':'Document preview'} sandbox="" src={url} className="h-72 w-full rounded-xl border"/>:null}<a href={url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm font-bold text-blue-500">{mime.startsWith('image/')||mime.startsWith('video/')||mime==='application/pdf'?(ar?'فتح المعاينة':'Open preview'):(ar?'تحميل الملف للمعاينة':'Download to review')}</a>{!mime.startsWith('image/')&&!mime.startsWith('video/')&&mime!=='application/pdf'&&<p className="mt-2 text-xs opacity-70">{ar?'القوالب والملفات المضغوطة تُعاين بعد تحميلها بالبرنامج المناسب.':'Templates and archives can be reviewed in their compatible app.'}</p>}</div>}</div>;
+}
+export default function PreviewFiles({value,onChange,onBusy,disabled=false,ar=true}:{value:PreviewAsset[];onChange:(files:PreviewAsset[])=>void;onBusy?:(busy:boolean)=>void;disabled?:boolean;ar?:boolean}){
+ const [busy,setBusy]=useState(false),[error,setError]=useState(''),[current,setCurrent]=useState('');const urls=useRef(new Set<string>());
+ useEffect(()=>()=>{for(const url of urls.current)URL.revokeObjectURL(url);},[]);
+ async function upload(files:FileList|null){
+ if(!files?.length)return;
+ if(value.length+files.length>3){setError(ar?'أقصى عدد 3 ملفات.':'Maximum 3 files.');return;}
+ try{for(const file of files)previewFileType(file.name,file.size);}catch(e:any){setError(ar?e.message:'Use a supported file up to 25 MB.');return;}
+ setBusy(true);onBusy?.(true);setError('');let uploaded=[...value];
+ try{for(const file of files){setCurrent(file.name);const prepared=await uploadApi({action:'prepare',name:file.name,size:file.size});
+ const normalized=new Blob([file],{type:prepared.mime});
+ const {error:e}=await supabase.storage.from(prepared.bucket).uploadToSignedUrl(prepared.path,prepared.token,normalized,{contentType:prepared.mime,upsert:false});if(e)throw new Error(ar?'تعذر رفع الملف. تحقق من اتصالك وحاول مجددًا.':'Upload failed. Check your connection and retry.');
+ const completed=await uploadApi({action:'complete',id:prepared.id});const url=URL.createObjectURL(normalized);urls.current.add(url);uploaded=[...uploaded,{...completed,url}];onChange(uploaded);
+ }}catch(e:any){setError(e.message);}finally{setBusy(false);onBusy?.(false);setCurrent('');}
+ }
+ return <div className="rounded-2xl border border-dashed border-blue-300 bg-blue-50/50 p-4 sm:p-5"><label className={`flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 text-center ${busy||disabled?'opacity-50':''}`}><FileUp className="h-7 w-7 text-blue-600"/><span className="font-black text-blue-700">{ar?'ارفع ملفات المعاينة من جهازك':'Upload preview files from your device'}</span><span className="text-xs leading-6 text-slate-600">{ar?'صورة، فيديو، كتاب PDF أو قالب · حتى 3 ملفات، 25 ميجابايت لكل ملف':'Image, video, PDF book or template · Up to 3 files, 25 MB each'}</span><input aria-label={ar?'رفع ملفات المعاينة':'Upload preview files'} type="file" multiple accept={Object.keys(PREVIEW_MIMES).map(ext=>'.'+ext).join(',')} disabled={busy||disabled||value.length>=3} onChange={e=>{void upload(e.target.files);e.target.value='';}} className="mt-2 w-full max-w-sm text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:font-bold file:text-white"/></label><p className="mt-3 text-xs leading-6 text-slate-500">{ar?'المعاينة نسخة أو عينة من منتجك تراجعها الإدارة قبل النشر. للقوالب متعددة الملفات، ارفع ملف ZIP.':'A preview is a copy or sample for our team to review before publication. Bundle multi-file templates in ZIP.'}</p>{busy&&<p role="status" className="mt-3 flex items-center gap-2 break-all text-sm text-blue-700"><Loader2 size={18} className="shrink-0 animate-spin"/>{ar?'جارٍ رفع':'Uploading'} {current}</p>}{error&&<p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}<div className="mt-4 space-y-4">{value.map(asset=><div key={asset.id} className="relative rounded-xl border border-slate-200 bg-white p-4 text-slate-800"><button type="button" aria-label={ar?`إزالة ${asset.name}`:`Remove ${asset.name}`} disabled={busy||disabled} onClick={()=>{if(asset.url?.startsWith('blob:')){URL.revokeObjectURL(asset.url);urls.current.delete(asset.url);}onChange(value.filter(a=>a.id!==asset.id));}} className="mb-3 flex items-center gap-1 text-xs text-red-500"><X size={14}/>{ar?'إزالة':'Remove'}</button><AssetPreview asset={asset} ar={ar}/></div>)}</div></div>;
+}

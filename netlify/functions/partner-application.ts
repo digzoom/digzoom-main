@@ -1,4 +1,6 @@
 import type { Handler } from "@netlify/functions";
+import { ownedPreviewAssets } from "../lib/partner-assets";
+import { PRODUCT_KINDS } from "../../src/data/partnerFiles";
 import { verifySupabaseToken } from "../lib/trpc";
 import { getSupabaseAdmin } from "../lib/supabase-admin";
 
@@ -16,26 +18,32 @@ export const handler: Handler = async event => {
     if (!user?.email) return {statusCode:401,body:JSON.stringify({error:'سجّل الدخول قبل تقديم طلب الشراكة'})};
     const raw = JSON.parse(event.body || "{}");
     if (raw.terms_version !== '2026-10-v1') return {statusCode:400,body:JSON.stringify({error:'وافق على شروط الشراكة'})};
+    const previewIds = raw.preview_asset_ids || [];
+    await ownedPreviewAssets(previewIds,user.id,!raw.preview_url);
+    if (previewIds.length && (!PRODUCT_KINDS.some(kind=>kind.value===raw.product_type) || !clean(raw.product_title,180))) return {statusCode:400,body:JSON.stringify({error:'اختر نوع المنتج واكتب اسمه'})};
     const payload = {
+      preview_asset_ids: previewIds, product_title: clean(raw.product_title,180) || null,
       user_id: user.id, terms_version: '2026-10-v1',
       name: clean(raw.name, 100), email: user.email.trim().toLowerCase(), phone: clean(raw.phone, 30),
-      brand: clean(raw.brand, 120), product_type: clean(raw.product_type, 120), preview_url: clean(raw.preview_url, 500),
+      brand: clean(raw.brand, 120), product_type: clean(raw.product_type, 120), preview_url: clean(raw.preview_url, 500) || null,
       suggested_price: raw.suggested_price === "" || raw.suggested_price == null ? null : Number(raw.suggested_price),
       description: clean(raw.description, 2000), rights_confirmed: raw.rights_confirmed === true || raw.rights_confirmed === "true",
     };
-    if (!payload.name || !payload.email || !payload.phone || !payload.product_type || !payload.preview_url || !payload.description || !payload.rights_confirmed) return { statusCode: 400, body: JSON.stringify({ error: "Missing fields" }) };
+    if (!payload.name || !payload.email || !payload.phone || !payload.product_type || !payload.description || !payload.rights_confirmed) return { statusCode: 400, body: JSON.stringify({ error: "Missing fields" }) };
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) return { statusCode: 400, body: JSON.stringify({ error: "Invalid email" }) };
-    let url: URL; try { url = new URL(payload.preview_url); } catch { return { statusCode: 400, body: JSON.stringify({ error: "Invalid preview URL" }) }; }
-    if (!["http:", "https:"].includes(url.protocol)) return { statusCode: 400, body: JSON.stringify({ error: "Invalid preview URL" }) };
+    if(payload.preview_url) {
+      let url: URL; try {url=new URL(payload.preview_url);}catch{return {statusCode:400,body:JSON.stringify({error:'Invalid preview URL'})};}
+      if(url.protocol!=='https:')return {statusCode:400,body:JSON.stringify({error:'Invalid preview URL'})};
+    }
     if (payload.suggested_price !== null && (!Number.isFinite(payload.suggested_price) || payload.suggested_price < 0 || payload.suggested_price > 100000)) return { statusCode: 400, body: JSON.stringify({ error: "Invalid price" }) };
     const ip = (event.headers["x-nf-client-connection-ip"] || event.headers["x-forwarded-for"]?.split(",")[0] || "").trim().slice(0, 64);
-    const supabase = getSupabaseAdmin();
+    const supabase: any = getSupabaseAdmin();
     const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const { count } = await supabase.from("partner_applications").select("id", { count: "exact", head: true }).eq("ip_address", ip).gte("created_at", since);
     if ((count || 0) >= 3) return { statusCode: 429, body: JSON.stringify({ error: "Too many requests" }) };
     const { data, error } = await supabase.from("partner_applications").insert({ ...payload, ip_address: ip || null, user_agent: event.headers["user-agent"]?.slice(0, 500) || null }).select("id").single();
     if (error) throw error;
-    if (RESEND_API_KEY) await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: TO, reply_to: payload.email, subject: `[DigZoom Partner] ${payload.brand || payload.name}`, html: `<h2>Digital Partner Application</h2><p><b>Name:</b> ${html(payload.name)}</p><p><b>Brand:</b> ${html(payload.brand)}</p><p><b>Email:</b> ${html(payload.email)}</p><p><b>Phone:</b> ${html(payload.phone)}</p><p><b>Type:</b> ${html(payload.product_type)}</p><p><b>Price:</b> ${payload.suggested_price ?? "Not set"}</p><p><b>Preview:</b> ${html(payload.preview_url)}</p><p><b>Description:</b><br>${html(payload.description).replace(/\n/g, "<br>")}</p>` }) });
+    if (RESEND_API_KEY) await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: TO, reply_to: payload.email, subject: `[DigZoom Partner] ${payload.brand || payload.name}`, html: `<h2>Digital Partner Application</h2><p><b>Name:</b> ${html(payload.name)}</p><p><b>Brand:</b> ${html(payload.brand)}</p><p><b>Email:</b> ${html(payload.email)}</p><p><b>Phone:</b> ${html(payload.phone)}</p><p><b>Type:</b> ${html(payload.product_type)}</p><p><b>Price:</b> ${payload.suggested_price ?? "Not set"}</p><p><b>Preview:</b> ${html(payload.preview_url || `${previewIds.length} preview file(s) in partner admin`)}</p><p><b>Description:</b><br>${html(payload.description).replace(/\n/g, "<br>")}</p>` }) });
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ success: true, application_id: data.id }) };
   } catch (error) { console.error("[partner-application]", error); return { statusCode: 500, body: JSON.stringify({ error: "Unable to submit" }) }; }
 };

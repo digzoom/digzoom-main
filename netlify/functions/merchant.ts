@@ -1,5 +1,6 @@
 import type {Handler} from '@netlify/functions';
 import {z} from 'zod';
+import {ownedPreviewAssets,PREVIEW_BUCKET} from '../lib/partner-assets';
 import {getSupabaseAdmin} from '../lib/supabase-admin';
 import {verifySupabaseToken} from '../lib/trpc';
 import {signReferral} from '../lib/merchant-accounting';
@@ -8,7 +9,7 @@ const db=():any=>getSupabaseAdmin();
 const result=(statusCode:number,value:unknown)=>({statusCode,headers:{'Content-Type':'application/json','Cache-Control':'no-store'},body:JSON.stringify(value)});
 async function checked(query:any) {const {data,error}=await query;if(error)throw error;return data;}
 const url=z.string().url().max(500).refine(v=>v.startsWith('https://'),'HTTPS required');
-const offerSchema=z.object({title:z.string().trim().min(3).max(180),description:z.string().trim().min(30).max(4000),price_sar:z.coerce.number().int().min(1).max(100000),image_url:url,preview_url:url,fulfillment_method:z.string().trim().min(10).max(1000),rights_confirmed:z.literal(true),status:z.enum(['draft','review']).default('review')});
+const offerSchema=z.object({title:z.string().trim().min(3).max(180),description:z.string().trim().min(30).max(4000),price_sar:z.coerce.number().int().min(1).max(100000),image_url:url.optional(),preview_url:url.optional(),preview_asset_ids:z.array(z.uuid()).max(3).default([]),product_kind:z.enum(['template','book','video','image','course','software','asset','other']).default('other'),fulfillment_method:z.string().trim().min(10).max(1000),rights_confirmed:z.literal(true),status:z.enum(['draft','review']).default('review')});
 export const handler:Handler=async(event)=>{
  try {
    if(event.httpMethod==='GET' && event.queryStringParameters?.ref) {
@@ -27,7 +28,7 @@ export const handler:Handler=async(event)=>{
      if(event.queryStringParameters?.admin==='true') {
        if(!isAdmin)return result(403,{error:'للإدارة فقط'});
        const [applications,merchants,offers,items,settlements,settings]=await Promise.all([
-         checked(db().from('partner_applications').select('id,name,email,brand,product_type,preview_url,description,status,user_id,terms_version,created_at').order('created_at',{ascending:false}).limit(100)),
+         checked(db().from('partner_applications').select('id,name,email,brand,product_type,product_title,preview_url,preview_asset_ids,description,status,user_id,terms_version,created_at').order('created_at',{ascending:false}).limit(100)),
          checked(db().from('merchants').select('*').order('created_at',{ascending:false})),
          checked(db().from('merchant_offers').select('*').order('created_at',{ascending:false}).limit(200)),
          checked(db().from('merchant_order_items').select('*').order('created_at',{ascending:false}).limit(500)),
@@ -52,7 +53,24 @@ export const handler:Handler=async(event)=>{
      if(!isAdmin)return result(403,{error:'للإدارة فقط'});
      if(action==='approve_application')await checked(db().rpc('approve_merchant_application',{p_application:z.number().int().positive().parse(input.id)}));
      else if(action==='reject_application')await checked(db().from('partner_applications').update({status:'rejected'}).eq('id',z.number().int().positive().parse(input.id)).eq('status','new'));
-     else if(action==='publish_offer')await checked(db().rpc('publish_merchant_offer',{p_offer:z.uuid().parse(input.id),p_category:z.number().int().positive().parse(input.category_id)}));
+     else if(action==='publish_offer') {
+       const id=z.uuid().parse(input.id),category=z.number().int().positive().parse(input.category_id);
+       const offer=await checked(db().from('merchant_offers').select('*').eq('id',id).eq('status','review').single());
+       const merchant=await checked(db().from('merchants').select('user_id,status').eq('id',offer.merchant_id).single());
+       if(merchant.status!=='active')throw new Error('التاجر موقوف');
+       const assets=await ownedPreviewAssets(offer.preview_asset_ids||[],merchant.user_id,false);
+       const cover=assets.find((a:any)=>a.mime_type.startsWith('image/'));
+       let publishedCover:string|undefined;
+       if(cover){
+         const {data:file,error:e}=await db().storage.from(PREVIEW_BUCKET).download(cover.storage_path);if(e)throw e;
+         publishedCover=`merchant-covers/${id}.${cover.storage_path.split('.').pop()}`;
+         const {error:uploadError}=await db().storage.from('product-images').upload(publishedCover,file,{contentType:cover.mime_type,upsert:true});if(uploadError)throw uploadError;
+         const imageUrl=db().storage.from('product-images').getPublicUrl(publishedCover).data.publicUrl;
+         await checked(db().from('merchant_offers').update({image_url:imageUrl}).eq('id',id));
+       }
+       try {await checked(db().rpc('publish_merchant_offer',{p_offer:id,p_category:category}));}
+       catch(error){if(publishedCover)await db().storage.from('product-images').remove([publishedCover]);throw error;}
+     }
      else if(action==='reject_offer')await checked(db().from('merchant_offers').update({status:'rejected',review_note:z.string().trim().min(3).max(1000).parse(input.note)}).eq('id',z.uuid().parse(input.id)).in('status',['draft','review']));
      else if(action==='merchant_status') {
        const id=z.uuid().parse(input.id), status=z.enum(['active','suspended']).parse(input.status);
@@ -79,7 +97,9 @@ export const handler:Handler=async(event)=>{
    const merchant=await checked(db().from('merchants').select('id,status').eq('user_id',user.id).maybeSingle());
    if(!merchant||merchant.status!=='active')return result(403,{error:'حساب التاجر يحتاج اعتماد الإدارة'});
    if(action==='save_offer') {
-     const offer=offerSchema.parse(input.offer);
+     const parsed=offerSchema.parse(input.offer);
+     await ownedPreviewAssets(parsed.preview_asset_ids,user.id,!parsed.preview_url);
+     const offer={...parsed,image_url:parsed.image_url||'/logo.png',preview_url:parsed.preview_url||null};
      if(input.id) {
        const data=await checked(db().from('merchant_offers').update({...offer,review_note:null}).eq('id',z.uuid().parse(input.id)).eq('merchant_id',merchant.id).in('status',['draft','rejected']).select('id'));
        if(!data?.length)return result(409,{error:'العرض منشور أو تحت المراجعة'});
