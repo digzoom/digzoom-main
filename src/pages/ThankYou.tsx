@@ -26,6 +26,7 @@ export default function ThankYou() {
     { order_id: orderId, session_id: sessionId || undefined },
     { enabled: Boolean(orderId), retry: false }
   );
+  const fulfillment = trpc.listOrderFulfillments.useQuery({order_id:orderId,session_id:sessionId||undefined},{enabled:Boolean(orderId),retry:false});
   const createLink = trpc.createDownloadLink.useMutation();
 
   const handleDownload = async (orderItemId: number) => {
@@ -67,8 +68,8 @@ export default function ThankYou() {
           </h1>
           <p className="text-gray-400 text-lg">
             {lang === 'ar'
-              ? (verified ? 'شكراً لشرائك! ملفاتك جاهزة للتحميل الآمن.' : 'لم يتم تأكيد الدفع لهذا الطلب بعد.')
-              : (verified ? 'Thank you! Your files are ready for secure download.' : 'Payment has not been verified for this order yet.')}
+              ? (verified ? 'شكرًا لشرائك! تابع التحميل أو حالة تسليم منتجاتك أدناه.' : 'لم يتم تأكيد الدفع لهذا الطلب بعد.')
+              : (verified ? 'Thank you! Your downloads and delivery status appear below.' : 'Payment has not been verified for this order yet.')}
           </p>
         </div>
 
@@ -143,6 +144,7 @@ export default function ThankYou() {
           </div>
         )}
 
+        {verified && (fulfillment.data||[]).length > 0 && <section className="mb-6 rounded-2xl border border-blue-500/20 bg-[#151520] p-6"><div className="flex items-center justify-between gap-3"><h2 className="text-xl font-bold text-white">{lang==='ar'?'تسليم منتجاتك':'Product delivery'}</h2><button onClick={()=>fulfillment.refetch()} className="text-sm text-blue-400">{lang==='ar'?'تحديث':'Refresh'}</button></div>{(fulfillment.data||[]).map((item: {id:number;title:string;status:string;message:string})=><article key={item.id} className="mt-4 rounded-xl border border-white/10 p-4"><h3 className="font-bold text-white">{item.title}</h3><p className="mt-2 text-sm text-slate-400">{item.status==='delivered'?(lang==='ar'?'تم التسليم واعتماده':'Delivery approved'):(lang==='ar'?'قيد التجهيز؛ ستظهر تفاصيل التسليم بعد اعتمادها.':'Preparing; delivery details appear after approval.')}</p>{item.message&&<p className="mt-3 whitespace-pre-wrap break-words text-slate-200">{item.message}</p>}</article>)}</section>}
         {/* Back to Home */}
         <div className="text-center">
           <Link

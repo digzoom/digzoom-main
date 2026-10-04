@@ -1,3 +1,4 @@
+import { syncMerchantPayment } from "./merchant-ledger";
 import { getSupabaseAdmin } from "./supabase-admin";
 
 type StripeSession = {
@@ -90,6 +91,10 @@ export async function confirmPaidOrder(session: StripeSession) {
       amount_total: session.amount_total, currency: session.currency },
   }).eq("id", orderId).eq("status", "pending").select("id");
   if (updateError) throw new Error("Order payment update failed");
+  const {error: ledgerError} = await supabase.from('merchant_order_items').update({status:'fee_pending',paid_at:new Date().toISOString()}).eq('order_id',orderId).eq('status','pending');
+  if (ledgerError) throw new Error('Merchant payment record failed');
+  try { await syncMerchantPayment(orderId, session.payment_intent, new Date().toISOString()); }
+  catch (feeError) { console.error('[merchant-fees] deferred reconciliation',orderId,feeError); }
   if (!paidOrders?.length) return true;
 
   if (order.coupon_id) {

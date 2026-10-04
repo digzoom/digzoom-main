@@ -1,4 +1,5 @@
 import type { Handler } from "@netlify/functions";
+import { verifySupabaseToken } from "../lib/trpc";
 import { getSupabaseAdmin } from "../lib/supabase-admin";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
@@ -10,9 +11,14 @@ const html = (value: string) => value.replace(/[&<>"']/g, c => ({ "&": "&amp;", 
 export const handler: Handler = async event => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   try {
+    const token = (event.headers.authorization || '').replace(/^Bearer /, '');
+    const user = token ? await verifySupabaseToken(token) : undefined;
+    if (!user?.email) return {statusCode:401,body:JSON.stringify({error:'سجّل الدخول قبل تقديم طلب الشراكة'})};
     const raw = JSON.parse(event.body || "{}");
+    if (raw.terms_version !== '2026-10-v1') return {statusCode:400,body:JSON.stringify({error:'وافق على شروط الشراكة'})};
     const payload = {
-      name: clean(raw.name, 100), email: clean(raw.email, 254).toLowerCase(), phone: clean(raw.phone, 30),
+      user_id: user.id, terms_version: '2026-10-v1',
+      name: clean(raw.name, 100), email: user.email.trim().toLowerCase(), phone: clean(raw.phone, 30),
       brand: clean(raw.brand, 120), product_type: clean(raw.product_type, 120), preview_url: clean(raw.preview_url, 500),
       suggested_price: raw.suggested_price === "" || raw.suggested_price == null ? null : Number(raw.suggested_price),
       description: clean(raw.description, 2000), rights_confirmed: raw.rights_confirmed === true || raw.rights_confirmed === "true",

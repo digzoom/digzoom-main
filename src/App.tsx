@@ -20,6 +20,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Cart = lazy(() => import("./pages/Cart"));
+const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const ThankYou = lazy(() => import("./pages/ThankYou"));
 const Payment = lazy(() => import("./pages/Payment"));
@@ -121,6 +122,7 @@ export default function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/partners" element={<Partners />} />
+                <Route path="/partner-dashboard" element={<PartnerDashboard />} />
                 <Route path="/digital-assets" element={<DigitalAssets />} />
                 <Route path="/plans/:planId" element={<ServicePlanDetail />} />
                 <Route

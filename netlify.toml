@@ -61,6 +61,11 @@
   to = "/.netlify/functions/partner-application"
   status = 200
 
+[[redirects]]
+  from = "/api/merchant"
+  to = "/.netlify/functions/merchant"
+  status = 200
+
 # Stripe requires the exact raw request body for signature verification.
 [[redirects]]
   from = "/api/stripe/webhook"

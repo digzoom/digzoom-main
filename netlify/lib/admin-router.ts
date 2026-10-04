@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createRouter, publicQuery, authedQuery, adminQuery } from "./trpc";
 import { getSupabaseAdmin } from "./supabase-admin";
 import { confirmPaidOrder, sendOrderEmail } from "./order-confirmation";
+import { snapshotMerchantItems } from "./merchant-ledger";
 import { randomUUID } from "node:crypto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -339,6 +340,7 @@ export const adminRouter = createRouter({
       }
 
       try {
+        await snapshotMerchantItems(orderId, ctx.cookie, totalAmount - taxAmount);
         const siteUrl = (process.env.SITE_URL || process.env.URL || "https://digzoom.com").replace(/\/$/, "");
         const stripeParams = new URLSearchParams({
           mode: "payment",
@@ -386,6 +388,13 @@ export const adminRouter = createRouter({
         throw new Error("Unable to start secure payment");
       }
     }),
+
+  listOrderFulfillments: publicQuery.input(z.object({order_id:z.string().min(6),session_id:z.string().optional()})).query(async({input,ctx})=>{
+    await authorizeOrderAccess(input.order_id,ctx.user?.id,input.session_id);
+    const {data,error}=await admin().from('order_items').select('id,product_title,product_type,delivery_status,delivery_payload').eq('order_id',input.order_id).eq('product_type','manual_service');
+    if(error)throw new Error('Unable to load delivery');
+    return (data||[]).map((item:any)=>({id:item.id,title:item.product_title,status:item.delivery_status,message:item.delivery_status==='delivered'?String(item.delivery_payload?.message||''):''}));
+  }),
 
   /* Secure digital delivery. Metadata is separate from signed-link creation
      so refreshing the confirmation page does not consume a download. */
@@ -523,7 +532,7 @@ export const adminRouter = createRouter({
     const ids = (orders || []).map((order: any) => order.id);
     if (!ids.length) return [];
     const { data: items, error: itemsError } = await admin().from("order_items")
-      .select("id,order_id,product_id,product_title,quantity,price_at_time,delivery_status,download_count,max_downloads")
+      .select("id,order_id,product_id,product_title,quantity,price_at_time,delivery_status,delivery_payload,product_type,download_count,max_downloads")
       .in("order_id", ids);
     if (itemsError) throw new Error("Unable to load order items");
     return (orders || []).map((order: any) => ({

@@ -1,6 +1,7 @@
 import type { Handler } from "@netlify/functions";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { getSupabaseAdmin } from "../lib/supabase-admin";
+import { holdMerchantCharge } from "../lib/merchant-ledger";
 import { confirmPaidOrder } from "../lib/order-confirmation";
 
 function verifyStripeSignature(payload: Buffer, header: string, secret: string) {
@@ -50,11 +51,19 @@ export const handler: Handler = async (event) => {
     }
   }
 
+  if (["charge.refunded", "charge.dispute.created", "charge.dispute.closed"].includes(stripeEvent.type)) {
+    try {
+      const object = stripeEvent.data.object;
+      await holdMerchantCharge(stripeEvent.type.startsWith("charge.dispute") ? {payment_intent: object.payment_intent,charge:object.charge} : object, stripeEvent.type);
+    } catch { return {statusCode: 500, body: "Merchant hold failed"}; }
+  }
+
   if (stripeEvent.type === "checkout.session.expired") {
     const session = stripeEvent.data.object as any;
     const orderId = session.metadata?.order_id;
     if (orderId) {
-      await getSupabaseAdmin().from("orders").update({ status: "cancelled" }).eq("id", orderId).eq("status", "pending");
+      const db: any = getSupabaseAdmin();
+      await db.from("orders").update({ status: "cancelled" }).eq("id", orderId).eq("status", "pending");
     }
   }
 

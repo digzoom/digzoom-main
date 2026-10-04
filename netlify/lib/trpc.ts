@@ -8,6 +8,7 @@ interface TrpcContext {
   user?: { id: string; role: string; email?: string };
   ipAddress?: string;
   userAgent?: string;
+  cookie?: string;
 }
 
 // NOTE: superjson transformer removed — both client and server use plain JSON.

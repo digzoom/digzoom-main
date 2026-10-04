@@ -80,6 +80,7 @@ export const handler = async (event: any, _context: any) => {
         user,
         ipAddress: event.headers?.['x-nf-client-connection-ip'] || event.headers?.['x-forwarded-for']?.split(',')[0]?.trim(),
         userAgent: event.headers?.['user-agent'],
+        cookie: event.headers?.cookie,
       }),
       onError: (opts: any) => {
         console.error(

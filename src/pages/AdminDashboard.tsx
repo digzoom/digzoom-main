@@ -1,3 +1,4 @@
+import AdminPartners from '@/components/partners/AdminPartners';
 import { Fragment, useState, useEffect } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -13,7 +14,7 @@ import {
   XCircle, ImagePlus, Crown
 } from 'lucide-react';
 
-type Tab = 'dash' | 'products' | 'orders' | 'customers' | 'coupons' | 'reviews' | 'analytics' | 'settings';
+type Tab = 'dash' | 'products' | 'orders' | 'customers' | 'coupons' | 'reviews' | 'analytics' | 'settings' | 'partners';
 
 const CATEGORIES = [
   { id: 1, name: 'جرافيكس' }, { id: 2, name: 'خطوط' },
@@ -61,6 +62,7 @@ export default function AdminDashboard() {
     { key: 'dash', label: t.admin.dash, icon: <LayoutDashboard className="w-5 h-5" /> },
     { key: 'products', label: t.admin.products, icon: <Package className="w-5 h-5" /> },
     { key: 'orders', label: t.admin.orders, icon: <ShoppingBag className="w-5 h-5" /> },
+    { key: 'partners', label: lang === 'ar' ? 'شركاء المتجر' : 'Store partners', icon: <Users className="w-5 h-5" /> },
     { key: 'customers', label: t.admin.customers, icon: <Users className="w-5 h-5" /> },
     { key: 'coupons', label: t.admin.coupons, icon: <Tag className="w-5 h-5" /> },
     { key: 'reviews', label: t.admin.reviews, icon: <Star className="w-5 h-5" /> },
@@ -158,6 +160,7 @@ export default function AdminDashboard() {
           {tab === 'reviews' && <ReviewsTab />}
           {tab === 'analytics' && <AnalyticsTab />}
           {tab === 'settings' && <SettingsTab />}
+          {tab === 'partners' && <AdminPartners />}
         </div>
       </main>
     </div>
