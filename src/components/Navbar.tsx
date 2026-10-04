@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import {
-  Bot,
   BriefcaseBusiness,
   ChevronDown,
-  Cloud,
+  Clapperboard,
+  Sparkles,
+  Layers3,
+  CreditCard,
+  Flame,
   Gamepad2,
   Gift,
   Globe,
@@ -15,12 +18,9 @@ import {
   LogOut,
   Menu,
   Package,
-  PackageOpen,
   ShieldCheck,
-  ShoppingBag,
   ShoppingCart,
   Search,
-  Smartphone,
   Store,
   Tag,
   UploadCloud,
@@ -34,24 +34,43 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 const primaryLinks = (isAr: boolean) => [
   { name: isAr ? "الرئيسية" : "Home", path: "/", icon: Home },
   { name: isAr ? "العروض" : "Offers", path: "/shop?sort=offers", icon: Tag },
-  { name: isAr ? "الأكثر مبيعًا" : "Best sellers", path: "/shop?sort=popular", icon: ShoppingBag },
-  { name: isAr ? "الاشتراكات" : "Subscriptions", path: "/shop?category=subscriptions", icon: Cloud },
-  { name: isAr ? "الذكاء الاصطناعي" : "AI", path: "/shop?category=ai", icon: Bot },
+  { name: isAr ? "الأكثر مبيعًا" : "Best sellers", path: "/shop?sort=popular", icon: Flame },
+  { name: isAr ? "الاشتراكات" : "Subscriptions", path: "/shop?category=subscriptions", icon: Clapperboard },
+  { name: isAr ? "الذكاء الاصطناعي" : "AI", path: "/shop?category=ai", icon: Sparkles },
   { name: isAr ? "البرامج" : "Software", path: "/shop?category=software", icon: Laptop2 },
   { name: isAr ? "الألعاب" : "Gaming", path: "/shop?category=gaming", icon: Gamepad2 },
-  { name: isAr ? "المنتجات الرقمية" : "Digital products", path: "/shop?category=templates", icon: PackageOpen },
-  { name: isAr ? "بطاقات الشحن" : "Recharge cards", path: "/shop?category=recharge", icon: Smartphone },
+  { name: isAr ? "المنتجات الرقمية" : "Digital products", path: "/shop?category=templates", icon: Layers3 },
+  { name: isAr ? "بطاقات الشحن" : "Recharge cards", path: "/shop?category=recharge", icon: CreditCard },
 ];
 
 const sideLinks = (isAr: boolean) => [
   ...primaryLinks(isAr),
-  { name: isAr ? "خدمات DigZoom" : "DigZoom services", path: "/marketing", icon: BriefcaseBusiness },
+  { name: isAr ? "خدمات ديج زوم" : "DigZoom services", path: "/marketing", icon: BriefcaseBusiness },
   { name: isAr ? "سوق الأصول الرقمية" : "Digital assets", path: "/digital-assets", icon: KeyRound },
   { name: isAr ? "بيع منتجاتك معنا" : "Sell with us", path: "/partners", icon: UploadCloud },
   { name: isAr ? "منتجات مجانية" : "Free products", path: "/shop?price=free", icon: Gift },
   { name: "DigZoom Pass", path: "/#digzoom-pass", icon: ShieldCheck },
   { name: isAr ? "المتجر" : "Store", path: "/shop", icon: Store },
 ];
+
+
+const menuDetails: Record<string, { color: string; badge: string; ar: string; en: string }> = {
+  '/': { color: '#60a5fa', badge: 'DZ', ar: 'كل عالمك الرقمي', en: 'Your digital world' },
+  '/shop?sort=offers': { color: '#fb7185', badge: '%', ar: 'خصومات وباقات', en: 'Deals & bundles' },
+  '/shop?sort=popular': { color: '#fb923c', badge: '★', ar: 'اكتشف المنتجات البارزة', en: 'Discover featured products' },
+  '/shop?category=subscriptions': { color: '#f472b6', badge: '▶', ar: 'مشاهدة، موسيقى وتطبيقات', en: 'Streaming, music & apps' },
+  '/shop?category=ai': { color: '#2dd4bf', badge: 'AI', ar: 'كتابة، تصميم وإنتاج', en: 'Writing, design & creation' },
+  '/shop?category=software': { color: '#60a5fa', badge: '+', ar: 'برامج العمل والتصميم', en: 'Work & design software' },
+  '/shop?category=gaming': { color: '#a78bfa', badge: '✦', ar: 'ألعاب، بطاقات وشحن', en: 'Games, cards & top-ups' },
+  '/shop?category=templates': { color: '#34d399', badge: '↓', ar: 'قوالب، كتب وتصاميم', en: 'Templates, books & designs' },
+  '/shop?category=recharge': { color: '#fbbf24', badge: 'ϟ', ar: 'رصيد وبطاقات اتصال', en: 'Balance & mobile cards' },
+  '/marketing': { color: '#38bdf8', badge: '↗', ar: 'موقعك ومحتواك وتسويقك', en: 'Websites, content & marketing' },
+  '/digital-assets': { color: '#c084fc', badge: '◈', ar: 'مواقع وأصول قابلة للنقل', en: 'Transferable sites & assets' },
+  '/partners': { color: '#2dd4bf', badge: '+', ar: 'قدّم منتجك للمراجعة', en: 'Submit your product for review' },
+  '/shop?price=free': { color: '#f472b6', badge: '0', ar: 'تصفّح المنتجات المجانية', en: 'Explore free products' },
+  '/#digzoom-pass': { color: '#fbbf24', badge: '★', ar: 'اكتشف مزايا ديج زوم', en: 'Discover DigZoom benefits' },
+  '/shop': { color: '#818cf8', badge: 'DZ', ar: 'تصفّح جميع المنتجات', en: 'Browse all products' },
+};
 
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -196,20 +215,34 @@ export default function Navbar() {
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-[#090d15]/95 px-5 py-4 backdrop-blur-xl">
               <div className="flex items-center gap-3">
                 <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="h-10 w-10 rounded-xl object-cover" />
-                <div><div className="font-black text-white">DigZoom</div><div className="text-xs text-slate-500">{isAr ? "كل عالمك الرقمي" : "Your digital world"}</div></div>
+                <div><div className="font-black text-white">{isAr ? "ديج زوم" : "DigZoom"}</div><div className="text-xs text-slate-500">{isAr ? "كل عالمك الرقمي" : "Your digital world"}</div></div>
               </div>
-              <button onClick={() => setDrawerOpen(false)} className="rounded-xl p-2 text-slate-400 hover:bg-white/5 hover:text-white"><X className="h-5 w-5" /></button>
+              <button onClick={() => setDrawerOpen(false)} aria-label={isAr ? "إغلاق القائمة الجانبية" : "Close sidebar"} className="rounded-xl p-2 text-slate-400 hover:bg-white/5 hover:text-white"><X className="h-5 w-5" /></button>
             </div>
 
             <div className="p-4">
-              <div className="mb-3 text-xs font-black uppercase tracking-[.18em] text-blue-400">{isAr ? "تصفح DigZoom" : "Explore DigZoom"}</div>
+              <div className="mb-3 text-xs font-black uppercase tracking-[.18em] text-blue-400">{isAr ? "تصفّح ديج زوم" : "Explore DigZoom"}</div>
               <div className="space-y-1">
-                {sideLinks(isAr).map(({ name, path, icon: Icon }) => (
-                  <Link key={path} to={path} className="flex items-center justify-between rounded-xl px-3 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/[.05] hover:text-white">
-                    <span className="flex items-center gap-3"><Icon className="h-4 w-4 text-blue-300" />{name}</span>
-                    <span className="text-slate-600">›</span>
-                  </Link>
-                ))}
+                {sideLinks(isAr).map(({ name, path, icon: Icon }) => {
+                  const detail = menuDetails[path];
+                  const active = `${location.pathname}${location.search}${location.hash}` === path;
+                  return (
+                    <Link key={path} to={path} aria-current={active ? "page" : undefined}
+                      className={`group flex min-h-[72px] items-center gap-3 rounded-2xl border px-3 py-2.5 text-slate-200 transition duration-200 hover:border-white/15 hover:bg-white/[.055] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 active:bg-white/10 ${active ? "border-white/15 bg-white/[.07]" : "border-transparent"}`}>
+                      <span aria-hidden="true" className="relative isolate flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-lg transition-transform duration-200 motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:rotate-3 motion-safe:group-active:scale-95"
+                        style={{ color: detail.color, borderColor: `${detail.color}55`, background: `linear-gradient(145deg, ${detail.color}50, ${detail.color}12 65%, #0c1220)`, boxShadow: `inset 0 1px 0 ${detail.color}55, 0 4px 12px #0005` }}>
+                        <span className="absolute inset-x-1 top-1 h-4 rounded-t-xl bg-gradient-to-b from-white/15 to-transparent" />
+                        <Icon className="h-7 w-7 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)]" strokeWidth={1.8} fill={`${detail.color}22`} />
+                        <span className="absolute -bottom-1 -end-1 flex h-[19px] min-w-[19px] items-center justify-center rounded-md border border-[#090d15] px-1 text-[9px] font-black text-[#090d15]" style={{ background: detail.color }}>{detail.badge}</span>
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-extrabold leading-6 group-hover:text-white">{name}</span>
+                        <span className="block text-[11px] font-medium leading-5 text-slate-400">{isAr ? detail.ar : detail.en}</span>
+                      </span>
+                      <span aria-hidden="true" className="text-lg text-slate-600 group-hover:text-slate-300">{isAr ? '‹' : '›'}</span>
+                    </Link>
+                  );
+                })}
               </div>
 
               <div className="my-5 border-t border-white/10" />
