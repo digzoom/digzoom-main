@@ -95,33 +95,34 @@ export default function DigitalHubHome() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
-      <section className="relative bg-[#f3f0ff] pb-10 pt-24 md:pt-28">
+      <section className="relative bg-[#f3f0ff] pb-6 pt-24 md:pb-10 md:pt-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div onMouseEnter={() => setHeroPaused(true)} onMouseLeave={() => setHeroPaused(false)} onFocusCapture={() => setHeroPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroPaused(false); }} aria-roledescription={ar ? "عرض شرائح" : "carousel"} aria-label={ar ? "اكتشف DigZoom" : "Discover DigZoom"} className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-blue-400/60 via-indigo-300/40 to-violet-500/60 p-[2px] shadow-[0_20px_60px_rgba(79,70,229,.14)]">
-            <div className={`relative overflow-hidden rounded-[30px] bg-[#f7f4ff] ${slide === 0 ? "text-slate-950" : "text-white"}`}>
+            <div className={`relative overflow-hidden rounded-[30px] bg-[#f7f4ff] ${slide === 0 ? "text-slate-950" : "bg-[#11132d] text-white md:bg-[#f7f4ff]"}`}>
+            <div aria-hidden="true" className="aspect-[1942/809] md:hidden" />
             {slides.map((item, index) => (
-              <div key={item.href} aria-hidden={index !== slide} className={`absolute inset-0 transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+              <div key={item.href} aria-hidden={index !== slide} className={`absolute inset-x-0 top-0 aspect-[1942/809] md:inset-0 md:aspect-auto transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
                 <img src={item.image} alt={item.title} style={{ animationPlayState: heroPaused || manualPaused ? "paused" : "running" }} className={`${index === slide ? "digzoom-hero-drift " : ""}${index === 0 ? "h-full w-full object-contain object-top" : "h-full w-full object-cover"}`} />
                 {index !== 0 && <div className="absolute inset-0 bg-gradient-to-r from-[#11132d]/90 via-[#141633]/65 to-[#161c43]/10 rtl:bg-gradient-to-l" />}
               </div>
             ))}
 
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] rounded-[30px] bg-[radial-gradient(ellipse_at_top_left,rgba(96,165,250,.12),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(167,139,250,.14),transparent_50%)] ring-1 ring-inset ring-indigo-200/20" />
-            <div className="relative z-10 flex min-h-[740px] items-end px-7 pb-20 pt-[52vw] sm:px-10 md:min-h-[600px] md:px-10 md:pt-36 lg:px-12">
+            <div className="relative z-10 flex items-end px-5 pb-20 pt-6 sm:px-7 md:min-h-[600px] md:px-10 md:pt-36 lg:px-12">
               <div className={slide === 0 ? "w-full md:ml-auto md:max-w-[43%]" : "max-w-2xl"}>
-                {slide !== 0 && <div className="mb-5 inline-flex rounded-full border border-indigo-200/30 bg-black/30 px-4 py-2 text-sm font-black tracking-[.14em] text-indigo-100 backdrop-blur-xl md:absolute md:top-24">{current.eyebrow}</div>}
-                <h1 className="min-h-[135px] text-4xl font-black leading-[1.2] tracking-[-.04em] sm:text-5xl md:min-h-[126px]">
+                {slide !== 0 && <div className="mb-4 inline-flex rounded-full border border-indigo-200/30 bg-black/30 px-3 py-1.5 text-xs font-black tracking-[.06em] md:px-4 md:py-2 md:text-sm md:tracking-[.14em] text-indigo-100 backdrop-blur-xl md:absolute md:top-24">{current.eyebrow}</div>}
+                <h1 className="text-[30px] font-black leading-[1.25] tracking-[-.04em] sm:text-4xl md:min-h-[126px] md:text-5xl">
                   {current.title}
                   <span className="mt-2 block bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 bg-clip-text text-transparent">{current.accent}</span>
                 </h1>
-                <p className={`mt-6 min-h-16 max-w-xl text-lg leading-8 ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>{current.text}</p>
-                <div className="mt-8 flex min-h-14 flex-wrap gap-3">
-                  <Link onClick={slide === 0 ? (event) => { event.preventDefault(); document.getElementById("departments")?.scrollIntoView({ behavior: "smooth", block: "start" }); } : undefined} to={current.href} className="inline-flex min-h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-7 font-black text-white shadow-[0_18px_60px_rgba(59,130,246,.25)]">
+                <p className={`mt-4 max-w-xl text-base leading-7 md:mt-6 md:min-h-16 md:text-lg md:leading-8 ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>{current.text}</p>
+                <div className="mt-5 flex flex-wrap gap-3 md:mt-8 md:min-h-14">
+                  <Link onClick={slide === 0 ? (event) => { event.preventDefault(); document.getElementById("departments")?.scrollIntoView({ behavior: "smooth", block: "start" }); } : undefined} to={current.href} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 font-black text-white shadow-[0_18px_60px_rgba(59,130,246,.25)] md:min-h-14 md:px-7">
                     {current.cta}<Arrow className="h-5 w-5" />
                   </Link>
-                  {slide !== 0 && <Link to="/shop" className="inline-flex min-h-14 items-center gap-2 rounded-2xl border border-white/15 bg-black/30 px-7 font-bold backdrop-blur-xl">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
+                  {slide !== 0 && <Link to="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-black/30 px-5 font-bold backdrop-blur-xl md:min-h-14 md:px-7">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
                 </div>
-                <div className={`mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>
+                <div className={`mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold md:mt-8 md:gap-x-6 md:gap-y-3 md:text-sm ${slide === 0 ? "text-slate-600" : "text-slate-300"}`}>
                   <span className="inline-flex items-center gap-2"><Zap className="h-4 w-4 text-amber-300" />{ar ? "تسليم رقمي" : "Digital delivery"}</span>
                   <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" />{ar ? "دفع آمن" : "Secure checkout"}</span>
                   <span className="inline-flex items-center gap-2"><Headphones className="h-4 w-4 text-cyan-300" />{ar ? "دعم سريع" : "Fast support"}</span>
