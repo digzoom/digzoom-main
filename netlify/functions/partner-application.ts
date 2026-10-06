@@ -7,6 +7,7 @@ import { getSupabaseAdmin } from "../lib/supabase-admin";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const FROM = process.env.CONTACT_FROM_EMAIL || "DigZoom Partners <contact@digzoom.com>";
 const TO = process.env.CONTACT_TO_EMAIL || "info@digzoom.com";
+const NOTIFICATION_TIMEOUT_MS = 5000;
 const clean = (value: unknown, max: number) => String(value || "").trim().slice(0, max);
 const html = (value: string) => value.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c] || c));
 
@@ -43,7 +44,19 @@ export const handler: Handler = async event => {
     if ((count || 0) >= 3) return { statusCode: 429, body: JSON.stringify({ error: "Too many requests" }) };
     const { data, error } = await supabase.from("partner_applications").insert({ ...payload, ip_address: ip || null, user_agent: event.headers["user-agent"]?.slice(0, 500) || null }).select("id").single();
     if (error) throw error;
-    if (RESEND_API_KEY) await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: TO, reply_to: payload.email, subject: `[DigZoom Partner] ${payload.brand || payload.name}`, html: `<h2>Digital Partner Application</h2><p><b>Name:</b> ${html(payload.name)}</p><p><b>Brand:</b> ${html(payload.brand)}</p><p><b>Email:</b> ${html(payload.email)}</p><p><b>Phone:</b> ${html(payload.phone)}</p><p><b>Type:</b> ${html(payload.product_type)}</p><p><b>Price:</b> ${payload.suggested_price ?? "Not set"}</p><p><b>Preview:</b> ${html(payload.preview_url || `${previewIds.length} preview file(s) in partner admin`)}</p><p><b>Description:</b><br>${html(payload.description).replace(/\n/g, "<br>")}</p>` }) });
+    // The application is already saved. Notification delivery must not invite a duplicate submission.
+    if (RESEND_API_KEY) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), NOTIFICATION_TIMEOUT_MS);
+      try {
+        const notification = await fetch("https://api.resend.com/emails", { method: "POST", signal: controller.signal, headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: TO, reply_to: payload.email, subject: `[DigZoom Partner] ${payload.brand || payload.name}`, html: `<h2>Digital Partner Application</h2><p><b>Name:</b> ${html(payload.name)}</p><p><b>Brand:</b> ${html(payload.brand)}</p><p><b>Email:</b> ${html(payload.email)}</p><p><b>Phone:</b> ${html(payload.phone)}</p><p><b>Type:</b> ${html(payload.product_type)}</p><p><b>Price:</b> ${payload.suggested_price ?? "Not set"}</p><p><b>Preview:</b> ${html(payload.preview_url || `${previewIds.length} preview file(s) in partner admin`)}</p><p><b>Description:</b><br>${html(payload.description).replace(/\n/g, "<br>")}</p>` }) });
+        if (!notification.ok) console.error("[partner-application] Notification failed", { application_id: data.id, status: notification.status });
+      } catch (error) {
+        console.error("[partner-application] Notification failed", { application_id: data.id, error });
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ success: true, application_id: data.id }) };
   } catch (error) { console.error("[partner-application]", error); return { statusCode: 500, body: JSON.stringify({ error: "Unable to submit" }) }; }
 };

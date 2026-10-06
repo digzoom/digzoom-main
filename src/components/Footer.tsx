@@ -98,7 +98,7 @@ export default function Footer() {
                 <span dir="ltr">+966 56 988 8456</span>
               </div>
               <a
-                href="https://wa.me/00966569888456"
+                href="https://wa.me/966569888456"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-gray-400 text-sm hover:text-emerald-400 transition-colors"

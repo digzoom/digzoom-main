@@ -22,6 +22,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { productTitle, productLongDescription } from "@/lib/i18n";
 import { cachedProduct, readStorefrontCache } from "@/lib/storefrontCache";
 import { useCart } from "@/hooks/useCart";
+import Seo from "@/components/Seo";
+import { productFeatures } from "@/lib/productFeatures";
 
 const CHECKOUT_ENABLED = import.meta.env.VITE_CHECKOUT_ENABLED === "true";
 
@@ -148,6 +150,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center pt-20">
+        <Seo />
         <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
       </div>
     );
@@ -156,6 +159,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center pt-20 px-4">
+        <Seo />
         <div className="text-center max-w-md mx-auto">
           <div className="w-20 h-20 rounded-2xl bg-[#151520] border border-white/[0.06] flex items-center justify-center mx-auto mb-6">
             <Zap className="w-10 h-10 text-gray-600" />
@@ -190,7 +194,7 @@ export default function ProductDetail() {
   const discount = product.original_price
     ? Math.round((1 - product.price / product.original_price) * 100)
     : 0;
-  const features = (product.features as string[]) || [];
+  const features = productFeatures(product, lang);
   const trustBadges = getTrustBadges(
     Boolean(product.download_url || product.storage_path),
   );
@@ -203,6 +207,7 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] pt-20 md:pt-24 pb-24 md:pb-16">
+      <Seo product={product} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 mb-6 overflow-x-auto whitespace-nowrap">

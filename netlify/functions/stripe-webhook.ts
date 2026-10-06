@@ -1,18 +1,25 @@
 import type { Handler } from "@netlify/functions";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { getSupabaseAdmin } from "../lib/supabase-admin";
 import { holdMerchantCharge } from "../lib/merchant-ledger";
 import { confirmPaidOrder } from "../lib/order-confirmation";
+import { syncFullyRefundedOrder } from "../lib/order-refunds";
+
+type StripeEvent = {
+  type: string;
+  data: { object: Parameters<typeof confirmPaidOrder>[0] & Parameters<typeof syncFullyRefundedOrder>[0] & { charge?: string } };
+};
 
 function verifyStripeSignature(payload: Buffer, header: string, secret: string) {
   const fields = header.split(",").map((part) => part.split("=", 2));
   const timestamp = fields.find(([key]) => key === "t")?.[1];
   const signatures = fields.filter(([key]) => key === "v1").map(([, value]) => value);
-  if (!timestamp || signatures.length === 0) return false;
+  if (!timestamp || !/^\d+$/.test(timestamp) || !Number.isSafeInteger(Number(timestamp)) || signatures.length === 0) return false;
   if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
   const expected = createHmac("sha256", secret).update(`${timestamp}.${payload.toString("utf8")}`).digest("hex");
   return signatures.some((signature) => {
-    if (signature.length !== expected.length) return false;
+    if (!/^[a-fA-F0-9]{64}$/.test(signature)) return false;
     return timingSafeEqual(Buffer.from(signature, "hex"), Buffer.from(expected, "hex"));
   });
 }
@@ -32,17 +39,17 @@ export const handler: Handler = async (event) => {
     ? Buffer.from(event.body, "base64")
     : Buffer.from(event.body, "utf8");
 
-  let stripeEvent: any;
+  let stripeEvent: StripeEvent;
   try {
     if (!verifyStripeSignature(rawBody, signature, webhookSecret)) throw new Error("Signature mismatch");
     stripeEvent = JSON.parse(rawBody.toString("utf8"));
-  } catch (error: any) {
-    console.error("[stripe-webhook] invalid signature:", error?.message || error);
+  } catch (error) {
+    console.error("[stripe-webhook] invalid signature:", error instanceof Error ? error.message : error);
     return { statusCode: 400, body: "Invalid signature" };
   }
 
   if (stripeEvent.type === "checkout.session.completed" || stripeEvent.type === "checkout.session.async_payment_succeeded") {
-    const session = stripeEvent.data.object as any;
+    const session = stripeEvent.data.object;
     try {
       await confirmPaidOrder(session);
     } catch (error) {
@@ -58,11 +65,20 @@ export const handler: Handler = async (event) => {
     } catch { return {statusCode: 500, body: "Merchant hold failed"}; }
   }
 
+  if (stripeEvent.type === "charge.refunded") {
+    try {
+      await syncFullyRefundedOrder(stripeEvent.data.object);
+    } catch (error) {
+      console.error("[stripe-webhook] order refund sync failed", stripeEvent.data.object?.id, error);
+      return { statusCode: 500, body: "Order refund sync failed" };
+    }
+  }
+
   if (stripeEvent.type === "checkout.session.expired") {
-    const session = stripeEvent.data.object as any;
+    const session = stripeEvent.data.object;
     const orderId = session.metadata?.order_id;
     if (orderId) {
-      const db: any = getSupabaseAdmin();
+      const db = getSupabaseAdmin() as SupabaseClient;
       await db.from("orders").update({ status: "cancelled" }).eq("id", orderId).eq("status", "pending");
     }
   }

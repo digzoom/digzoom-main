@@ -21,6 +21,29 @@ export async function snapshotMerchantItems(orderId:string,cookie:string|undefin
 export async function syncMerchantPayment(orderId:string,paymentIntent:string|undefined|null,paidAt?:string) {
  const {data:ledger,error}=await db().from('merchant_order_items').select('*').eq('order_id',orderId);
  if(error) throw error; if(!ledger?.length) return;
+ // A completed, verified zero-total Checkout has no PaymentIntent or fees.
+ // Keep its merchant rows reconcilable without inventing a payment reference.
+ if(!paymentIntent) {
+   const {data:order,error:orderError}=await db().from('orders').select('id,total_amount,status,paid_at,payment_payload').eq('id',orderId).single();
+   if(orderError||!order||Number(order.total_amount)!==0||!order.paid_at||
+      !['paid','processing','completed'].includes(order.status)||
+      order.payment_payload?.payment_status!=='no_payment_required'||
+      order.payment_payload?.amount_total!==0||order.payment_payload?.currency?.toLowerCase()!=='sar'||
+      !order.payment_payload?.checkout_session_id||order.payment_payload?.payment_intent_id) throw new Error('Missing Stripe payment reference');
+   const {data:settings,error:settingsError}=await db().from('merchant_settings').select('hold_days').eq('id',true).single();
+   if(settingsError||!settings) throw new Error('Unable to load merchant settlement settings');
+   for(const row of ledger) {
+     if(row.settlement_id||row.status==='held') continue;
+     if(Number(row.gross_cents)!==0) throw new Error('Zero-total merchant amount mismatch');
+     const {error:updateError}=await db().from('merchant_order_items').update({
+       paid_at:order.paid_at,status:'ready',stripe_fee_cents:0,commission_cents:0,merchant_cents:0,
+       ready_at:new Date(new Date(order.paid_at).getTime()+settings.hold_days*86400000).toISOString(),
+       fee_evidence:{checkout_session_id:order.payment_payload.checkout_session_id,payment_status:'no_payment_required',amount_total:0,currency:'sar'},
+     }).eq('id',row.id).is('settlement_id',null).neq('status','held');
+     if(updateError) throw updateError;
+   }
+   return;
+ }
  const key=process.env.STRIPE_SECRET_KEY; if(!key||!paymentIntent) throw new Error('Missing Stripe payment reference');
  const res=await fetch(`https://api.stripe.com/v1/payment_intents/${encodeURIComponent(paymentIntent)}?expand[]=latest_charge.balance_transaction`,{headers:{Authorization:`Bearer ${key}`},signal:AbortSignal.timeout(10000)});
  if(!res.ok) throw new Error('Unable to verify merchant payment');
@@ -45,13 +68,25 @@ export async function syncMerchantPayment(orderId:string,paymentIntent:string|un
    if(e) throw e;
  }
 }
-export async function holdMerchantCharge(charge:any,reason:string) {
- if (!charge.payment_intent && typeof charge.charge === 'string') {
-   const response=await fetch(`https://api.stripe.com/v1/charges/${encodeURIComponent(charge.charge)}`,{headers:{Authorization:`Bearer ${process.env.STRIPE_SECRET_KEY}`},signal:AbortSignal.timeout(10000)});
-   if(!response.ok)throw new Error('Unable to identify disputed order');
-   charge=await response.json();
+export async function holdMerchantCharge(
+ charge: Parameters<typeof import('./order-refunds').resolveStripeChargeOrder>[0] & {charge?:string}, reason:string,
+) {
+ const {resolveStripeChargeOrder}=await import('./order-refunds');
+ let order=await resolveStripeChargeOrder(charge);
+ if(!order&&typeof charge.charge==='string') {
+   if(!/^ch_[A-Za-z0-9]+$/.test(charge.charge)) return;
+   const key=process.env.STRIPE_SECRET_KEY;
+   if(!key) throw new Error('Unable to identify disputed order');
+   const response=await fetch(`https://api.stripe.com/v1/charges/${encodeURIComponent(charge.charge)}`,{headers:{Authorization:`Bearer ${key}`},signal:AbortSignal.timeout(10000)});
+   if(!response.ok) throw new Error('Unable to identify disputed order');
+   const verifiedCharge=await response.json() as Parameters<typeof resolveStripeChargeOrder>[0];
+   const originalIntent=typeof charge.payment_intent==='string'?charge.payment_intent:charge.payment_intent?.id;
+   const verifiedIntent=typeof verifiedCharge.payment_intent==='string'?verifiedCharge.payment_intent:verifiedCharge.payment_intent?.id;
+   if(verifiedCharge.object!=='charge'||verifiedCharge.id!==charge.charge||(originalIntent&&originalIntent!==verifiedIntent)) return;
+   order=await resolveStripeChargeOrder(verifiedCharge);
  }
- let orderId=charge.metadata?.order_id;
- if(!orderId&&charge.payment_intent) {const {data,error}=await db().from('orders').select('id').contains('payment_payload',{payment_intent_id:charge.payment_intent}).maybeSingle(); if(error) throw error; orderId=data?.id;}
- if(orderId) {const {error}=await db().from('merchant_order_items').update({status:'held',hold_reason:reason}).eq('order_id',orderId);if(error)throw error;}
+ if(order) {
+   const {error}=await db().from('merchant_order_items').update({status:'held',hold_reason:reason}).eq('order_id',order.id);
+   if(error) throw error;
+ }
 }

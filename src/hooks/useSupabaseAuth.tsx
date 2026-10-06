@@ -1,4 +1,7 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { toast } from 'sonner';
+import i18n from '@/i18n/i18n';
+import type { Session, UserMetadata } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { UserRole } from '@/types/database';
 
@@ -13,6 +16,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
@@ -20,7 +24,7 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error?: string; success?: boolean }>;
   updatePassword: (newPassword: string) => Promise<{ error?: string }>;
   exchangeRecoveryCode: (code: string) => Promise<{ error?: string }>;
-  logout: () => Promise<void>;
+  logout: () => Promise<{ error?: string }>;
   signInWithGoogle: () => Promise<void>;
   isAdmin: boolean;
   isSupport: boolean;
@@ -41,28 +45,28 @@ function makeUserHeaders(token: string) {
 }
 
 // Generic REST fetch helper
-async function restQuery(token: string, table: string, select: string, eq?: { col: string; val: string }) {
+async function restQuery(token: string, table: string, select: string, eq: { col: string; val: string }, signal: AbortSignal) {
   let url = `${SUPABASE_URL}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
   if (eq) url += `&${eq.col}=eq.${encodeURIComponent(eq.val)}`;
   url += '&limit=1';
 
   const res = await fetch(url, {
     headers: makeUserHeaders(token),
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]),
   });
   return res;
 }
 
 // Fetch profile + role using USER token (passes RLS)
-async function loadProfile(token: string, userId: string, email: string, metadata: any): Promise<User> {
+async function loadProfile(token: string, userId: string, email: string, metadata: UserMetadata, signal: AbortSignal): Promise<User> {
 
   // 1. Query profiles
-  const profileRes = await restQuery(token, 'profiles', 'full_name,avatar_url,role,phone', { col: 'id', val: userId });
+  const profileRes = await restQuery(token, 'profiles', 'full_name,avatar_url,role,phone', { col: 'id', val: userId }, signal);
   const profiles = await profileRes.json().catch(() => []);
   const profile = Array.isArray(profiles) ? profiles[0] : profiles;
 
   // 2. Query user_roles
-  const rolesRes = await restQuery(token, 'user_roles', 'role,is_active', { col: 'user_id', val: userId });
+  const rolesRes = await restQuery(token, 'user_roles', 'role,is_active', { col: 'user_id', val: userId }, signal);
   const userRoles = await rolesRes.json().catch(() => []);
   const ur = Array.isArray(userRoles) ? userRoles[0] : userRoles;
 
@@ -91,13 +95,23 @@ async function loadProfile(token: string, userId: string, email: string, metadat
   };
 }
 
+// StrictMode can mount twice while the one-time PKCE exchange is in flight.
+// Share only that pending operation, never a session or completed code.
+let pendingExchange: { code: string; result: ReturnType<typeof supabase.auth.exchangeCodeForSession> } | null = null;
+function exchangeCode(code: string) {
+  if (pendingExchange?.code === code) return pendingExchange.result;
+  const exchange = { code, result: supabase.auth.exchangeCodeForSession(code) };
+  pendingExchange = exchange;
+  const clear = () => { if (pendingExchange === exchange) pendingExchange = null; };
+  void exchange.result.then(clear, clear);
+  return exchange.result;
+}
+
 // Recovery code exchange (uses Supabase client for PKCE)
 async function exchangeRecoveryCodeFn(code: string): Promise<{ error?: string }> {
   try {
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await exchangeCode(code);
     if (error || !data.session) return { error: error?.message || 'Invalid recovery code' };
-    localStorage.setItem('sb_access_token', data.session.access_token);
-    localStorage.setItem('sb_refresh_token', data.session.refresh_token);
     return {};
   } catch {
     return { error: 'Failed to process recovery link' };
@@ -106,131 +120,135 @@ async function exchangeRecoveryCodeFn(code: string): Promise<{ error?: string }>
 
 export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const mounted = useRef(false);
+  const currentSession = useRef<Session | null>(null);
+  const revision = useRef(0);
+  const profileRequest = useRef<AbortController | null>(null);
+  const profileResult = useRef<Promise<void> | null>(null);
 
-  // Core: load user from token
-  const loadUser = useCallback(async (token: string) => {
-    try {
-      // Get auth user info
-      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-        headers: makeUserHeaders(token),
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (!res.ok) {
-        console.error('[AUTH] /auth/v1/user FAILED');
-        localStorage.removeItem('sb_access_token');
-        setUser(null);
-        return;
-      }
-
-      const authUser = await res.json();
-
-      // Load profile + role with user token (passes RLS)
-      const userData = await loadProfile(token, authUser.id, authUser.email, authUser.user_metadata);
-      setUser(userData);
-    } catch (e) {
-      console.error('[AUTH] loadUser exception:', e);
-      setUser(null);
+  // The SDK owns persistence, expiry and token rotation. These legacy mirrors
+  // support the non-tRPC API callers; they are never used to restore a session.
+  const applySession = useCallback((next: Session | null, reload = false): Promise<void> => {
+    if (!mounted.current) return Promise.resolve();
+    const previous = currentSession.current;
+    if (!reload && next && previous?.access_token === next.access_token && profileResult.current) {
+      return profileResult.current;
     }
+
+    const requestRevision = ++revision.current;
+    profileRequest.current?.abort();
+    currentSession.current = next;
+    setSession(next);
+
+    if (!next) {
+      localStorage.removeItem('sb_access_token');
+      localStorage.removeItem('sb_refresh_token');
+      profileResult.current = null;
+      setUser(null);
+      setLoading(false);
+      return Promise.resolve();
+    }
+
+    localStorage.setItem('sb_access_token', next.access_token);
+    localStorage.setItem('sb_refresh_token', next.refresh_token);
+    if (previous?.user.id !== next.user.id) {
+      setUser(null);
+      setLoading(true);
+    }
+
+    const controller = new AbortController();
+    profileRequest.current = controller;
+    const isCurrent = () => mounted.current && revision.current === requestRevision;
+    const result = (async () => {
+      try {
+        const profile = await loadProfile(
+          next.access_token, next.user.id, next.user.email || '', next.user.user_metadata,
+          controller.signal,
+        );
+        if (isCurrent()) setUser(profile);
+      } catch (error) {
+        if (isCurrent() && !controller.signal.aborted) {
+          console.error('[AUTH] Profile load failed:', error);
+          profileResult.current = null;
+          setUser(null);
+        }
+      } finally {
+        if (isCurrent()) setLoading(false);
+      }
+    })();
+    profileResult.current = result;
+    return result;
   }, []);
 
-  // Mount: handle OAuth callback + restore session
+  // Restore the SDK session and handle OAuth/recovery callbacks. A later auth
+  // event always wins over an older restoration or profile response.
   useEffect(() => {
-    let mounted = true;
-
-    const init = async () => {
-      setLoading(true);
-
-      // 1. Check for PKCE OAuth callback (?code= in search params)
-      // We use detectSessionInUrl=false so we handle this manually.
-      // redirectTo in signInWithOAuth is window.location.origin (no hash),
-      // so ?code= appears in window.location.search, NOT in the hash fragment.
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
-
-      if (code) {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-        if (error) {
-          console.error('[AUTH] exchangeCodeForSession FAILED:', error.message);
-        } else if (data.session) {
-          localStorage.setItem('sb_access_token', data.session.access_token);
-          localStorage.setItem('sb_refresh_token', data.session.refresh_token);
-
-          // Remove the one-time code immediately. OAuth returns home while
-          // password recovery stays on the reset screen.
-          url.searchParams.delete('code');
-          url.searchParams.delete('type');
-          window.history.replaceState({}, '', url.pathname + url.search);
-          if (url.pathname === '/auth/callback') {
-            window.location.replace('/');
-            return;
-          }
-        }
+    mounted.current = true;
+    let active = true;
+    const initialRevision = revision.current;
+    const { data: listener } = supabase.auth.onAuthStateChange((event, next) => {
+      // getSession below handles initialization, including PKCE exchange.
+      if (active && event !== 'INITIAL_SESSION') {
+        // Keep the SDK callback synchronous: awaiting SDK calls here can deadlock.
+        void applySession(next, event === 'USER_UPDATED');
       }
-
-      // 2. No callback code — check for existing session via Supabase client
-      const { data: { session }, error } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error('[AUTH] getSession error:', error.message);
-      }
-
-      if (session?.access_token) {
-        localStorage.setItem('sb_access_token', session.access_token);
-        localStorage.setItem('sb_refresh_token', session.refresh_token);
-        if (mounted) await loadUser(session.access_token);
-      } else {
-        // Fallback: try stored token
-        const token = localStorage.getItem('sb_access_token');
-        if (token) {
-          if (mounted) await loadUser(token);
-        } else {
-          if (mounted) setUser(null);
-        }
-      }
-
-      if (mounted) setLoading(false);
-    };
-
-    init();
-
-    // Listen for auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
-        localStorage.setItem('sb_access_token', session.access_token);
-        if (mounted) await loadUser(session.access_token);
-      } else if (event === 'SIGNED_OUT') {
-        localStorage.removeItem('sb_access_token');
-        localStorage.removeItem('sb_refresh_token');
-        if (mounted) setUser(null);
-      }
-      if (mounted) setLoading(false);
     });
 
-    return () => { mounted = false; listener?.subscription?.unsubscribe(); };
-  }, [loadUser]);
+    const init = async () => {
+      try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+        if (code) {
+          const { error } = await exchangeCode(code);
+          if (!active) return;
+          if (error) {
+            console.error('[AUTH] exchangeCodeForSession failed:', error.message);
+          } else {
+            url.searchParams.delete('code');
+            url.searchParams.delete('type');
+            window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+            if (url.pathname === '/auth/callback') {
+              window.location.replace('/');
+              return;
+            }
+          }
+        }
 
-  // Email/Password Login
+        const { data: { session: restored }, error } = await supabase.auth.getSession();
+        if (error) console.error('[AUTH] getSession failed:', error.message);
+        if (active && revision.current === initialRevision) await applySession(restored);
+      } catch (error) {
+        console.error('[AUTH] Session initialization failed:', error);
+        if (active && revision.current === initialRevision) await applySession(null);
+      }
+    };
+    void init();
+
+    return () => {
+      active = false;
+      mounted.current = false;
+      // This is a generation counter, not a captured DOM ref.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      ++revision.current;
+      profileRequest.current?.abort();
+      profileResult.current = null;
+      listener.subscription.unsubscribe();
+    };
+  }, [applySession]);
+
   const login = useCallback(async (email: string, password: string) => {
-    const { ok, data } = await (async () => {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        signal: AbortSignal.timeout(15000),
-      });
-      const d = await r.json().catch(() => ({}));
-      return { ok: r.ok, data: d };
-    })();
-
-    if (!ok || !data.access_token) return { error: data?.msg || data?.message || 'Login failed' };
-
-    localStorage.setItem('sb_access_token', data.access_token);
-    await loadUser(data.access_token);
+    // This stores the full session and starts the SDK's existing refresh lifecycle.
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.session) return { error: error?.message || 'Login failed' };
+    // SIGNED_IN has already applied this session. Do not replay an older
+    // result if another sign-in/sign-out happened while this request finished.
+    if (currentSession.current?.access_token === data.session.access_token) {
+      await profileResult.current;
+    }
     return {};
-  }, [loadUser]);
+  }, []);
 
   // Register
   const register = useCallback(async (email: string, password: string, name: string) => {
@@ -242,22 +260,20 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     return {};
   }, []);
 
-  // Logout
+  // Keep the SDK's existing (global) sign-out scope and clear UI only on success.
   const logout = useCallback(async () => {
-    const token = localStorage.getItem('sb_access_token');
-    if (token) {
-      try {
-        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-          method: 'POST',
-          headers: makeUserHeaders(token),
-          signal: AbortSignal.timeout(10000),
-        });
-      } catch { /* ignore */ }
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.dismiss('auth-sign-out-error');
+      return {};
+    } catch {
+      const message = i18n.language === 'en'
+        ? "Couldn't sign out. Please try again."
+        : 'تعذر تسجيل الخروج. حاول مرة أخرى.';
+      toast.error(message, { id: 'auth-sign-out-error', duration: 5000 });
+      return { error: message };
     }
-    await supabase.auth.signOut();
-    localStorage.removeItem('sb_access_token');
-    localStorage.removeItem('sb_refresh_token');
-    setUser(null);
   }, []);
 
   // Password Reset
@@ -291,7 +307,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, loading, isLoading: loading,
+      user, session, loading, isLoading: loading,
       login, register, resetPassword, updatePassword,
       exchangeRecoveryCode: exchangeRecoveryCodeFn,
       logout, signInWithGoogle, isAdmin, isSupport,
@@ -301,6 +317,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Keep the context hook beside its provider.
 export function useSupabaseAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useSupabaseAuth must be used within SupabaseAuthProvider');
