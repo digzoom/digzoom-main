@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "./supabase-admin";
 import { confirmPaidOrder, sendOrderEmail } from "./order-confirmation";
 import { snapshotMerchantItems } from "./merchant-ledger";
 import { randomUUID } from "node:crypto";
+import { canDeliverOrder, isRevokedOrder, productDownloadFilename } from "./order-delivery";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function admin(): any { return getSupabaseAdmin(); }
@@ -35,6 +36,7 @@ async function retrieveStripeCheckout(sessionId: string) {
   const body = await response.json() as {
     id?: string;
     payment_status?: string;
+    status?: string;
     amount_total?: number;
     currency?: string;
     payment_intent?: string | null;
@@ -47,7 +49,7 @@ async function retrieveStripeCheckout(sessionId: string) {
   return body as typeof body & { id: string };
 }
 
-async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?: string) {
+async function readDeliveryOrder(orderId: string) {
   const { data: order, error } = await admin()
     .from("orders")
     .select("id,user_id,status,paid_at,payment_payload")
@@ -55,20 +57,36 @@ async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?
     .maybeSingle();
 
   if (error || !order) throw new Error("Order not found");
-  const paid = order.status === "paid" || order.status === "completed" || !!order.paid_at;
-  if (userId && order.user_id === userId && paid) return order;
+  if (isRevokedOrder(order.status)) throw new Error("Downloads are not available for this order");
+  return order;
+}
+
+async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?: string) {
+  const order = await readDeliveryOrder(orderId);
+  if (userId && order.user_id === userId && canDeliverOrder(order)) return order;
 
   if (sessionId) {
     const storedSessionId = order.payment_payload?.checkout_session_id;
     if (storedSessionId !== sessionId) throw new Error("Download authorization failed");
     const session = await retrieveStripeCheckout(sessionId);
-    if (session.payment_status === "paid" && session.metadata?.order_id === orderId) {
-      await confirmPaidOrder(session);
-      return order;
+    if (session.metadata?.order_id === orderId && await confirmPaidOrder(session)) {
+      // Confirmation can race with cancellation/refund. Authorize the current
+      // stored state, never the pre-confirmation snapshot or Stripe alone.
+      const confirmedOrder = await readDeliveryOrder(orderId);
+      if (canDeliverOrder(confirmedOrder)) return confirmedOrder;
     }
   }
 
   throw new Error("Downloads are not available for this order");
+}
+
+async function assertCurrentDeliveryAccess(orderId: string, userId?: string, sessionId?: string) {
+  const order = await readDeliveryOrder(orderId);
+  const sameOwner = Boolean(userId && order.user_id === userId);
+  const sameSession = Boolean(sessionId && order.payment_payload?.checkout_session_id === sessionId);
+  if (!canDeliverOrder(order) || (!sameOwner && !sameSession)) {
+    throw new Error("Downloads are not available for this order");
+  }
 }
 
 const couponCartItemSchema = z.object({
@@ -459,7 +477,7 @@ export const adminRouter = createRouter({
 
       const { data: product } = await admin()
         .from("products")
-        .select("storage_path,title_en")
+        .select("storage_path,title_en,file_type")
         .eq("id", item.product_id)
         .maybeSingle();
       if (!product?.storage_path) throw new Error("Product file is not ready");
@@ -479,22 +497,29 @@ export const adminRouter = createRouter({
         .maybeSingle();
       if (updateError || !updated) throw new Error("Please retry the download");
 
-      const filename = `${product.title_en || "digzoom-product"}.xlsx`.replace(/[^a-zA-Z0-9._ -]/g, "");
-      const { data: signed, error: signedError } = await admin().storage
-        .from("digital-products")
-        .createSignedUrl(product.storage_path, 120, { download: filename });
-      if (signedError || !signed?.signedUrl) {
-        await admin().from("order_items").update({ download_count: item.download_count }).eq("id", item.id);
-        throw new Error("Unable to create secure download link");
-      }
+      try {
+        await assertCurrentDeliveryAccess(input.order_id, ctx.user?.id, input.session_id);
+        const filename = productDownloadFilename(product.storage_path, product.title_en, product.file_type);
+        const { data: signed, error: signedError } = await admin().storage
+          .from("digital-products")
+          .createSignedUrl(product.storage_path, 120, { download: filename });
+        if (signedError || !signed?.signedUrl) throw new Error("Unable to create secure download link");
 
-      await admin().from("download_logs").insert({
-        order_item_id: item.id,
-        user_id: ctx.user?.id || null,
-        ip_address: ctx.ipAddress || null,
-        user_agent: ctx.userAgent || null,
-      });
-      return { url: signed.signedUrl, expires_in: 120 };
+        await admin().from("download_logs").insert({
+          order_item_id: item.id,
+          user_id: ctx.user?.id || null,
+          ip_address: ctx.ipAddress || null,
+          user_agent: ctx.userAgent || null,
+        });
+        // Do not expose the URL if a refund/cancellation won any awaited work.
+        await assertCurrentDeliveryAccess(input.order_id, ctx.user?.id, input.session_id);
+        return { url: signed.signedUrl, expires_in: 120 };
+      } catch (error) {
+        // Never overwrite a newer count from another concurrent download.
+        await admin().from("order_items").update({ download_count: item.download_count })
+          .eq("id", item.id).eq("download_count", item.download_count + 1);
+        throw error;
+      }
     }),
 
   /* ─── Customer account ─── */
@@ -836,7 +861,7 @@ export const adminRouter = createRouter({
       checked++;
       try {
         const session = await retrieveStripeCheckout(sessionId);
-        if (session.payment_status === "paid" && session.metadata?.order_id === order.id) {
+        if (session.metadata?.order_id === order.id) {
           if (await confirmPaidOrder(session)) confirmed++;
         }
       } catch (error) {

@@ -34,7 +34,7 @@ export default async () => {
       });
       if (!response.ok) throw new Error(`Stripe responded ${response.status}`);
       const session = await response.json() as Parameters<typeof confirmPaidOrder>[0];
-      if (session.payment_status === "paid" && session.metadata?.order_id === order.id) {
+      if (session.metadata?.order_id === order.id) {
         await confirmPaidOrder(session);
       }
     } catch (error) {

@@ -99,6 +99,7 @@ export default function Cart() {
                     <div className="flex items-center gap-1.5 md:gap-2 bg-white/[0.03] rounded-lg p-1 border border-white/[0.06]">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        aria-label={`${lang === 'ar' ? 'تقليل كمية' : 'Decrease quantity of'} ${productTitle(item, lang)}`}
                         className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors"
                       >
                         <Minus className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400" />
@@ -108,6 +109,7 @@ export default function Cart() {
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        aria-label={`${lang === 'ar' ? 'زيادة كمية' : 'Increase quantity of'} ${productTitle(item, lang)}`}
                         className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors"
                       >
                         <Plus className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400" />
@@ -119,6 +121,7 @@ export default function Cart() {
                       </span>
                       <button
                         onClick={() => removeFromCart(item.id)}
+                        aria-label={`${lang === 'ar' ? 'إزالة من السلة:' : 'Remove from cart:'} ${productTitle(item, lang)}`}
                         className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-gray-600 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />

@@ -1,9 +1,11 @@
 import { syncMerchantPayment } from "./merchant-ledger";
 import { getSupabaseAdmin } from "./supabase-admin";
+import { canDeliverOrder, isRevokedOrder } from "./order-delivery";
 
 type StripeSession = {
   id: string;
   payment_status?: string;
+  status?: string;
   amount_total?: number;
   currency?: string;
   payment_intent?: string | null;
@@ -74,7 +76,9 @@ async function notifyOwner(order: any, items: any[]) {
 /** Shared by the signed Stripe webhook and a Stripe-verified return from Checkout. */
 export async function confirmPaidOrder(session: StripeSession) {
   const orderId = session.metadata?.order_id;
-  if (!orderId || session.payment_status !== "paid") return false;
+  const noCostOrder = session.payment_status === "no_payment_required"
+    && session.status === "complete" && session.amount_total === 0 && !session.payment_intent;
+  if (!orderId || (session.payment_status !== "paid" && !noCostOrder)) return false;
   // The checkout schema lives in Supabase migrations; this server-only client
   // uses the same ungenerated table typing as the existing admin router.
   const supabase: any = getSupabaseAdmin();
@@ -82,15 +86,23 @@ export async function confirmPaidOrder(session: StripeSession) {
     .select("id,total_amount,status,coupon_id,customer_name,customer_email,customer_phone,payment_payload")
     .eq("id", orderId).maybeSingle();
   if (error || !order) throw new Error("Unknown order");
+  if (isRevokedOrder(order.status)) return false;
   if (session.currency?.toLowerCase() !== "sar" || session.amount_total !== Math.round(Number(order.total_amount) * 100) ||
+      (noCostOrder && Number(order.total_amount) !== 0) ||
       order.payment_payload?.checkout_session_id !== session.id) throw new Error("Checkout session mismatch");
 
   const { data: paidOrders, error: updateError } = await supabase.from("orders").update({
     status: "paid", paid_at: new Date().toISOString(), payment_method: "stripe",
     payment_payload: { checkout_session_id: session.id, payment_intent_id: session.payment_intent,
-      amount_total: session.amount_total, currency: session.currency },
+      amount_total: session.amount_total, currency: session.currency, payment_status: session.payment_status },
   }).eq("id", orderId).eq("status", "pending").select("id");
   if (updateError) throw new Error("Order payment update failed");
+  if (!paidOrders?.length) {
+    const { data: currentOrder, error: currentError } = await supabase.from("orders")
+      .select("status,paid_at").eq("id", orderId).maybeSingle();
+    if (currentError) throw new Error("Unable to verify current order status");
+    if (!currentOrder || !canDeliverOrder(currentOrder)) return false;
+  }
   const {error: ledgerError} = await supabase.from('merchant_order_items').update({status:'fee_pending',paid_at:new Date().toISOString()}).eq('order_id',orderId).eq('status','pending');
   if (ledgerError) throw new Error('Merchant payment record failed');
   try { await syncMerchantPayment(orderId, session.payment_intent, new Date().toISOString()); }

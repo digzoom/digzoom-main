@@ -1,11 +1,10 @@
-import { Navigate, Routes, Route, useLocation } from "react-router";
+import { Navigate, Routes, Route, useLocation, useMatch } from "react-router";
 import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import ScrollToTop from "@/components/ScrollToTop";
 import { LanguageProvider } from "@/hooks/useLanguage.tsx";
 import { CartProvider } from "@/hooks/useCart.tsx";
 import { AuthProvider } from "@/hooks/useAuth.tsx";
-import { SupabaseAuthProvider } from "@/hooks/useSupabaseAuth.tsx";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AdminGuard from "./components/AdminGuard";
@@ -46,14 +45,14 @@ const DigitalAssets = lazy(() => import("./pages/DigitalAssets"));
 export default function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isProductRoute = useMatch('/product/:id');
 
   return (
     <LanguageProvider>
       <CartProvider>
-        <SupabaseAuthProvider>
           <AuthProvider>
             <ScrollToTop />
-            <Seo />
+            {!isProductRoute && <Seo />}
             {!isAdminRoute && <Navbar />}
             <Suspense
               fallback={
@@ -142,7 +141,6 @@ export default function App() {
               offset={{ top: 88 }}
             />
           </AuthProvider>
-        </SupabaseAuthProvider>
       </CartProvider>
     </LanguageProvider>
   );
