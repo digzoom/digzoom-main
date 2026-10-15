@@ -5,6 +5,7 @@ import {getSupabaseAdmin} from '../lib/supabase-admin';
 import {verifySupabaseToken} from '../lib/trpc';
 import {signReferral} from '../lib/merchant-accounting';
 import {syncMerchantPayment} from '../lib/merchant-ledger';
+import {loadMerchantSummary} from '../lib/merchant-summary';
 const db=():any=>getSupabaseAdmin();
 const result=(statusCode:number,value:unknown)=>({statusCode,headers:{'Content-Type':'application/json','Cache-Control':'no-store'},body:JSON.stringify(value)});
 async function checked(query:any) {const {data,error}=await query;if(error)throw error;return data;}
@@ -39,12 +40,13 @@ export const handler:Handler=async(event)=>{
      const merchant=await checked(db().from('merchants').select('*').eq('user_id',user.id).maybeSingle());
      const application=await checked(db().from('partner_applications').select('id,status,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(1).maybeSingle());
      if(!merchant)return result(200,{merchant:null,application});
-     const [offers,items,settlements,settings]=await Promise.all([
+     const [offers,items,settlements,settings,summary]=await Promise.all([
        checked(db().from('merchant_offers').select('*').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(200)),
        checked(db().from('merchant_order_items').select('id,order_id,product_title,quantity,source,commission_percent,gross_cents,stripe_fee_cents,commission_cents,merchant_cents,status,paid_at,ready_at,fulfillment_note,fulfillment_submitted_at,delivered_at,hold_reason,settlement_id').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(500)),
        checked(db().from('merchant_settlements').select('id,gross_cents,transfer_fee_cents,paid_cents,reference,created_at').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(100)),
-       checked(db().from('merchant_settings').select('*').eq('id',true).single())]);
-     return result(200,{merchant,application,offers,items,settlements,settings});
+       checked(db().from('merchant_settings').select('*').eq('id',true).single()),
+       loadMerchantSummary(db(),merchant)]);
+     return result(200,{merchant,application,offers,items,settlements,settings,summary});
    }
    if((event.body?.length||0)>15000)return result(413,{error:'الطلب كبير'});
    const input=JSON.parse(event.body||'{}'), action=z.string().parse(input.action);
