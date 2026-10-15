@@ -15,6 +15,7 @@ export type MerchantOffer = {
 export type MerchantOrderItem = {
   id: string;
   order_id: string;
+  order_status?: string | null;
   product_title: string;
   quantity: number;
   source: string;

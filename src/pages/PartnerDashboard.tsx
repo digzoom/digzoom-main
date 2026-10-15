@@ -713,7 +713,12 @@ function MerchantContent({
                 {item.order_id}
               </p>
               <p className="mt-3 text-sm">
-                {status(item.status)} · {item.commission_percent}% ·{" "}
+                {item.order_status === "cancelled"
+                  ? t("طلب ملغي", "Order cancelled")
+                  : item.order_status === "refunded"
+                    ? t("طلب مسترجع", "Order refunded")
+                    : status(item.status)}{" "}
+                · {item.commission_percent}% ·{" "}
                 {item.source === "merchant"
                   ? t("من رابطك", "Your referral")
                   : t("من DigZoom", "DigZoom sale")}
@@ -770,6 +775,9 @@ function MerchantContent({
               {item.paid_at &&
                 !item.delivered_at &&
                 !item.settlement_id &&
+                ["paid", "processing", "completed"].includes(
+                  item.order_status || ""
+                ) &&
                 ["ready", "fee_pending"].includes(item.status) &&
                 !inactive && (
                   <form

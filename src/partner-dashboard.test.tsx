@@ -53,6 +53,7 @@ const fixture = (): MerchantAccountData => ({
     {
       id: "item",
       order_id: "DZ-verified-order",
+      order_status: "paid",
       product_title: "Example product",
       quantity: 1,
       source: "merchant",
@@ -251,6 +252,25 @@ describe("seller dashboard", () => {
     expect(container.querySelector('[role="alert"]')).toBeNull();
     expect(button("New product").disabled).toBe(false);
   });
+  it.each(["cancelled", "refunded"])(
+    "hides delivery writes and labels a %s parent order",
+    async orderStatus => {
+      const data = fixture();
+      data.items[0].order_status = orderStatus;
+      data.items[0].status = "ready";
+      state.api.mockResolvedValue(data);
+      await render();
+      expect(text()).toContain(
+        orderStatus === "cancelled" ? "Order cancelled" : "Order refunded"
+      );
+      expect(
+        [...container.querySelectorAll("button")].some(
+          node => node.textContent === "Submit delivery evidence"
+        )
+      ).toBe(false);
+    }
+  );
+
   it("cancels an edit cleanly, and a new form does not retain that product", async () => {
     await render();
     await click("Edit");

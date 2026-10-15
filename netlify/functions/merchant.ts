@@ -42,11 +42,11 @@ export const handler:Handler=async(event)=>{
      if(!merchant)return result(200,{merchant:null,application});
      const [offers,items,settlements,settings,summary]=await Promise.all([
        checked(db().from('merchant_offers').select('*').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(200)),
-       checked(db().from('merchant_order_items').select('id,order_id,product_title,quantity,source,commission_percent,gross_cents,stripe_fee_cents,commission_cents,merchant_cents,status,paid_at,ready_at,fulfillment_note,fulfillment_submitted_at,delivered_at,hold_reason,settlement_id').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(500)),
+       checked(db().from('merchant_order_items').select('id,order_id,product_title,quantity,source,commission_percent,gross_cents,stripe_fee_cents,commission_cents,merchant_cents,status,paid_at,ready_at,fulfillment_note,fulfillment_submitted_at,delivered_at,hold_reason,settlement_id,orders(status)').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(500)),
        checked(db().from('merchant_settlements').select('id,gross_cents,transfer_fee_cents,paid_cents,reference,created_at').eq('merchant_id',merchant.id).order('created_at',{ascending:false}).limit(100)),
        checked(db().from('merchant_settings').select('*').eq('id',true).single()),
        loadMerchantSummary(db(),merchant)]);
-     return result(200,{merchant,application,offers,items,settlements,settings,summary});
+     return result(200,{merchant,application,offers,items:items.map(({orders,...item}:{orders?:{status:string}|null;[key:string]:unknown})=>({...item,order_status:orders?.status??null})),settlements,settings,summary});
    }
    if((event.body?.length||0)>15000)return result(413,{error:'الطلب كبير'});
    const input=JSON.parse(event.body||'{}'), action=z.string().parse(input.action);
@@ -80,8 +80,8 @@ export const handler:Handler=async(event)=>{
        const offers=await checked(db().from('merchant_offers').select('product_id').eq('merchant_id',m.id).eq('status','published'));
        if(offers.length)await checked(db().from('products').update({is_active:status==='active'}).in('id',offers.map((o:any)=>o.product_id)));
      } else if(action==='approve_delivery') {
-       const item=await checked(db().from('merchant_order_items').select('*').eq('id',z.uuid().parse(input.id)).single());
-       if(!item.paid_at||!item.fulfillment_submitted_at||item.status==='held')throw new Error('راجع الدفع والتسليم أولًا');
+       const item=await checked(db().from('merchant_order_items').select('*,orders(status)').eq('id',z.uuid().parse(input.id)).single());
+       if(!item.paid_at||!item.fulfillment_submitted_at||item.delivered_at||item.settlement_id||!['ready','fee_pending'].includes(item.status)||!['paid','processing','completed'].includes(item.orders?.status))throw new Error('راجع الدفع والتسليم أولًا');
        await checked(db().from('order_items').update({delivery_status:'delivered',delivered_at:new Date().toISOString(),delivery_payload:{message:item.fulfillment_note}}).eq('id',item.order_item_id));
        await checked(db().from('merchant_order_items').update({delivered_at:new Date().toISOString()}).eq('id',item.id));
      } else if(action==='settings') await checked(db().from('merchant_settings').update({minimum_payout_cents:z.number().int().min(10000).parse(input.minimum_payout_cents),hold_days:z.number().int().min(7).max(90).parse(input.hold_days)}).eq('id',true));
@@ -111,9 +111,9 @@ export const handler:Handler=async(event)=>{
        await checked(db().from('merchant_offers').insert({...offer,merchant_id:merchant.id}));
      }
    } else if(action==='fulfill') {
-     const item=await checked(db().from('merchant_order_items').select('id,paid_at,status,delivered_at').eq('id',z.uuid().parse(input.id)).eq('merchant_id',merchant.id).maybeSingle());
+     const item=await checked(db().from('merchant_order_items').select('id,paid_at,status,delivered_at,settlement_id,orders(status)').eq('id',z.uuid().parse(input.id)).eq('merchant_id',merchant.id).maybeSingle());
      if(!item)return result(404,{error:'الطلب غير موجود'});
-     if(!item.paid_at||item.status==='held'||item.delivered_at)return result(409,{error:'هذا الطلب غير متاح للتسليم'});
+     if(!item.paid_at||item.delivered_at||item.settlement_id||!['ready','fee_pending'].includes(item.status)||!['paid','processing','completed'].includes(item.orders?.status))return result(409,{error:'هذا الطلب غير متاح للتسليم'});
      await checked(db().from('merchant_order_items').update({fulfillment_note:z.string().trim().min(10).max(3000).parse(input.note),fulfillment_submitted_at:new Date().toISOString()}).eq('id',item.id).eq('merchant_id',merchant.id));
    } else return result(400,{error:'إجراء غير معروف'});
    return result(200,{ok:true});
