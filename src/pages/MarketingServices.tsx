@@ -512,6 +512,62 @@ export default function MarketingServices() {
         </div>
       </section>
 
+      {/* Operational website services inspired by a market comparison; availability is scoped before contract. */}
+      <section className="border-t border-slate-100 bg-[#f8faff] py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <span className="text-sm font-black text-blue-700">
+              {ar ? "تفاصيل خدمة إدارة المواقع" : "Website management details"}
+            </span>
+            <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl">
+              {ar ? "ماذا يمكننا أن ندير في موقعك؟" : "What can we manage on your website?"}
+            </h2>
+            <p className="mt-4 leading-8 text-slate-600">
+              {ar
+                ? "إدارة الموقع ليست مجرد تغيير صور ونصوص. نحدد معك الأعمال التشغيلية المناسبة لموقعك، ونوضح ما يدخل في الباقة وما يحتاج عرض سعر مستقلًا قبل البدء."
+                : "Website management is more than replacing images and text. We agree on the right operational tasks for your site and clarify what is included in your plan versus separately quoted work."}
+            </p>
+          </div>
+          <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {(ar
+              ? [
+                  ["المتابعة والصيانة", "فحص الروابط والنماذج والأعطال الظاهرة على الجوال والكمبيوتر، وتحديد الإصلاحات المطلوبة."],
+                  ["النسخ الاحتياطي والاستعادة", "مراجعة إعدادات النسخ الاحتياطي المتاحة لدى الاستضافة، واتفاق منفصل على إعداد النسخ واختبار الاستعادة عند الحاجة."],
+                  ["إدارة لوحة التحكم", "تحديث الصفحات والأقسام والمنتجات والصور والأسعار والصلاحيات المصرح بها."],
+                  ["الحماية والتحديثات", "مراجعة التحديثات الأساسية والتنبيهات الأمنية والصلاحيات، وتنفيذ التغييرات بعد تقييم أثرها."],
+                  ["التدريب والتسليم", "شرح المهام الأساسية لمسؤول الموقع، وكيفية تحديث المحتوى ومتابعة الطلبات أو الاستفسارات."],
+                  ["البريد والتحسين والتوسع", "دراسة بريد احترافي باسم النطاق، وتحسين تجربة الجوال والبحث، وربط أدوات القياس أو طلب تطوير إضافي."],
+                ]
+              : [
+                  ["Maintenance and monitoring", "Review broken links, forms, and visible desktop/mobile issues and identify necessary fixes."],
+                  ["Backups and recovery", "Review hosting backup settings and separately agree on setup and restore testing when needed."],
+                  ["Dashboard operations", "Update approved pages, categories, products, images, prices, and user permissions."],
+                  ["Security and updates", "Review core updates, security alerts, and access rights; assess impact before changes."],
+                  ["Training and handover", "Show your team how to update content and manage incoming inquiries or orders."],
+                  ["Email and growth", "Explore domain email, mobile/search improvements, analytics connections, or extra development."],
+                ]
+            ).map(([title, description]) => (
+              <article key={title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                  <Check className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <h3 className="text-lg font-black">{title}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{description}</p>
+              </article>
+            ))}
+          </div>
+          <p className="mt-6 rounded-xl border border-blue-100 bg-white px-5 py-4 text-sm leading-7 text-slate-600">
+            {ar
+              ? "مهم: لا تعني هذه القائمة أن جميع الخدمات مشمولة في كل باقة. عدد النسخ الاحتياطية، مستوى الدعم، تراخيص الأدوات، الاستضافة، البريد، التطوير البرمجي والتكلفة تُحدد في عرض العمل المكتوب. لا نقدم أنظمة محاسبة أو موارد بشرية أو عيادات جاهزة ضمن باقات إدارة المواقع."
+              : "Important: not every service is included in every plan. Backup frequency, support level, software licenses, hosting, email, development, and fees are defined in your written scope. Accounting, HR, and clinic software are not standard website-management deliverables."}
+          </p>
+          <button type="button" onClick={() => scrollTo("contact")} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-700 px-6 font-bold text-white hover:bg-blue-600">
+            {ar ? "اطلب تقييم موقعك وتحديد الأعمال" : "Request a website scope review"}
+            <Arrow className="h-4 w-4" />
+          </button>
+        </div>
+      </section>
+
       <section className="bg-[#eef3ff] py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.08fr_.92fr] lg:px-8">
           <div>
