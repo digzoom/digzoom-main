@@ -129,7 +129,7 @@ export default function Navbar() {
                 <div className="h-8 w-8 overflow-hidden rounded-[.7rem] ring-1 ring-blue-400/25 shadow-[0_0_18px_rgba(59,130,246,.2)] sm:h-9 sm:w-9">
                   <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="h-full w-full object-cover" />
                 </div>
-                <span className="hidden min-[360px]:inline text-base font-black tracking-tight sm:text-lg">
+                <span className="hidden min-[400px]:inline text-base font-black tracking-tight sm:text-lg">
                   <span className="text-white">Dig</span>
                   <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoom</span>
                 </span>
@@ -163,10 +163,12 @@ export default function Navbar() {
             <div className="flex items-center gap-1 sm:gap-2">
               <button
                 onClick={toggleLang}
-                className="hidden items-center gap-1 rounded-xl px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 lg:flex"
+                aria-label={isAr ? "Switch to English" : "التبديل إلى العربية"}
+                title={isAr ? "English" : "العربية"}
+                className="flex h-10 min-w-11 shrink-0 items-center justify-center gap-1 rounded-xl border border-blue-400/40 bg-blue-500/10 px-2 text-sm font-bold text-white transition hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:px-3"
               >
-                <Globe className="h-4 w-4" />
-                {isAr ? "EN" : "AR"}
+                <Globe aria-hidden="true" className="hidden h-4 w-4 sm:block" />
+                <span dir="ltr">{isAr ? "EN" : "AR"}</span>
               </button>
 
               <Link to="/cart" className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/5 hover:text-white" aria-label={isAr ? "السلة" : "Cart"}>
