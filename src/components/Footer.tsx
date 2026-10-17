@@ -7,6 +7,7 @@ export default function Footer() {
 
   const storeLinks = [
     { name: lang === "ar" ? "جميع المنتجات" : "All Products", path: "/shop" },
+    { name: lang === "ar" ? "هدايا وملفات مجانية" : "Free gifts and files", path: "/freebies" },
     {
       name: lang === "ar" ? "الخدمات والباقات" : "Services and Plans",
       path: "/#plans",

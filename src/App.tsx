@@ -41,6 +41,7 @@ const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
 const ServicePaymentSuccess = lazy(() => import("./pages/ServicePaymentSuccess"));
 const Partners = lazy(() => import("./pages/Partners"));
 const DigitalAssets = lazy(() => import("./pages/DigitalAssets"));
+const Freebies = lazy(() => import("./pages/Freebies"));
 
 export default function App() {
   const location = useLocation();
@@ -86,6 +87,7 @@ export default function App() {
                 />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/freebies" element={<Freebies />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shop/:category" element={<Shop />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
