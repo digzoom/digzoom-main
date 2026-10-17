@@ -9,7 +9,9 @@ export const handler: Handler = async event => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   if (event.body && event.body.length > 8192) return { statusCode: 413, body: JSON.stringify({ error: 'Request too large' }) };
   const origin = event.headers.origin;
-  if (origin && !allowedOrigins.has(origin) && !/^http:\/\/localhost:(3000|5173)$/.test(origin)) {
+  if (origin && !allowedOrigins.has(origin) &&
+      !/^https:\/\/deploy-preview-\d+--digzoom-production\.netlify\.app$/.test(origin) &&
+      !/^http:\/\/localhost:(3000|5173)$/.test(origin)) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Invalid origin' }) };
   }
 
