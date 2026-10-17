@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" role="img" aria-label="Warm gradient offer card background">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#25124d"/><stop offset=".53" stop-color="#b02e83"/><stop offset="1" stop-color="#ff9c4b"/></linearGradient><linearGradient id="wave"><stop stop-color="#fff" stop-opacity=".19"/><stop offset="1" stop-color="#fff" stop-opacity=".04"/></linearGradient></defs>
+  <rect width="1080" height="1080" fill="url(#bg)"/><path d="M-50 750c370-200 690-60 1180-480v760H-50Z" fill="url(#wave)"/><path d="M-50 840c390-220 650-100 1180-480" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="4"/><circle cx="900" cy="140" r="330" fill="#ffd496" opacity=".18"/><rect x="80" y="80" width="920" height="920" rx="48" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3"/><circle cx="935" cy="935" r="18" fill="#ffe6ae"/>
+</svg>

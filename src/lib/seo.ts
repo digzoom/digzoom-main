@@ -46,6 +46,10 @@ const descriptions: Record<string, LocalizedText> = {
     ar: ['تواصل مع DigZoom', 'تواصل مع فريق DigZoom للاستفسارات والخدمات.'],
     en: ['Contact DigZoom', 'Contact the DigZoom team for questions and services.'],
   },
+  '/freebies': {
+    ar: ['هدايا DigZoom المجانية | قوالب وصور ودليل تسويق', 'نزّل خلفيات منشورات وقوالب صور ودليل تسويق مجاني من إعداد DigZoom.'],
+    en: ['Free DigZoom Gifts | Templates, Visuals and Marketing Guide', 'Download original social backgrounds and a free marketing checklist from DigZoom.'],
+  },
 };
 
 export function pageMetadata(pathname: string, lang: 'ar' | 'en', product?: Product | null): Metadata {

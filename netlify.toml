@@ -47,6 +47,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/freebie-lead"
+  to = "/.netlify/functions/freebie-lead"
+  status = 200
+
+[[redirects]]
   from = "/api/catalog"
   to = "/.netlify/functions/catalog"
   status = 200

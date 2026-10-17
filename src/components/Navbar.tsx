@@ -34,6 +34,7 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 const primaryLinks = (isAr: boolean) => [
   { name: isAr ? "الرئيسية" : "Home", path: "/", icon: Home },
   { name: isAr ? "العروض" : "Offers", path: "/shop?sort=offers", icon: Tag },
+  { name: isAr ? "هدايا مجانية" : "Free gifts", path: "/freebies", icon: Gift },
   { name: isAr ? "الأكثر مبيعًا" : "Best sellers", path: "/shop?sort=popular", icon: Flame },
   { name: isAr ? "الاشتراكات" : "Subscriptions", path: "/shop?category=subscriptions", icon: Clapperboard },
   { name: isAr ? "الذكاء الاصطناعي" : "AI", path: "/shop?category=ai", icon: Sparkles },
@@ -57,6 +58,7 @@ const sideLinks = (isAr: boolean) => [
 const menuDetails: Record<string, { color: string; badge: string; ar: string; en: string }> = {
   '/': { color: '#60a5fa', badge: 'DZ', ar: 'كل عالمك الرقمي', en: 'Your digital world' },
   '/shop?sort=offers': { color: '#fb7185', badge: '%', ar: 'خصومات وباقات', en: 'Deals & bundles' },
+  '/freebies': { color: '#5eead4', badge: '↓', ar: 'قوالب وصور ودليل مجاني', en: 'Free templates, visuals & guide' },
   '/shop?sort=popular': { color: '#fb923c', badge: '★', ar: 'اكتشف المنتجات البارزة', en: 'Discover featured products' },
   '/shop?category=subscriptions': { color: '#f472b6', badge: '▶', ar: 'مشاهدة، موسيقى وتطبيقات', en: 'Streaming, music & apps' },
   '/shop?category=ai': { color: '#2dd4bf', badge: 'AI', ar: 'كتابة، تصميم وإنتاج', en: 'Writing, design & creation' },

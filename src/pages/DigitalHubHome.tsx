@@ -148,6 +148,8 @@ export default function DigitalHubHome() {
         </div>
       </div></section>
 
+      <section className="bg-white pb-12"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><div className="flex flex-col items-start justify-between gap-5 rounded-3xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-fuchsia-50 p-7 sm:flex-row sm:items-center sm:p-9"><div><div className="flex items-center gap-2 text-sm font-black text-indigo-700"><Gift size={18}/>{ar ? 'هدايا مجانية من DigZoom' : 'Free DigZoom gifts'}</div><h2 className="mt-2 text-2xl font-black text-slate-950 sm:text-3xl">{ar ? 'قوالب صور ودليل تسويق جاهزة للتنزيل' : 'Visual templates and a marketing guide to download'}</h2><p className="mt-2 text-slate-600">{ar ? 'أربع هدايا أصلية لأصحاب المشاريع، بالعربية والإنجليزية.' : 'Four original gifts for growing businesses, in Arabic and English.'}</p></div><Link to="/freebies" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-indigo-700 px-6 font-black text-white hover:bg-indigo-800">{ar ? 'استعرض الهدايا' : 'Explore gifts'}<Arrow size={18}/></Link></div></div></section>
+
       <section className="border-y border-slate-200 bg-[#f8fafc]">
         <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
           <div className="flex gap-3 overflow-x-auto pb-1">
