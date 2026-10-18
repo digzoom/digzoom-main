@@ -4,10 +4,10 @@ import { ArrowDownToLine, CheckCircle2, Gift, Image, ListChecks, LockKeyhole } f
 import { useLanguage } from '@/hooks/useLanguage';
 
 const gifts = [
-  { id: 'social-square', file: '/freebies/social-square.svg', image: '/freebies/social-square.svg', ar: 'خلفية منشور مربع', en: 'Square social background', arDesc: 'تصميم SVG بمقاس 1080 × 1080؛ عدّل ألوانه ونصوصك عليه.', enDesc: 'Editable 1080 × 1080 SVG background for your posts.' },
-  { id: 'story-background', file: '/freebies/story-background.svg', image: '/freebies/story-background.svg', ar: 'خلفية ستوري', en: 'Story background', arDesc: 'خلفية عمودية بمقاس 1080 × 1920 للإعلانات والقصص.', enDesc: 'Vertical 1080 × 1920 SVG for stories and promotions.' },
-  { id: 'offer-card', file: '/freebies/offer-card.svg', image: '/freebies/offer-card.svg', ar: 'بطاقة عرض', en: 'Offer card', arDesc: 'قالب بصري مجاني للعروض؛ أضف السعر والوصف في محررك.', enDesc: 'A visual offer template; add your price and copy in an editor.' },
-  { id: 'marketing-checklist', file: '/freebies/marketing-checklist.txt', image: null, ar: 'قائمة فحص تسويقية', en: 'Marketing checklist', arDesc: 'خطوات عملية مختصرة قبل نشر حملة أو منتج جديد.', enDesc: 'A concise launch checklist for campaigns and new products.' },
+  { id: 'social-square', file: '/freebies/social-square.svg', image: '/freebies/social-square.svg', photo: '/images/freebies/social-square.webp', ar: 'خلفية منشور مربع', en: 'Square social background', arDesc: 'تصميم SVG بمقاس 1080 × 1080؛ عدّل ألوانه ونصوصك عليه.', enDesc: 'Editable 1080 × 1080 SVG background for your posts.', arAlt: 'صاحب مشروع يعمل على تصميم منشور في الحاسوب', enAlt: 'Business owner editing a social post on a laptop' },
+  { id: 'story-background', file: '/freebies/story-background.svg', image: '/freebies/story-background.svg', photo: '/images/freebies/story-background.webp', ar: 'خلفية ستوري', en: 'Story background', arDesc: 'خلفية عمودية بمقاس 1080 × 1920 للإعلانات والقصص.', enDesc: 'Vertical 1080 × 1920 SVG for stories and promotions.', arAlt: 'صاحبة مشروع تعرض تصميم ستوري على هاتفها', enAlt: 'Business owner showing a story design on her phone' },
+  { id: 'offer-card', file: '/freebies/offer-card.svg', image: '/freebies/offer-card.svg', photo: '/images/freebies/offer-card.webp', ar: 'بطاقة عرض', en: 'Offer card', arDesc: 'قالب بصري مجاني للعروض؛ أضف السعر والوصف في محررك.', enDesc: 'A visual offer template; add your price and copy in an editor.', arAlt: 'صاحبة متجر تراجع تصميم عرض على جهاز لوحي', enAlt: 'Shop owner reviewing an offer design on a tablet' },
+  { id: 'marketing-checklist', file: '/freebies/marketing-checklist.txt', image: null, photo: '/images/freebies/marketing-checklist.webp', ar: 'قائمة فحص تسويقية', en: 'Marketing checklist', arDesc: 'خطوات عملية مختصرة قبل نشر حملة أو منتج جديد.', enDesc: 'A concise launch checklist for campaigns and new products.', arAlt: 'صاحب مشروع يراجع قائمة خطوات التسويق بجانب حاسوبه', enAlt: 'Business owner reviewing a marketing checklist beside his laptop' },
 ] as const;
 
 type GiftId = (typeof gifts)[number]['id'];
@@ -69,8 +69,10 @@ export default function Freebies() {
           <h2 className="text-2xl font-black">{ar ? 'اختر هديتك' : 'Choose your gift'}</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {gifts.map(gift => <button key={gift.id} type="button" aria-pressed={selected === gift.id} onClick={() => { setSelected(gift.id); setUnlocked(null); setError(''); }} className={`overflow-hidden rounded-2xl border bg-white text-start shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${selected === gift.id ? 'border-blue-600 ring-2 ring-blue-300' : 'border-slate-200'}`}>
-              <div className="flex h-44 items-center justify-center overflow-hidden bg-slate-100">
-                {gift.image ? <img src={gift.image} alt="" className="h-full w-full object-cover"/> : <ListChecks size={55} className="text-indigo-500"/>}
+              <div className="relative h-48 overflow-hidden bg-slate-100">
+                <img src={gift.photo} alt={ar ? gift.arAlt : gift.enAlt} loading="lazy" decoding="async" className="h-full w-full object-cover"/>
+                <span className="absolute start-3 top-3 rounded-full bg-slate-950/75 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">{ar ? 'صورة توضيحية' : 'Illustrative photo'}</span>
+                {gift.image && <img src={gift.image} alt={ar ? 'معاينة الملف الفعلي' : 'Actual file preview'} loading="lazy" className="absolute bottom-3 end-3 h-20 w-20 rounded-xl border-2 border-white bg-white object-cover shadow-lg"/>}
               </div>
               <div className="p-5"><div className="flex items-center justify-between gap-3"><h3 className="font-black">{ar ? gift.ar : gift.en}</h3><span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">{ar ? 'مجاني' : 'Free'}</span></div><p className="mt-2 text-sm leading-6 text-slate-600">{ar ? gift.arDesc : gift.enDesc}</p></div>
             </button>)}
