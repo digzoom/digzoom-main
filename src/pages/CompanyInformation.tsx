@@ -1,5 +1,6 @@
 import { useLanguage } from '@/hooks/useLanguage';
 import { Building2, MapPin, Mail, Calendar, Shield, FileText } from 'lucide-react';
+import MerchantDisclosure from '@/components/MerchantDisclosure';
 
 export default function CompanyInformation() {
   const { lang } = useLanguage();
@@ -53,6 +54,8 @@ export default function CompanyInformation() {
               : 'DIGZOOM LIMITED LIABILITY COMPANY is a legally registered company in the State of Wyoming, United States of America'}
           </p>
         </div>
+
+        <MerchantDisclosure className="mb-8" />
 
         {/* Company Details */}
         <div className="space-y-4 mb-12">
