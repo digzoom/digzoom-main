@@ -11,6 +11,7 @@ import { productTitle } from '@/lib/i18n';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { trpc } from '@/providers/trpc';
 import { toast } from 'sonner';
+import MerchantDisclosure from '@/components/MerchantDisclosure';
 
 const CHECKOUT_ENABLED = import.meta.env.VITE_CHECKOUT_ENABLED === 'true';
 
@@ -303,6 +304,8 @@ export default function Checkout() {
                 </div>
               </div>
             </div>
+
+            <MerchantDisclosure />
 
             {/* Secure Payment Preview */}
             {CHECKOUT_ENABLED && <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-4 md:p-6">
