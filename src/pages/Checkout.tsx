@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 import {
   CreditCard, ShieldCheck, Lock, ArrowLeft, ArrowRight,
   Loader2, Shield, Clock, Headphones, Award, CheckCircle,
@@ -125,8 +125,7 @@ export default function Checkout() {
   // payments are disabled, keep this route visible so visitors get a clear,
   // honest status message instead of an apparently blank page.
   if (items.length === 0 && CHECKOUT_ENABLED) {
-    navigate('/cart');
-    return null;
+    return <Navigate to="/cart" replace />;
   }
 
   const handleCheckout = async () => {
