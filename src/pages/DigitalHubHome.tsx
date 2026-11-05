@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { storefrontSections } from "@/data/storefrontSections";
 import SectionCard from "@/components/SectionCard";
 
-export default function DigitalHubHome() {
+// audit preview before partners\nexport default function DigitalHubHome() {
   const { lang } = useLanguage();
   const ar = lang === "ar";
   const Arrow = ar ? ArrowLeft : ArrowRight;
