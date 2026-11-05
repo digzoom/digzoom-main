@@ -19,7 +19,7 @@ export default function SharedPaymentComplete() {
         <p className="mt-4 leading-7 text-gray-400">
           {cancelled
             ? (lang === 'ar' ? 'لم يتم تأكيد دفع هذا الطلب. يمكن لصاحب الطلب إرسال رابط الدفع من جديد إذا ظل صالحًا.' : 'This order is not paid. Ask the recipient to share the link again if it is still valid.')
-            : (lang === 'ar' ? 'سيصل تأكيد الاستلام إلى صاحب الطلب بعد تحقق النظام من الدفع. رابط الدفع لا يمنح الدافع حق تنزيل المنتج.' : 'The order recipient receives access after payment is verified. This payment link does not grant the payer access to downloads.')}
+            : (lang === 'ar' ? 'يستطيع صاحب الطلب استلام المنتج عبر رابطه الخاص بعد تأكيد الدفع. رابط الدفع لا يمنح الدافع حق تنزيل المنتج.' : 'The recipient can access the product using their private link after payment verification. This payment link does not grant the payer access to downloads.')}
         </p>
         <Link to="/" className="mt-6 inline-flex items-center gap-2 text-blue-300 hover:underline"><Home className="h-4 w-4" />{lang === 'ar' ? 'العودة للرئيسية' : 'Back to home'}</Link>
       </section>
