@@ -1,9 +1,11 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Mail, Phone, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
 export default function Footer() {
   const { lang, t } = useLanguage();
+  const { pathname } = useLocation();
+  const isCheckoutPage = pathname === "/checkout" || pathname.startsWith("/service-checkout/");
 
   const storeLinks = [
     { name: lang === "ar" ? "جميع المنتجات" : "All Products", path: "/shop" },
@@ -20,10 +22,6 @@ export default function Footer() {
   const companyLinks = [
     { name: t.navbar.about, path: "/about" },
     { name: t.navbar.contact, path: "/contact" },
-    {
-      name: lang === "ar" ? "معلومات الشركة" : "Company Information",
-      path: "/company",
-    },
     {
       name: lang === "ar" ? "الثقة والأمان" : "Trust & Security",
       path: "/trust-security",
@@ -175,12 +173,12 @@ export default function Footer() {
               <span className="text-gray-500 text-sm">info@digzoom.com</span>
             </div>
           </div>
-          <div className="text-center pt-4 border-t border-white/[0.02]">
+          {!isCheckoutPage && <div className="text-center pt-4 border-t border-white/[0.02]">
             <p className="text-gray-600 text-xs uppercase tracking-wider">
               DIGZOOM LIMITED LIABILITY COMPANY &middot; WYOMING, USA &middot;
               info@digzoom.com
             </p>
-          </div>
+          </div>}
         </div>
       </div>
     </footer>
