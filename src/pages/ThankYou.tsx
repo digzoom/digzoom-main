@@ -22,11 +22,20 @@ export default function ThankYou() {
     if (fromUrl) localStorage.setItem('lastCheckoutSessionId', fromUrl);
     return fromUrl || localStorage.getItem('lastCheckoutSessionId') || '';
   });
+  const [accessToken] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('access_token');
+    if (fromUrl && orderId) {
+      localStorage.setItem('lastOrderAccessOrderId', orderId);
+      localStorage.setItem('lastOrderAccessToken', fromUrl);
+    }
+    return fromUrl || (localStorage.getItem('lastOrderAccessOrderId') === orderId
+      ? localStorage.getItem('lastOrderAccessToken') : '') || '';
+  });
   const downloads = trpc.listOrderDownloads.useQuery(
-    { order_id: orderId, session_id: sessionId || undefined },
+    { order_id: orderId, session_id: sessionId || undefined, access_token: accessToken || undefined },
     { enabled: Boolean(orderId), retry: false }
   );
-  const fulfillment = trpc.listOrderFulfillments.useQuery({order_id:orderId,session_id:sessionId||undefined},{enabled:Boolean(orderId),retry:false});
+  const fulfillment = trpc.listOrderFulfillments.useQuery({order_id:orderId,session_id:sessionId||undefined,access_token:accessToken||undefined},{enabled:Boolean(orderId),retry:false});
   const createLink = trpc.createDownloadLink.useMutation();
 
   const handleDownload = async (orderItemId: number) => {
@@ -35,6 +44,7 @@ export default function ThankYou() {
         order_id: orderId,
         order_item_id: orderItemId,
         session_id: sessionId || undefined,
+        access_token: accessToken || undefined,
       });
       window.location.assign(result.url);
       void downloads.refetch();

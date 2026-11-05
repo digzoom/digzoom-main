@@ -22,6 +22,7 @@ const Cart = lazy(() => import("./pages/Cart"));
 const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const ThankYou = lazy(() => import("./pages/ThankYou"));
+const SharedPaymentComplete = lazy(() => import("./pages/SharedPaymentComplete"));
 const Payment = lazy(() => import("./pages/Payment"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Privacy = lazy(() => import("./pages/Privacy"));
@@ -94,6 +95,7 @@ export default function App() {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/thank-you" element={<ThankYou />} />
+                <Route path="/shared-payment-complete" element={<SharedPaymentComplete />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/service-payment-success" element={<ServicePaymentSuccess />} />
                 <Route
