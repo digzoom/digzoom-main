@@ -35,6 +35,28 @@ describe('Stripe-verified order confirmation', () => {
     expect(mocks.sync).toHaveBeenCalledWith(order.id, 'pi_test_order', expect.any(String));
   });
 
+  it('preserves shared-payment delivery restrictions and sends the private recipient link separately', async () => {
+    const sharedOrder = { ...order, customer_email: 'recipient@example.com', payment_payload: { checkout_session_id: 'cs_test_order', share_payment: true } };
+    const update = queryResult([{ id: order.id }]);
+    mocks.from.mockReturnValueOnce(queryResult(sharedOrder))
+      .mockReturnValueOnce(update).mockReturnValueOnce(queryResult(null)).mockReturnValueOnce(queryResult([]));
+    vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_shared_order_secret');
+
+    await expect(confirmPaidOrder(paidSession)).resolves.toBe(true);
+    expect(update.update).toHaveBeenCalledWith(expect.objectContaining({
+      status: 'paid',
+      payment_payload: expect.objectContaining({ share_payment: true, checkout_session_id: 'cs_test_order' }),
+    }));
+    const messages = mocks.fetch.mock.calls
+      .filter(([url]) => url === 'https://api.resend.com/emails')
+      .map(([, options]) => JSON.parse(options.body));
+    expect(messages).toHaveLength(2);
+    expect(messages[0].to).not.toContain('recipient@example.com');
+    expect(messages[1].to).toEqual(['recipient@example.com']);
+    expect(messages[1].html).toContain('access_token=');
+    expect(messages[0].html).not.toContain('access_token=');
+  });
+
   it('fulfills a completed zero-total checkout without requiring a PaymentIntent', async () => {
     const update = prepareNewOrder(0);
     await expect(confirmPaidOrder(freeSession)).resolves.toBe(true);
