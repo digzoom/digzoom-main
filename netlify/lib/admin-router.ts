@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "./supabase-admin";
 import { confirmPaidOrder, sendOrderEmail } from "./order-confirmation";
 import { snapshotMerchantItems } from "./merchant-ledger";
 import { randomUUID } from "node:crypto";
+import { orderAccessToken, validOrderAccessToken } from "./shared-payment";
 import { canDeliverOrder, isRevokedOrder, productDownloadFilename } from "./order-delivery";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,11 +62,15 @@ async function readDeliveryOrder(orderId: string) {
   return order;
 }
 
-async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?: string) {
+async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?: string, accessToken?: string) {
   const order = await readDeliveryOrder(orderId);
   if (userId && order.user_id === userId && canDeliverOrder(order)) return order;
+  if (order.payment_payload?.share_payment === true && accessToken &&
+      validOrderAccessToken(orderId, accessToken) && canDeliverOrder(order)) return order;
 
-  if (sessionId) {
+  // The payer receives the Stripe session ID on return, but only the order
+  // recipient may access shared-order downloads.
+  if (sessionId && order.payment_payload?.share_payment !== true) {
     const storedSessionId = order.payment_payload?.checkout_session_id;
     if (storedSessionId !== sessionId) throw new Error("Download authorization failed");
     const session = await retrieveStripeCheckout(sessionId);
@@ -80,11 +85,12 @@ async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?
   throw new Error("Downloads are not available for this order");
 }
 
-async function assertCurrentDeliveryAccess(orderId: string, userId?: string, sessionId?: string) {
+async function assertCurrentDeliveryAccess(orderId: string, userId?: string, sessionId?: string, accessToken?: string) {
   const order = await readDeliveryOrder(orderId);
   const sameOwner = Boolean(userId && order.user_id === userId);
-  const sameSession = Boolean(sessionId && order.payment_payload?.checkout_session_id === sessionId);
-  if (!canDeliverOrder(order) || (!sameOwner && !sameSession)) {
+  const sameSession = Boolean(sessionId && order.payment_payload?.share_payment !== true && order.payment_payload?.checkout_session_id === sessionId);
+  const sameRecipient = Boolean(order.payment_payload?.share_payment === true && accessToken && validOrderAccessToken(orderId, accessToken));
+  if (!canDeliverOrder(order) || (!sameOwner && !sameSession && !sameRecipient)) {
     throw new Error("Downloads are not available for this order");
   }
 }
@@ -276,6 +282,7 @@ export const adminRouter = createRouter({
         coupon_code: z.string().optional(),
         coupon_discount: z.number().min(0).default(0),
         customer_notes: z.string().optional(),
+        share_payment: z.boolean().default(false),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -362,12 +369,16 @@ export const adminRouter = createRouter({
         const siteUrl = (process.env.SITE_URL || process.env.URL || "https://digzoom.com").replace(/\/$/, "");
         const stripeParams = new URLSearchParams({
           mode: "payment",
-          customer_email: input.customer_email.trim().toLowerCase(),
           "metadata[order_id]": orderId,
           "payment_intent_data[metadata][order_id]": orderId,
-          success_url: `${siteUrl}/thank-you?order_id=${encodeURIComponent(orderId)}&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${siteUrl}/checkout?payment=cancelled`,
+          success_url: input.share_payment
+            ? `${siteUrl}/shared-payment-complete?order_id=${encodeURIComponent(orderId)}&session_id={CHECKOUT_SESSION_ID}`
+            : `${siteUrl}/thank-you?order_id=${encodeURIComponent(orderId)}&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: input.share_payment
+            ? `${siteUrl}/shared-payment-complete?payment=cancelled`
+            : `${siteUrl}/checkout?payment=cancelled`,
         });
+        if (!input.share_payment) stripeParams.set("customer_email", input.customer_email.trim().toLowerCase());
         if (coupon.code) {
           stripeParams.set("line_items[0][quantity]", "1");
           stripeParams.set("line_items[0][price_data][currency]", "sar");
@@ -386,7 +397,7 @@ export const adminRouter = createRouter({
 
         const { data: savedOrder, error: saveError } = await admin().from("orders").update({
           payment_method: "stripe",
-          payment_payload: { checkout_session_id: session.id },
+          payment_payload: { checkout_session_id: session.id, share_payment: input.share_payment },
         }).eq("id", orderId).eq("status", "pending").select("id").single();
         if (saveError || !savedOrder) {
           try {
@@ -399,7 +410,12 @@ export const adminRouter = createRouter({
           throw new Error("Unable to save checkout session");
         }
 
-        return { orderId, status: "pending", checkoutUrl: session.url };
+        return {
+          orderId, status: "pending", checkoutUrl: session.url,
+          recipientUrl: input.share_payment
+            ? `${siteUrl}/thank-you?order_id=${encodeURIComponent(orderId)}&access_token=${orderAccessToken(orderId)}`
+            : null,
+        };
       } catch (error: any) {
         console.error("[createOrder] Stripe session error:", error?.message || error);
         await admin().from("orders").update({ status: "cancelled" }).eq("id", orderId);
@@ -407,8 +423,8 @@ export const adminRouter = createRouter({
       }
     }),
 
-  listOrderFulfillments: publicQuery.input(z.object({order_id:z.string().min(6),session_id:z.string().optional()})).query(async({input,ctx})=>{
-    await authorizeOrderAccess(input.order_id,ctx.user?.id,input.session_id);
+  listOrderFulfillments: publicQuery.input(z.object({order_id:z.string().min(6),session_id:z.string().optional(),access_token:z.string().max(128).optional()})).query(async({input,ctx})=>{
+    await authorizeOrderAccess(input.order_id,ctx.user?.id,input.session_id,input.access_token);
     const {data,error}=await admin().from('order_items').select('id,product_title,product_type,delivery_status,delivery_payload').eq('order_id',input.order_id).eq('product_type','manual_service');
     if(error)throw new Error('Unable to load delivery');
     return (data||[]).map((item:any)=>({id:item.id,title:item.product_title,status:item.delivery_status,message:item.delivery_status==='delivered'?String(item.delivery_payload?.message||''):''}));
@@ -420,9 +436,10 @@ export const adminRouter = createRouter({
     .input(z.object({
       order_id: z.string().min(6),
       session_id: z.string().min(10).max(255).optional(),
+      access_token: z.string().max(128).optional(),
     }))
     .query(async ({ input, ctx }) => {
-      await authorizeOrderAccess(input.order_id, ctx.user?.id, input.session_id);
+      await authorizeOrderAccess(input.order_id, ctx.user?.id, input.session_id, input.access_token);
 
       const { data: items, error: itemsError } = await admin()
         .from("order_items")
@@ -461,9 +478,10 @@ export const adminRouter = createRouter({
       order_id: z.string().min(6),
       order_item_id: z.number().int().positive(),
       session_id: z.string().min(10).max(255).optional(),
+      access_token: z.string().max(128).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      await authorizeOrderAccess(input.order_id, ctx.user?.id, input.session_id);
+      await authorizeOrderAccess(input.order_id, ctx.user?.id, input.session_id, input.access_token);
 
       const { data: item } = await admin()
         .from("order_items")
@@ -498,7 +516,7 @@ export const adminRouter = createRouter({
       if (updateError || !updated) throw new Error("Please retry the download");
 
       try {
-        await assertCurrentDeliveryAccess(input.order_id, ctx.user?.id, input.session_id);
+        await assertCurrentDeliveryAccess(input.order_id, ctx.user?.id, input.session_id, input.access_token);
         const filename = productDownloadFilename(product.storage_path, product.title_en, product.file_type);
         const { data: signed, error: signedError } = await admin().storage
           .from("digital-products")
@@ -512,7 +530,7 @@ export const adminRouter = createRouter({
           user_agent: ctx.userAgent || null,
         });
         // Do not expose the URL if a refund/cancellation won any awaited work.
-        await assertCurrentDeliveryAccess(input.order_id, ctx.user?.id, input.session_id);
+        await assertCurrentDeliveryAccess(input.order_id, ctx.user?.id, input.session_id, input.access_token);
         return { url: signed.signedUrl, expires_in: 120 };
       } catch (error) {
         // Never overwrite a newer count from another concurrent download.
