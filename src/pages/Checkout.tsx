@@ -436,7 +436,7 @@ export default function Checkout() {
 
           {/* Summary */}
           <div className="space-y-4 md:space-y-6">
-            <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-4 md:p-6 h-fit lg:sticky lg:top-24">
+            <div className="bg-[#151520] rounded-2xl border border-white/[0.04] p-4 md:p-6 h-fit">
               <h3 className="text-white font-semibold mb-4 md:mb-6 text-sm md:text-base">{t.checkout.summary}</h3>
               <div className="space-y-3 md:space-y-4 mb-4 md:mb-6 max-h-40 md:max-h-60 overflow-y-auto custom-scrollbar">
                 {items.map(item => {
