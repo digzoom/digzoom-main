@@ -14,6 +14,10 @@ export default function Seo({ product }: { product?: Product | null }) {
   useEffect(() => {
     const { title, description, canonical, image, locale } = pageMetadata(location.pathname, lang, product);
     document.title = title;
+    // The detailed company profile remains available by direct URL, but is not a search landing page.
+    let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    if (!robots) { robots = document.createElement('meta'); robots.name = 'robots'; document.head.appendChild(robots); }
+    robots.content = location.pathname === '/company' ? 'noindex, follow' : 'index, follow';
     setMeta('meta[name="description"]', description);
     setMeta('meta[property="og:title"]', title);
     setMeta('meta[property="og:description"]', description);
