@@ -1,6 +1,7 @@
 import { syncMerchantPayment } from "./merchant-ledger";
 import { getSupabaseAdmin } from "./supabase-admin";
 import { canDeliverOrder, isRevokedOrder } from "./order-delivery";
+import { orderAccessToken } from "./shared-payment";
 
 type StripeSession = {
   id: string;
@@ -45,6 +46,30 @@ async function notifyOwner(order: any, items: any[]) {
     await sendOrderEmail(order, items);
   } catch (error) {
     console.error("[order-notification] email failed", order.id, error);
+  }
+
+  if (order.payment_payload?.share_payment === true && process.env.RESEND_API_KEY) {
+    const siteUrl = (process.env.SITE_URL || process.env.URL || "https://digzoom.com").replace(/\/$/, "");
+    const recipientUrl = `${siteUrl}/thank-you?order_id=${encodeURIComponent(order.id)}&access_token=${orderAccessToken(order.id)}`;
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": `digzoom-shared-order-recipient-${order.id}`,
+        },
+        body: JSON.stringify({
+          from: process.env.ORDER_FROM_EMAIL || process.env.CONTACT_FROM_EMAIL || "DigZoom <contact@digzoom.com>",
+          to: [order.customer_email],
+          subject: `تم دفع طلبك لدى DigZoom — ${order.id}`,
+          html: `<p>تم تأكيد دفع طلبك ${html(order.id)}.</p><p>للاطلاع على المنتجات واستلامها افتح رابطك الخاص:</p><p><a href="${html(recipientUrl)}">عرض الطلب واستلامه</a></p><p>احتفظ بهذا الرابط لنفسك ولا ترسله للدافع. إذا لم تطلب هذا المنتج، تواصل معنا عبر digzoom.com/contact.</p>`,
+        }),
+      });
+      if (!response.ok) throw new Error(`Recipient email rejected (${response.status})`);
+    } catch (error) {
+      console.error("[order-notification] recipient email failed", order.id, error);
+    }
   }
 
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -93,7 +118,7 @@ export async function confirmPaidOrder(session: StripeSession) {
 
   const { data: paidOrders, error: updateError } = await supabase.from("orders").update({
     status: "paid", paid_at: new Date().toISOString(), payment_method: "stripe",
-    payment_payload: { checkout_session_id: session.id, payment_intent_id: session.payment_intent,
+    payment_payload: { ...order.payment_payload, checkout_session_id: session.id, payment_intent_id: session.payment_intent,
       amount_total: session.amount_total, currency: session.currency, payment_status: session.payment_status },
   }).eq("id", orderId).eq("status", "pending").select("id");
   if (updateError) throw new Error("Order payment update failed");
