@@ -66,7 +66,19 @@ async function authorizeOrderAccess(orderId: string, userId?: string, sessionId?
   const order = await readDeliveryOrder(orderId);
   if (userId && order.user_id === userId && canDeliverOrder(order)) return order;
   if (order.payment_payload?.share_payment === true && accessToken &&
-      validOrderAccessToken(orderId, accessToken) && canDeliverOrder(order)) return order;
+      validOrderAccessToken(orderId, accessToken)) {
+    if (canDeliverOrder(order)) return order;
+    // The recipient can verify a paid Checkout Session even when the webhook
+    // has not arrived yet. The payer still has no recipient token.
+    const storedSessionId = order.payment_payload?.checkout_session_id;
+    if (storedSessionId) {
+      const session = await retrieveStripeCheckout(storedSessionId);
+      if (session.metadata?.order_id === orderId && await confirmPaidOrder(session)) {
+        const confirmedOrder = await readDeliveryOrder(orderId);
+        if (canDeliverOrder(confirmedOrder)) return confirmedOrder;
+      }
+    }
+  }
 
   // The payer receives the Stripe session ID on return, but only the order
   // recipient may access shared-order downloads.
