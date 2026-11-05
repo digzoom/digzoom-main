@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from 'react-router';
 import {
   CreditCard, ShieldCheck, Lock, ArrowLeft, ArrowRight,
   Loader2, Shield, Clock, Headphones, Award, CheckCircle,
-  Smartphone, Globe, Tag, X
+  Smartphone, Globe, Tag, X, Share2, Copy, ExternalLink
 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -38,6 +38,9 @@ export default function Checkout() {
   const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
   const [loading, setLoading] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [recipientLink, setRecipientLink] = useState('');
+  const [sharedOrderId, setSharedOrderId] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<null | {
     code: string;
@@ -128,7 +131,7 @@ export default function Checkout() {
     return <Navigate to="/cart" replace />;
   }
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (sharePayment = false) => {
     if (!CHECKOUT_ENABLED) {
       toast.info(
         lang === 'ar'
@@ -165,17 +168,54 @@ export default function Checkout() {
         discount_amount: discount,
         coupon_code: appliedCoupon?.code,
         coupon_discount: appliedCoupon?.discountPercent || 0,
+        share_payment: sharePayment,
       });
 
-      // Store minimal order reference for thank-you page
+      if (!result.checkoutUrl) throw new Error('Missing secure checkout URL');
+      if (sharePayment) {
+        if (!result.recipientUrl) throw new Error('Missing recipient access link');
+        setShareLink(result.checkoutUrl);
+        setRecipientLink(result.recipientUrl);
+        setSharedOrderId(result.orderId);
+        // Keep the recipient's access on this device. The payer receives only
+        // the Stripe payment URL and never this private delivery link.
+        localStorage.setItem('lastOrderId', result.orderId);
+        localStorage.setItem('lastOrderEmail', finalEmail.trim().toLowerCase());
+        localStorage.setItem('lastOrderAccessOrderId', result.orderId);
+        localStorage.setItem('lastOrderAccessToken', new URL(result.recipientUrl).searchParams.get('access_token') || '');
+        toast.success(lang === 'ar' ? 'رابط الدفع جاهز للمشاركة' : 'Payment link ready to share');
+        setLoading(false);
+        return;
+      }
       localStorage.setItem('lastOrderId', result.orderId);
       localStorage.setItem('lastOrderEmail', finalEmail.trim().toLowerCase());
-      if (!result.checkoutUrl) throw new Error('Missing secure checkout URL');
       window.location.assign(result.checkoutUrl);
     } catch (error: any) {
       console.error('Checkout error:', error);
       toast.error(error.message || (lang === 'ar' ? 'فشل في إتمام الطلب' : 'Failed to complete order'));
       setLoading(false);
+    }
+  };
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      toast.success(lang === 'ar' ? 'تم نسخ رابط الدفع' : 'Payment link copied');
+    } catch {
+      toast.error(lang === 'ar' ? 'تعذر النسخ؛ انسخ الرابط يدويًا' : 'Copy failed; select the link manually');
+    }
+  };
+
+  const sendShareLink = async () => {
+    if (!navigator.share) { await copyShareLink(); return; }
+    try {
+      await navigator.share({
+        title: lang === 'ar' ? 'رابط دفع DigZoom' : 'DigZoom payment link',
+        text: lang === 'ar' ? 'يمكنك دفع هذا الطلب نيابةً عني:' : 'Please pay for this order:',
+        url: shareLink,
+      });
+    } catch (error) {
+      if ((error as Error)?.name !== 'AbortError') await copyShareLink();
     }
   };
 
@@ -500,7 +540,7 @@ export default function Checkout() {
 
             {/* Pay button (mobile bottom) */}
             <button
-              onClick={handleCheckout}
+              onClick={() => void handleCheckout(false)}
               disabled={loading || !CHECKOUT_ENABLED}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 active:scale-[0.98] text-white py-3.5 md:py-4 rounded-xl text-base md:text-lg font-medium transition-all shadow-lg shadow-blue-500/15 flex items-center justify-center gap-2"
             >
@@ -522,6 +562,47 @@ export default function Checkout() {
               )}
             </button>
 
+            {CHECKOUT_ENABLED && (
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-[#151520] p-4">
+                <p className="text-sm font-semibold text-white">
+                  {lang === 'ar' ? 'هل سيدفع شخص آخر عنك؟' : 'Someone else paying for you?'}
+                </p>
+                <p className="text-xs leading-5 text-gray-400">
+                  {lang === 'ar'
+                    ? 'أدخل اسمك وبريدك ورقمك أعلاه. شارك رابط الدفع فقط؛ ستبقى المنتجات لك بعد تأكيد الدفع.'
+                    : 'Enter your own name, email and phone above. Share only the payment link; the products remain yours after payment.'}
+                </p>
+                <button type="button" onClick={() => void handleCheckout(true)}
+                  disabled={loading || !CHECKOUT_ENABLED}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-400/40 px-4 py-3 text-sm font-semibold text-blue-300 transition hover:bg-blue-400/10 disabled:opacity-50">
+                  <Share2 className="h-4 w-4" />
+                  {lang === 'ar' ? 'إنشاء رابط ليُدفع عني' : 'Create a pay-for-me link'}
+                </button>
+                {shareLink && (
+                  <div className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3">
+                    <p className="text-sm font-semibold text-emerald-300">
+                      {lang === 'ar' ? 'شارك هذا الرابط مع من سيدفع' : 'Share this link with the payer'}
+                    </p>
+                    <input aria-label={lang === 'ar' ? 'رابط الدفع' : 'Payment link'} readOnly
+                      value={shareLink} onFocus={event => event.currentTarget.select()}
+                      className="w-full rounded-lg border border-white/10 bg-black/20 p-2.5 text-xs text-white" dir="ltr" />
+                    <div className="flex flex-wrap gap-2">
+                      <button type="button" onClick={() => void copyShareLink()} className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"><Copy className="h-4 w-4" />{lang === 'ar' ? 'نسخ الرابط' : 'Copy link'}</button>
+                      <button type="button" onClick={() => void sendShareLink()} className="flex items-center gap-2 rounded-lg border border-white/20 px-3 py-2 text-sm text-white"><Share2 className="h-4 w-4" />{lang === 'ar' ? 'مشاركة' : 'Share'}</button>
+                    </div>
+                    <p className="text-xs leading-5 text-amber-200">
+                      {lang === 'ar'
+                        ? 'رابط استلام المنتج خاص بك؛ لا تشاركه مع الدافع. رابط الدفع صالح لهذا الطلب فقط وقد تنتهي صلاحيته.'
+                        : 'Your delivery link is private; do not share it with the payer. The payment link is for this order only and may expire.'}
+                    </p>
+                    <a href={recipientLink} className="inline-flex items-center gap-2 text-xs text-blue-300 hover:underline">
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      {lang === 'ar' ? `عرض طلبي ${sharedOrderId} بعد الدفع` : `View my order ${sharedOrderId} after payment`}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
             {CHECKOUT_ENABLED && (
               <p className="text-gray-600 text-xs text-center flex items-center justify-center gap-1.5">
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
