@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { storefrontSections } from "@/data/storefrontSections";
 import SectionCard from "@/components/SectionCard";
 
-export default function DigitalHubHome() {
+// Netlify audit preview: no functional change\nexport default function DigitalHubHome() {
   const { lang } = useLanguage();
   const ar = lang === "ar";
   const Arrow = ar ? ArrowLeft : ArrowRight;
