@@ -79,8 +79,14 @@ export async function verifySupabaseToken(
       .maybeSingle();
 
     let resolvedRole: string;
-    if (!rolesErr && userRole?.is_active === true && userRole?.role) {
-      resolvedRole = userRole.role;
+    if (rolesErr) {
+      // A role lookup failure must never restore a stale privileged profile.
+      return undefined;
+    }
+    if (userRole) {
+      // An explicit role record is authoritative, including revocation.
+      resolvedRole = userRole.is_active === true && userRole.role
+        ? userRole.role : "user";
     } else {
       // Fallback: read from profiles
       const { data: profile, error: profileErr } = await admin
