@@ -99,7 +99,7 @@
 .section-frame--signal .section-frame__rail span:nth-child(3) { height:13px; }
 @media(prefers-reduced-motion:reduce) { .section-frame { transition:none; } .section-frame:hover { transform:none; } }
 
-.dz-nav {color:#17213a}.dz-nav>div>div>div:first-child{flex-direction:row-reverse}.dz-nav button,.dz-nav a,.dz-nav input{color:#27314b}.dz-nav input{background:#f6f7fa;border-color:#dfe3eb}.dz-nav a[aria-current=page]{color:#244dcc;background:#edf2ff}.dz-nav a:hover,.dz-nav button:hover{color:#244dcc;background:#f1f4ff}.dz-nav a[href='/login']{background:#234bce;color:white;box-shadow:none}.dz-nav button[title]{border-color:#dfe4ee;background:white}.dz-nav button[aria-label='Open menu'],.dz-nav button[aria-label='فتح القائمة']{border-color:#dde2ec}.dz-nav a[aria-label=DigZoom]{padding:0;border:0}.dz-wordmark{font:900 clamp(22px,2.25vw,34px)/1 Arial,sans-serif;letter-spacing:-2px;color:#15213d}.dz-wordmark strong,.dz-wordmark i{color:#244ed3}.dz-wordmark i{font-style:normal}.dz-nav div.absolute a,.dz-nav div.absolute button{color:white}
+.dz-nav{color:#e2e8f0}.dz-nav>div>div>div:first-child{flex-direction:row-reverse}.dz-nav a[aria-current=page]{color:#bfdbfe;background:rgba(59,130,246,.16)}.dz-nav a[aria-label=DigZoom]{padding:0;border:0;background:transparent}.dz-wordmark{font:900 clamp(22px,2.25vw,34px)/1 Arial,sans-serif;letter-spacing:-2px;color:#f8fafc}.dz-wordmark strong,.dz-wordmark i{color:#93c5fd}.dz-wordmark i{font-style:normal}
 @media(max-width:767px){.dz-nav>div>div{gap:4px}.dz-nav>div>div>div:first-child{gap:4px}}
 
 /* Gentle image movement keeps the slide copy stationary and readable. */

@@ -111,7 +111,7 @@ export default function StoreNavigation({user, isAdmin, logout}: NavigationProps
 
   return (
     <>
-      <nav className="dz-nav fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white">
+      <nav className="dz-nav fixed inset-x-0 top-0 z-50 border-b border-white/[0.07] bg-[rgba(7,10,16,.96)] shadow-[0_4px_30px_rgba(0,0,0,.28)] backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-3 lg:h-20">
             <div className="flex items-center gap-2">
