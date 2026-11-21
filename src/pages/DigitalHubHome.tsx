@@ -32,7 +32,7 @@ export default function DigitalHubHome() {
   const [heroHovered, setHeroHovered] = useState(false);
   const [heroFocused, setHeroFocused] = useState(false);
   const heroPaused = heroHovered || heroFocused;
-  const [manualPaused, setManualPaused] = useState(true);
+  const [manualPaused, setManualPaused] = useState(false);
 
   const slides = [
     {
@@ -101,7 +101,7 @@ export default function DigitalHubHome() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div onMouseEnter={() => setHeroHovered(true)} onMouseLeave={() => setHeroHovered(false)} onFocusCapture={() => setHeroFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroFocused(false); }} aria-roledescription={ar ? "عرض شرائح" : "carousel"} aria-label={ar ? "اكتشف DigZoom" : "Discover DigZoom"} className="dz-feature">
             <div className="dz-spread">
-            <div className="dz-art"><img src={current.image} alt="" fetchPriority="high" /><span dir="ltr" className="dz-index">DZ / DIGITAL SERIES <b>0{slide + 1}</b></span></div>
+            <div className="dz-art">{slides.map((item, index) => <div key={item.href} aria-hidden={index !== slide} className={`absolute inset-0 transition-opacity motion-reduce:transition-none ${index === slide ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}><img src={item.image} alt={item.title} fetchPriority={index === 0 ? 'high' : 'auto'} className={index === slide ? 'digzoom-hero-drift' : undefined} style={{animationPlayState: heroPaused || manualPaused ? 'paused' : 'running'}} /></div>)}<span dir="ltr" className="dz-index">DZ / DIGITAL SERIES <b>0{slide + 1}</b></span></div>
             <div className="dz-copy">
               <div>
                 <div className="dz-eyebrow"><span aria-hidden="true" />{slide === 0 ? (ar ? 'متجر ديج زوم الرقمي' : 'DIGZOOM DIGITAL STORE') : current.eyebrow}</div>
@@ -114,7 +114,7 @@ export default function DigitalHubHome() {
                   <Link onClick={slide === 0 ? (event) => { event.preventDefault(); document.getElementById("departments")?.scrollIntoView({ behavior: "smooth", block: "start" }); } : undefined} to={current.href} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 font-black text-white shadow-[0_18px_60px_rgba(59,130,246,.25)] md:min-h-14 md:px-7">
                     {current.cta}<Arrow className="h-5 w-5" />
                   </Link>
-                  {<Link to="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-indigo-300 bg-white px-5 font-bold text-slate-900 transition-colors hover:bg-indigo-50 md:min-h-14 md:border-white/30 md:bg-black/40 md:px-7 md:text-white md:backdrop-blur-xl md:hover:bg-black/60">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
+                  {slide !== 0 && <Link to="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-indigo-300 bg-white px-5 font-bold text-slate-900 transition-colors hover:bg-indigo-50 md:min-h-14 md:border-white/30 md:bg-black/40 md:px-7 md:text-white md:backdrop-blur-xl md:hover:bg-black/60">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
                 </div>
                 <div className={`mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold md:mt-8 md:gap-x-6 md:gap-y-3 md:text-sm ${slide === 0 ? "text-slate-600" : "text-slate-600 md:text-slate-200"}`}>
                   <span className="inline-flex items-center gap-2"><Zap className={`h-4 w-4 text-amber-700 ${slide === 0 ? "" : "md:text-amber-300"}`} />{ar ? "تسليم رقمي" : "Digital delivery"}</span>
