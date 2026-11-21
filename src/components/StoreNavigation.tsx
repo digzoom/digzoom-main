@@ -129,6 +129,9 @@ export default function StoreNavigation({user, isAdmin, logout}: NavigationProps
                 className="group flex shrink-0 items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.035] py-1.5 pe-3 ps-1.5 transition hover:border-blue-400/30 hover:bg-white/[0.06]"
                 aria-label="DigZoom"
               >
+                <span className="h-7 w-7 shrink-0 overflow-hidden rounded-[.6rem] ring-1 ring-blue-400/25 sm:h-9 sm:w-9">
+                  <img src="/images/digzoom-logo-side-new.jpg" alt="" className="h-full w-full object-cover" width={36} height={36} />
+                </span>
                 <span className="dz-wordmark" dir="ltr">Dig<strong>Zoom</strong><i>.</i></span>
               </Link>
             </div>

@@ -101,6 +101,7 @@
 
 .dz-nav{color:#e2e8f0}.dz-nav>div>div>div:first-child{flex-direction:row-reverse}.dz-nav a[aria-current=page]{color:#bfdbfe;background:rgba(59,130,246,.16)}.dz-nav a[aria-label=DigZoom]{padding:0;border:0;background:transparent}.dz-wordmark{font:900 clamp(22px,2.25vw,34px)/1 Arial,sans-serif;letter-spacing:-2px;color:#f8fafc}.dz-wordmark strong,.dz-wordmark i{color:#93c5fd}.dz-wordmark i{font-style:normal}
 @media(max-width:767px){.dz-nav>div>div{gap:4px}.dz-nav>div>div>div:first-child{gap:4px}}
+@media(max-width:399px){.dz-nav>div{padding-inline:8px}.dz-nav a[aria-label=DigZoom]{gap:4px}.dz-nav a[aria-label=DigZoom]>span:first-child{width:24px;height:24px}.dz-wordmark{font-size:18px;letter-spacing:-1px}.dz-nav button[aria-label='Open menu'],.dz-nav button[aria-label='فتح القائمة']{padding-inline:7px}}
 
 /* Gentle image movement keeps the slide copy stationary and readable. */
 @keyframes digzoom-hero-drift {
