@@ -23,10 +23,14 @@ import { storefrontSections } from "@/data/storefrontSections";
 import SectionCard from "@/components/SectionCard";
 
 export default function DigitalHubHome() {
+  const catalog = useSupabaseProducts();
+  return <StorefrontView {...catalog} />;
+}
+
+export function StorefrontView({products, categories: dbCategories, loading}: Pick<ReturnType<typeof useSupabaseProducts>, 'products' | 'categories' | 'loading'>) {
   const { lang } = useLanguage();
   const ar = lang === "ar";
   const Arrow = ar ? ArrowLeft : ArrowRight;
-  const { products, categories: dbCategories, loading } = useSupabaseProducts();
   const { addToCart } = useCart();
   const [slide, setSlide] = useState(0);
   const [heroHovered, setHeroHovered] = useState(false);
