@@ -32,11 +32,11 @@ export default function DigitalHubHome() {
   const [heroHovered, setHeroHovered] = useState(false);
   const [heroFocused, setHeroFocused] = useState(false);
   const heroPaused = heroHovered || heroFocused;
-  const [manualPaused, setManualPaused] = useState(false);
+  const [manualPaused, setManualPaused] = useState(true);
 
   const slides = [
     {
-      image: "/images/digzoom/store-hero-lifestyle-v1.webp",
+      image: "/images/digzoom/digital-studio.png",
       eyebrow: ar ? "DIGZOOM STORE" : "DIGZOOM STORE",
       title: ar ? "عالمك الرقمي،" : "Your digital world,",
       accent: ar ? "في مكان واحد." : "in one place.",
@@ -97,24 +97,15 @@ export default function DigitalHubHome() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f6f7fb] text-slate-950">
-      <section className="relative bg-[#f3f0ff] pb-6 pt-24 md:pb-10 md:pt-28">
+      <section className="dz-landing bg-white pt-20 lg:pt-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div onMouseEnter={() => setHeroHovered(true)} onMouseLeave={() => setHeroHovered(false)} onFocusCapture={() => setHeroFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroFocused(false); }} aria-roledescription={ar ? "عرض شرائح" : "carousel"} aria-label={ar ? "اكتشف DigZoom" : "Discover DigZoom"} className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-blue-400/60 via-indigo-300/40 to-violet-500/60 p-[2px] shadow-[0_20px_60px_rgba(79,70,229,.14)]">
-            <div className={`relative overflow-hidden rounded-[30px] bg-[#f7f4ff] text-slate-950 ${slide === 0 ? "" : "md:bg-[#11132d] md:text-white"}`}>
-            {/* Mobile art uses its own taller crop; desktop keeps the original full banner. */}
-            <div aria-hidden="true" className="aspect-[3/2] md:hidden" />
-            {slides.map((item, index) => (
-              <div key={item.href} aria-hidden={index !== slide} className={`absolute inset-x-0 top-0 aspect-[3/2] overflow-hidden md:inset-0 md:aspect-auto transition-opacity duration-700 ${index === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-                <img src={item.image} alt={item.title} style={{ animationPlayState: heroPaused || manualPaused ? "paused" : "running" }} className={`${index === slide ? "digzoom-hero-drift " : ""}${index === 0 ? "h-full w-full object-cover object-left md:object-contain md:object-top" : "h-full w-full object-cover"}`} />
-                {index !== 0 && <div className="absolute inset-0 hidden bg-gradient-to-r from-[#11132d]/90 via-[#141633]/65 to-[#161c43]/10 md:block rtl:bg-gradient-to-l" />}
-              </div>
-            ))}
-
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] rounded-[30px] bg-[radial-gradient(ellipse_at_top_left,rgba(96,165,250,.12),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(167,139,250,.14),transparent_50%)] ring-1 ring-inset ring-indigo-200/20" />
-            <div className="relative z-10 flex items-end px-5 pb-20 pt-6 sm:px-7 md:min-h-[600px] md:px-10 md:pt-36 lg:px-12">
-              <div className={slide === 0 ? "w-full md:ml-auto md:max-w-[43%]" : "max-w-2xl"}>
-                {slide !== 0 && <div className="mb-4 inline-flex rounded-full border border-indigo-200 bg-indigo-100 px-3 py-1.5 text-xs font-black tracking-[.06em] md:px-4 md:py-2 md:text-sm md:tracking-[.14em] text-indigo-950 md:border-indigo-200/30 md:bg-black/30 md:text-indigo-100 md:backdrop-blur-xl md:absolute md:top-24">{current.eyebrow}</div>}
-                <h1 className="text-[30px] font-black leading-[1.25] tracking-[-.04em] sm:text-4xl md:min-h-[126px] md:text-5xl">
+          <div onMouseEnter={() => setHeroHovered(true)} onMouseLeave={() => setHeroHovered(false)} onFocusCapture={() => setHeroFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHeroFocused(false); }} aria-roledescription={ar ? "عرض شرائح" : "carousel"} aria-label={ar ? "اكتشف DigZoom" : "Discover DigZoom"} className="dz-feature">
+            <div className="dz-spread">
+            <div className="dz-art"><img src={current.image} alt="" fetchPriority="high" /><span dir="ltr" className="dz-index">DZ / DIGITAL SERIES <b>0{slide + 1}</b></span></div>
+            <div className="dz-copy">
+              <div>
+                <div className="dz-eyebrow"><span aria-hidden="true" />{slide === 0 ? (ar ? 'متجر ديج زوم الرقمي' : 'DIGZOOM DIGITAL STORE') : current.eyebrow}</div>
+                <h1>
                   {current.title}
                   <span className={`mt-2 block bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-700 bg-clip-text text-transparent ${slide === 0 ? "" : "md:from-blue-300 md:via-indigo-300 md:to-violet-300"}`}>{current.accent}</span>
                 </h1>
@@ -123,7 +114,7 @@ export default function DigitalHubHome() {
                   <Link onClick={slide === 0 ? (event) => { event.preventDefault(); document.getElementById("departments")?.scrollIntoView({ behavior: "smooth", block: "start" }); } : undefined} to={current.href} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 font-black text-white shadow-[0_18px_60px_rgba(59,130,246,.25)] md:min-h-14 md:px-7">
                     {current.cta}<Arrow className="h-5 w-5" />
                   </Link>
-                  {slide !== 0 && <Link to="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-indigo-300 bg-white px-5 font-bold text-slate-900 transition-colors hover:bg-indigo-50 md:min-h-14 md:border-white/30 md:bg-black/40 md:px-7 md:text-white md:backdrop-blur-xl md:hover:bg-black/60">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
+                  {<Link to="/shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-indigo-300 bg-white px-5 font-bold text-slate-900 transition-colors hover:bg-indigo-50 md:min-h-14 md:border-white/30 md:bg-black/40 md:px-7 md:text-white md:backdrop-blur-xl md:hover:bg-black/60">{ar ? "استكشف المتجر" : "Explore store"}</Link>}
                 </div>
                 <div className={`mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold md:mt-8 md:gap-x-6 md:gap-y-3 md:text-sm ${slide === 0 ? "text-slate-600" : "text-slate-600 md:text-slate-200"}`}>
                   <span className="inline-flex items-center gap-2"><Zap className={`h-4 w-4 text-amber-700 ${slide === 0 ? "" : "md:text-amber-300"}`} />{ar ? "تسليم رقمي" : "Digital delivery"}</span>
@@ -143,7 +134,8 @@ export default function DigitalHubHome() {
       </section>
 
       <section id="departments" className="scroll-mt-24 bg-white"><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-5 flex items-end justify-between gap-3"><div><div className="dz-kicker" dir="ltr">01 / DIRECTORY</div><h2 className="text-2xl font-black tracking-tight md:text-3xl">{ar ? 'تسوّق حسب القسم' : 'Shop by department'}</h2></div><Link to="/shop" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700">{ar ? 'عرض الكل' : 'View all'}<Arrow size={16}/></Link></div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {storefrontSections.map(section => <SectionCard key={section.slug} section={section} ar={ar} count={counts[section.slug]} />)}
         </div>
       </div></section>

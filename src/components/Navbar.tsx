@@ -110,7 +110,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.07] bg-[rgba(7,10,16,.96)] shadow-[0_4px_30px_rgba(0,0,0,.28)] backdrop-blur-xl">
+      <nav className="dz-nav fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-3 lg:h-20">
             <div className="flex items-center gap-2">
@@ -128,13 +128,7 @@ export default function Navbar() {
                 className="group flex shrink-0 items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.035] py-1.5 pe-3 ps-1.5 transition hover:border-blue-400/30 hover:bg-white/[0.06]"
                 aria-label="DigZoom"
               >
-                <div className="h-8 w-8 overflow-hidden rounded-[.7rem] ring-1 ring-blue-400/25 shadow-[0_0_18px_rgba(59,130,246,.2)] sm:h-9 sm:w-9">
-                  <img src="/images/digzoom-logo-side-new.jpg" alt="DigZoom" className="h-full w-full object-cover" />
-                </div>
-                <span className="hidden min-[400px]:inline text-base font-black tracking-tight sm:text-lg">
-                  <span className="text-white">Dig</span>
-                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoom</span>
-                </span>
+                <span className="dz-wordmark" dir="ltr">Dig<strong>Zoom</strong><i>.</i></span>
               </Link>
             </div>
 
@@ -143,6 +137,7 @@ export default function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
+                  aria-current={location.pathname + location.search === link.path ? 'page' : undefined}
                   className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-400 transition hover:bg-white/[.04] hover:text-white"
                 >
                   {link.name}
@@ -155,6 +150,7 @@ export default function Navbar() {
                 <Search className={`absolute top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 ${isAr ? "right-3" : "left-3"}`} />
                 <input
                   name="search"
+                  aria-label={isAr ? 'ابحث عن منتج' : 'Search products'}
                   type="search"
                   placeholder={isAr ? "ابحث عن منتج..." : "Search products..."}
                   className={`w-full rounded-xl border border-white/10 bg-white/[.05] py-2.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400/40 focus:bg-white/[.07] ${isAr ? "pr-10 pl-3" : "pl-10 pr-3"}`}

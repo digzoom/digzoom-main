@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [inspectAttr(), react()],
   server: {
     port: 3000,
+    allowedHosts: ['difzoom-6a64b7aa4e3654e0.v0.build'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
