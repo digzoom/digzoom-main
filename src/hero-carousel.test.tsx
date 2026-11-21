@@ -33,7 +33,7 @@ const copy = {
   },
 };
 const images = [
-  '/images/digzoom/digital-studio.png',
+  '/images/digzoom/store-hero-lifestyle-v1.webp',
   '/images/digzoom/growth-hero-live-v3.webp',
   '/images/digzoom/creator-partner-live.webp',
 ];
@@ -280,16 +280,20 @@ describe('home hero carousel', () => {
     expectSlide(1);
   });
 
-  it('keeps slide artwork separate from the text and primary action', async () => {
+  it('keeps a single light mobile surface, with darker slide colors scoped to desktop', async () => {
     await render();
     for (const index of [0, 1, 2]) {
       await click(button(`Slide ${index + 1}`));
-      const art = hero().querySelector('.dz-art')!;
-      const copyPanel = hero().querySelector('.dz-copy')!;
-      expect(art.parentElement).toBe(copyPanel.parentElement);
-      expect(art.querySelector('h1, a')).toBeNull();
-      expect(copyPanel.querySelector('h1')).not.toBeNull();
-      expect(copyPanel.querySelector('a')).not.toBeNull();
+      // This protects the responsive class contract, not browser layout or computed contrast.
+      const surface = hero().firstElementChild!;
+      expect(surface.classList.contains('bg-[#f7f4ff]')).toBe(true);
+      expect(surface.classList.contains('text-slate-950')).toBe(true);
+      expect(surface.classList.contains('bg-[#11132d]')).toBe(false);
+      expect(surface.classList.contains('text-white')).toBe(false);
+      if (index !== 0) {
+        expect(surface.classList.contains('md:bg-[#11132d]')).toBe(true);
+        expect(surface.classList.contains('md:text-white')).toBe(true);
+      }
     }
   });
 });
