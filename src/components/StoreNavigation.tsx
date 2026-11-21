@@ -227,7 +227,7 @@ export default function StoreNavigation({user, isAdmin, logout}: NavigationProps
             </div>
 
             <div className="p-4">
-              <div className="mb-3 text-xs font-black uppercase tracking-[.18em] text-blue-400">{isAr ? "تصفّح ديج زوم" : "Explore DigZoom"}</div>
+              <div className="mb-3 text-sm font-black text-blue-300">{isAr ? "تصفّح ديج زوم" : "Explore DigZoom"}</div>
               <div className="space-y-1">
                 {sideLinks(isAr).map(({ name, path, icon: Icon }) => {
                   const detail = menuDetails[path];
@@ -242,10 +242,10 @@ export default function StoreNavigation({user, isAdmin, logout}: NavigationProps
                         <span className="absolute -bottom-1 -end-1 flex h-[19px] min-w-[19px] items-center justify-center rounded-md border border-[#090d15] px-1 text-[9px] font-black text-[#090d15]" style={{ background: detail.color }}>{detail.badge}</span>
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-extrabold leading-6 group-hover:text-white">{name}</span>
-                        <span className="block text-[11px] font-medium leading-5 text-slate-400">{isAr ? detail.ar : detail.en}</span>
+                        <span className="block text-base font-extrabold leading-6 text-slate-50 group-hover:text-white">{name}</span>
+                        <span className="block text-[13px] font-medium leading-5 text-slate-300">{isAr ? detail.ar : detail.en}</span>
                       </span>
-                      <span aria-hidden="true" className="text-lg text-slate-600 group-hover:text-slate-300">{isAr ? '‹' : '›'}</span>
+                      <span aria-hidden="true" className="text-lg text-slate-400 group-hover:text-white">{isAr ? '‹' : '›'}</span>
                     </Link>
                   );
                 })}
