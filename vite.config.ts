@@ -6,9 +6,21 @@ import { inspectAttr } from 'kimi-plugin-inspect-react'
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
-  plugins: [inspectAttr(), react()],
+  plugins: [inspectAttr(), react(), {
+    name: 'isolated-design-review',
+    apply: 'serve',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html, ctx) {
+        const env = ctx.server?.config.env;
+        return !env?.VITE_SUPABASE_URL || !env?.VITE_SUPABASE_ANON_KEY
+          ? html.replace('/src/main.tsx', '/src/design-review.tsx') : html;
+      },
+    },
+  }],
   server: {
     port: 3000,
+    allowedHosts: ['difzoom-6a64b7aa4e3654e0.v0.build'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
